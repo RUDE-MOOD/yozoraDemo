@@ -1,28 +1,59 @@
-import { useEnvironment } from '@react-three/drei'
+import { Stars } from '@react-three/drei'
 import * as THREE from 'three'
-import { useEffect } from 'react'
 
-export function SkyDome() {
-  const texture = useEnvironment({ files: 'textures/puresky2k.exr' })
-
-  useEffect(() => {
-    texture.mapping = THREE.UVMapping
-    texture.repeat.set(1, 0.5)
-    texture.offset.set(0, 0.5)
-    texture.needsUpdate = true
-  }, [texture])
-
+const GradientSky = () => {
   return (
-
-    // 半球体（ドーム）をベースにする
     <mesh>
-      <sphereGeometry args={[200, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
-      <meshBasicMaterial
-        map={texture}
+      <sphereGeometry args={[200, 32, 32]} />
+      <shaderMaterial
         side={THREE.BackSide}
-        toneMapped={false}
+        uniforms={{
+          colorTop: { value: new THREE.Color('#000000') },
+          colorBottom: { value: new THREE.Color('#101035') } // Deep glowing night blue
+        }}
+        vertexShader={`
+          varying vec3 vWorldPosition;
+          void main() {
+            vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+            vWorldPosition = worldPosition.xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+          }
+        `}
+        fragmentShader={`
+          uniform vec3 colorTop;
+          uniform vec3 colorBottom;
+          varying vec3 vWorldPosition;
+          void main() {
+            vec3 pointOnSphere = normalize(vWorldPosition);
+            // Gradient from bottom (y=-1) to top (y=1)
+            // But usually we just want the horizon glow.
+            // Let's map y from -1 to 1 to a 0-1 gradient
+            float t = smoothstep(-0.5, 0.5, pointOnSphere.y);
+            
+            vec3 finalColor = mix(colorBottom, colorTop, t);
+            gl_FragColor = vec4(finalColor, 1.0);
+          }
+        `}
       />
     </mesh>
+  )
+}
+
+export function SkyDome() {
+  return (
+    <>
+      <GradientSky />
+      {/* High performance procedural stars */}
+      <Stars
+        radius={150} // Radius of the inner sphere (smaller than sky sphere)
+        depth={50}   // Depth of star field
+        count={5000} // Number of stars
+        factor={4}   // Size factor
+        saturation={0}
+        fade         // Fade at edges
+        speed={1}    // Twinkle speed
+      />
+    </>
   )
 }
 

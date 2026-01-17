@@ -10,7 +10,8 @@ export const Experience = () => {
       <Suspense fallback={null}>
         <SkyDome />
         <Earth />
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={1} />
+        <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>
       <OrbitControls
         enablePan={false}
