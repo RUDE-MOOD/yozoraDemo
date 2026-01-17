@@ -1,17 +1,24 @@
-import { Environment, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
+import { SkyDome } from "./Skydome";
+import { Earth } from "./Earth";
+import { Suspense } from "react";
 
 
 export const Experience = () => {
   return (
     <>
-      <OrbitControls />
-      <Environment preset="city" />
-      <mesh position={[0, 0, 0]} rotation-y={Math.PI / 4}>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="white" />
-      </mesh>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[0, 3, 5]} intensity={0.5} />
+      <Suspense fallback={null}>
+        <SkyDome />
+        <Earth />
+        <ambientLight intensity={0.5} />
+      </Suspense>
+      <OrbitControls
+        enablePan={false}
+        minPolarAngle={Math.PI / 2}
+        autoRotate={true}
+        autoRotateSpeed={0.05}
+      />
+
     </>
   );
 };
