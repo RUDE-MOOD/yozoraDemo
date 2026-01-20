@@ -7,6 +7,8 @@ const GradientSky = () => {
       <sphereGeometry args={[200, 32, 32]} />
       <shaderMaterial
         side={THREE.BackSide}
+        // depthWriteを使って、GradientSkyが他のオブジェクトを覆い隠さないようにする
+        depthWrite={false}
         uniforms={{
           colorTop: { value: new THREE.Color('#000000') },
           colorBottom: { value: new THREE.Color('#101035') } // Deep glowing night blue
@@ -44,6 +46,7 @@ export function SkyDome() {
     <>
       <GradientSky />
       {/* High performance procedural stars */}
+      {/* 背景の星 */}
       <Stars
         radius={150} // Radius of the inner sphere (smaller than sky sphere)
         depth={50}   // Depth of star field

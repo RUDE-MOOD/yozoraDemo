@@ -1,4 +1,4 @@
-import { MeshReflectorMaterial, Float, Sparkles, Icosahedron } from "@react-three/drei";
+import { MeshReflectorMaterial,  Sparkles } from "@react-three/drei";
 
 export const Earth = () => {
   return (
@@ -25,7 +25,7 @@ export const Earth = () => {
       </mesh>
 
 
-
+      {/* 近距離の星 */}
       <Sparkles
         scale={[50, 20, 50]}
         position={[0, 10, 0]}
