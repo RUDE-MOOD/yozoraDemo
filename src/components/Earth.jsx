@@ -31,7 +31,7 @@ export const Earth = () => {
         position={[0, 10, 0]}
         count={500}
         size={10}
-        speed={1}
+        speed={1.3}
         opacity={0.7}
         color="#ffffff"
       />
