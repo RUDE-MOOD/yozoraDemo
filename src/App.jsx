@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { Experience } from "./components/Experience";
-import { PerspectiveCamera } from "@react-three/drei";
+import { Effects } from "./components/Effects";
 function App() {
   return (
     <>
@@ -11,6 +11,7 @@ function App() {
       >
         <color attach="background" args={['#101020']} />
         <Experience />
+        <Effects />
       </Canvas>
     </>
   );
