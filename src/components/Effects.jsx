@@ -12,26 +12,26 @@ import { BlendFunction } from "postprocessing";
 
 export const Effects = () => {
   const vignetteConfig = useControls("vignette", {
-    enabled: true,
+    enabled: false,
     offset: { value: 0.1, min: 0, max: 1 },
     darkness: { value: 0.92, min: 0, max: 1 },
   });
 
   const bloomConfig = useControls("bloom", {
-    enabled: true,
+    enabled: false,
     luminanceThreshold: { value: 1, min: 0, max: 2 },
     intensity: { value: 1.28, min: 0, max: 2 },
     mipmapBlur: true,
   });
 
   const brightnessContrastConfig = useControls("brightnessContrast", {
-    enabled: true,
+    enabled: false,
     brightness: { value: 0.02, min: -1, max: 1 },
     contrast: { value: -0.1, min: -1, max: 1 },
   });
 
   const sepiaConfig = useControls("sepia", {
-    enabled: true,
+    enabled: false,
     blendFunction: {
       value: "DARKEN",
       options: Object.keys(BlendFunction),
@@ -39,12 +39,12 @@ export const Effects = () => {
   });
 
   const noiseConfig = useControls("noise", {
-    enabled: true,
+    enabled: false,
     opacity: { value: 0.1, min: 0, max: 1 },
   });
 
   const autofocusConfig = useControls("autofocus", {
-    enabled: true,
+    enabled: false,
     mouse: true,
     focusRange: { value: 0.001, min: 0, max: 0.01 },
     bokehScale: { value: 8, min: 0, max: 40 },
