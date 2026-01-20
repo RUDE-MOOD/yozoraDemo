@@ -3,7 +3,7 @@ import { MeshReflectorMaterial, Float, Sparkles, Icosahedron } from "@react-thre
 export const Earth = () => {
   return (
     <group position={[0, -2, 0]}>
-      {/* 1. The Water Surface */}
+      {/* The Water Surface */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[200, 64]} />
         <MeshReflectorMaterial
@@ -30,8 +30,8 @@ export const Earth = () => {
         scale={[50, 20, 50]}
         position={[0, 10, 0]}
         count={500}
-        size={3}
-        speed={0.4}
+        size={10}
+        speed={1}
         opacity={0.7}
         color="#ffffff"
       />

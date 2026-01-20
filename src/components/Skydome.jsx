@@ -48,10 +48,10 @@ export function SkyDome() {
         radius={150} // Radius of the inner sphere (smaller than sky sphere)
         depth={50}   // Depth of star field
         count={5000} // Number of stars
-        factor={4}   // Size factor
+        factor={10}   // Size factor
         saturation={0}
         fade         // Fade at edges
-        speed={1}    // Twinkle speed
+        speed={3}    // Twinkle speed
       />
     </>
   )
