@@ -35,7 +35,7 @@ export const Experience = () => {
         maxZoom={1}
         azimuthRotateSpeed={0}
         polarRotateSpeed={0}
-        truckSpeed={1}
+        truckSpeed={5} //ドラッグ速度
         mouseButtons={{
           left: 2, // ACTION.TRUCK
           middle: 0,
