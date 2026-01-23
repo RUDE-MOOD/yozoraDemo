@@ -5,6 +5,19 @@ import { SkyBox } from "./SkyBox";
 import { Suspense } from "react";
 
 
+// Custom component to clamp camera position manually
+const FrameLimiter = () => {
+  useFrame(({ camera }) => {
+    // Hard limits for position (panning)
+    // Background is 1000x500. 
+    // Clamp X to -400..400 and Y to -200..200 to keep edges hidden.
+    // We do NOT clamp Z here, to allow zooming via CameraControls.
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -300, 300);
+    camera.position.y = THREE.MathUtils.clamp(camera.position.y, -150, 150);
+  });
+  return null;
+}
+
 export const Experience = () => {
   return (
     <>
@@ -13,6 +26,8 @@ export const Experience = () => {
         <ambientLight intensity={1} />
         <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>
+
+      <FrameLimiter />
 
       <CameraControls
         minZoom={0.5}        // Limit zoom level
