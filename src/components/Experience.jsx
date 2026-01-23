@@ -31,8 +31,8 @@ export const Experience = () => {
       <FrameLimiter />
 
       <CameraControls
-        minZoom={1}
-        maxZoom={1}
+        minZoom={0.5}
+        maxZoom={2}
         azimuthRotateSpeed={0}
         polarRotateSpeed={0}
         truckSpeed={5} //ドラッグ速度
@@ -40,7 +40,7 @@ export const Experience = () => {
           left: 2, // ACTION.TRUCK
           middle: 0,
           right: 0,
-          wheel: 0
+          wheel: 16 // ACTION.ZOOM (Controls magnification/zoom ratio)
         }}
         touches={{
           one: 2, // ACTION.TRUCK
