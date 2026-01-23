@@ -94,7 +94,7 @@ const FluidMaterial = shaderMaterial(
     }
 
     void main() {
-        vec2 st = vUv * 3.0; // Scale
+        vec2 st = vUv * 12.0; // Scale adjusted for 1000x500 geometry (was 3.0 for 240x120)
         // Animate the noise
         float q = fbm(st + vec2(time * 0.05, time * 0.02));
         
@@ -218,7 +218,7 @@ const FogMaterial = shaderMaterial(
     }
 
     void main() {
-        vec2 uv = vUv * 2.0;
+        vec2 uv = vUv * 8.0; // Scale adjusted for 1000x500 geometry (was 2.0 for 240x120)
         // Moving fog
         float q = fbm(uv + time * 0.05);
         
@@ -246,13 +246,13 @@ export function SkyBox() {
     <group name="SkyBox">
       {/* 1. Background Layer (Furthest) - Universe Color */}
       <mesh position={[0, 0, -50]} name="Layer1_Background">
-        <planeGeometry args={[240, 120]} />
+        <planeGeometry args={[1000, 500]} />
         <backgroundMaterial colorTop="#000000" colorBottom="#101035" />
       </mesh>
 
       {/* 2. Fluid Layer (Milky Way) - Slightly closer */}
       <mesh position={[0, 0.01, -40]} name="Layer2_Fluid">
-        <planeGeometry args={[240, 120]} />
+        <planeGeometry args={[1000, 500]} />
         <fluidMaterial
           ref={fluidRef}
           colorA="#101035"
@@ -265,11 +265,11 @@ export function SkyBox() {
 
       {/* 3. Distant Stars - Static noise with Twinkle */}
       <mesh position={[0, 0.02, -30]} name="Layer3_DistantStars">
-        <planeGeometry args={[240, 120]} />
+        <planeGeometry args={[1000, 500]} />
         <starsMaterial
           ref={starsRef}
           color="#ffffff"
-          density={40.0}
+          density={160.0} // Adjusted for 1000x500 (was 40.0)
           size={1.5}
           transparent
           depthWrite={false}
@@ -278,7 +278,7 @@ export function SkyBox() {
 
       {/* 4. Fog Layer - Volume illusion */}
       <mesh position={[0, 0.03, -20]} name="Layer4_Fog">
-        <planeGeometry args={[240, 120]} />
+        <planeGeometry args={[1000, 500]} />
         <fogMaterial
           ref={fogRef}
           color="#aaaaff"
