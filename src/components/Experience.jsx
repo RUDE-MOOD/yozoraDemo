@@ -45,7 +45,7 @@ export const Experience = () => {
         }}
         touches={{
           one: 2,
-          two: 0,
+          two: 16, // 16: ZOOM
           three: 0
         }}
         imgui={false}
