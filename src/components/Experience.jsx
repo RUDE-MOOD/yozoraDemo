@@ -30,25 +30,25 @@ export const Experience = () => {
       <FrameLimiter />
 
       <CameraControls
-        minZoom={0.5}        // Limit zoom level
-        maxZoom={2}          // Limit max zoom
-        minDistance={10}     // Closest distance (camera start is 10)
-        maxDistance={100}    // Furthest distance (prevents infinite shrink)
-        azimuthRotateSpeed={0}
-        polarRotateSpeed={0}
-        truckSpeed={5}
+        minZoom={0.5}        // 最小ズーム倍率 (これ以上縮小できない)
+        maxZoom={2}          // 最大ズーム倍率 (これ以上拡大できない)
+        minDistance={10}     // カメラの最小距離 (被写体に近づける限界)
+        maxDistance={100}    // カメラの最大距離 (被写体から離れられる限界 - これで黒い背景が見えるのを防ぐ)
+        azimuthRotateSpeed={0} // 水平方向の回転速度 (0 = 回転無効)
+        polarRotateSpeed={0}   // 垂直方向の回転速度 (0 = 回転無効)
+        truckSpeed={5}         // 平行移動(ドラッグ)の速度
         mouseButtons={{
-          left: 2,
-          middle: 0,
-          right: 0,
-          wheel: 16
+          left: 2,   // 左クリック: 2 = TRUCK (平行移動)
+          middle: 0, // ミドルクリック: 0 = 無効
+          right: 0,  // 右クリック: 0 = 無効
+          wheel: 16  // ホイールスクロール: 16 = ZOOM (ズーム)
         }}
         touches={{
-          one: 2,
-          two: 16, // 16: ZOOM
-          three: 0
+          one: 2,    // 1本指タッチ: 2 = TRUCK (平行移動)
+          two: 16,   // 2本指タッチ: 16 = ZOOM (ピンチズーム)
+          three: 0   // 3本指タッチ: 0 = 無効
         }}
-        imgui={false}
+        imgui={false} // デバッグUIの表示 (false = 非表示)
       />
 
     </>

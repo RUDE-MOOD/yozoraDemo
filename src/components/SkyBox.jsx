@@ -245,12 +245,23 @@ export function SkyBox() {
   return (
     <group name="SkyBox">
       {/* 1. Background Layer (Furthest) - Universe Color */}
+      {/* 
+         第一層: 背景レイヤー 
+         一番奥に配置される宇宙のベースカラー。
+         position Z: -50 (一番遠い)
+      */}
       <mesh position={[0, 0, -50]} name="Layer1_Background">
         <planeGeometry args={[1000, 500]} />
         <backgroundMaterial colorTop="#000000" colorBottom="#101035" />
       </mesh>
 
       {/* 2. Fluid Layer (Milky Way) - Slightly closer */}
+      {/* 
+         第二層: 流体/天の川レイヤー
+         ノイズを使った流れるような星雲の表現。
+         position Z: -40 
+         depthWrite={false}: 奥にある物体を隠さないようにする設定
+      */}
       <mesh position={[0, 0.01, -40]} name="Layer2_Fluid">
         <planeGeometry args={[1000, 500]} />
         <fluidMaterial
@@ -258,25 +269,38 @@ export function SkyBox() {
           colorA="#101035"
           colorB="#551a8b"
           transparent
-          blending={THREE.AdditiveBlending}
+          blending={THREE.AdditiveBlending} // 加算合成: 光り輝くような表現
           depthWrite={false}
         />
       </mesh>
 
       {/* 3. Distant Stars - Static noise with Twinkle */}
+      {/* 
+         第三層: 遠景の星レイヤー
+         瞬く星々を描画。
+         position Z: -30
+         density: 星の密度 (値が大きいほど星が増える)
+         size: 星の大きさ
+      */}
       <mesh position={[0, 0.02, -30]} name="Layer3_DistantStars">
         <planeGeometry args={[1000, 500]} />
         <starsMaterial
           ref={starsRef}
           color="#ffffff"
-          density={160.0} // Adjusted for 1000x500 (was 40.0)
-          size={1.5}
+          density={160.0} // 星の数を調整 (以前は40.0)
+          size={1.5}      // 星のサイズ
           transparent
           depthWrite={false}
         />
       </mesh>
 
       {/* 4. Fog Layer - Volume illusion */}
+      {/* 
+         第四層: フォグ(霧)レイヤー
+         前に配置することで奥行き感を出す薄い霧。
+         position Z: -20 (一番手前)
+         opacity: 透明度 (0.2 = 薄い, 1.0 = 不透明)
+      */}
       <mesh position={[0, 0.03, -20]} name="Layer4_Fog">
         <planeGeometry args={[1000, 500]} />
         <fogMaterial
