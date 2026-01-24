@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
   margin: 0;
   padding: 0;
@@ -11,4 +13,20 @@ body,
   height: 100vh;
   overflow: hidden;
   background-color: #000000;
+}
+
+@keyframes fade-in-char {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-char {
+  animation: fade-in-char 0.5s ease-out forwards;
 }

@@ -1,6 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { Experience } from "./components/Experience";
 import { Effects } from "./components/Effects";
+import { UI } from "./components/UI";
 import { Leva } from "leva";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Experience />
         <Effects />
       </Canvas>
+      <UI />
     </>
   );
 }

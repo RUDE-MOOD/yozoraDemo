@@ -26,6 +26,7 @@ export const Experience = () => {
         <SkyBox />
         <MyStars />
         <ambientLight intensity={1} />
+        <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>
 
       <FrameLimiter />
