@@ -2,6 +2,7 @@ import { CameraControls, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
 import { SkyBox } from "./SkyBox";
+import { MyStars } from "./MyStars";
 import { Suspense } from "react";
 
 
@@ -23,8 +24,8 @@ export const Experience = () => {
     <>
       <Suspense fallback={null}>
         <SkyBox />
+        <MyStars />
         <ambientLight intensity={1} />
-        <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>
 
       <FrameLimiter />
