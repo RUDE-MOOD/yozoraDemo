@@ -1,10 +1,59 @@
 import { Canvas } from "@react-three/fiber";
+import { useState } from "react";
+import * as THREE from "three";
 import { Experience } from "./components/Experience";
 import { Effects } from "./components/Effects";
 import { UI } from "./components/UI";
 import { Leva } from "leva";
 
 function App() {
+  const [userStars, setUserStars] = useState([]);
+
+  const handleAddStar = (text) => {
+    const now = new Date();
+    // Format date: YY/MM/DD HH:mm (e.g. 26/1/26 16:25)
+    // Month is 0-indexed, so add 1.
+    // getYear() returns year minus 1900, getFullYear() returns 2026.
+    // We want '26', so slice last 2 digits of full year.
+    const year = now.getFullYear().toString().slice(-2);
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const dateStr = `${year}/${month}/${day} ${hours}:${minutes}`;
+
+    // Random Position
+    // Constrain to -300~300 (X) and -150~150 (Y) to ensure they are within the camera's reachable area (FrameLimiter).
+    const x = (Math.random() - 0.5) * 600;
+    const y = (Math.random() - 0.5) * 300;
+    const z = -10 + (Math.random() - 0.5) * 15;
+
+    // Random Color logic from MyStars
+    const randomType = Math.random();
+    const color = new THREE.Color();
+    if (randomType > 0.9) {
+      color.setHSL(0.8 + Math.random() * 0.15, 0.9, 0.8);
+    } else if (randomType > 0.75) {
+      color.setHSL(0.08 + Math.random() * 0.12, 0.9, 0.8);
+    } else if (randomType > 0.5) {
+      color.setHSL(0.45 + Math.random() * 0.1, 0.8, 0.8);
+    } else {
+      color.setHSL(0.6 + Math.random() * 0.1, 0.6 + Math.random() * 0.4, 0.8 + Math.random() * 0.2);
+    }
+
+    const newStar = {
+      id: Date.now(),
+      position: [x, y, z],
+      color: color,
+      scale: 2.0 + Math.random() * 4.0,
+      random: Math.random(),
+      date: dateStr,
+      text: text // storing the diary text too just in case
+    };
+
+    setUserStars((prev) => [...prev, newStar]);
+  };
+
   return (
     <>
       <Leva hidden />
@@ -14,10 +63,10 @@ function App() {
         dpr={[1, 2]} // Optimize for mobile (clamp at 2x)
       >
         <color attach="background" args={['#101020']} />
-        <Experience />
+        <Experience userStars={userStars} />
         <Effects />
       </Canvas>
-      <UI />
+      <UI onSend={handleAddStar} />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
 import { SkyBox } from "./SkyBox";
 import { MyStars } from "./MyStars";
+import { UserAddedStars } from "./UserAddedStars";
 import { Suspense } from "react";
 
 
@@ -11,20 +12,23 @@ const FrameLimiter = () => {
   useFrame(({ camera }) => {
     // Hard limits for position (panning)
     // Background is 1000x500. 
-    // Clamp X to -400..400 and Y to -200..200 to keep edges hidden.
-    // We do NOT clamp Z here, to allow zooming via CameraControls.
-    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -300, 300);
-    camera.position.y = THREE.MathUtils.clamp(camera.position.y, -150, 150);
+    // Skybox valid area is roughly -500..500.
+    // We clamp slightly wider than star generation (-300..300) to allow centering stars at the edge.
+    // Max visible width at max zoom (Z=100) is approx 250 units.
+    // 320 + 125 = 445 < 500, so edges are still hidden.
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -320, 320);
+    camera.position.y = THREE.MathUtils.clamp(camera.position.y, -160, 160);
   });
   return null;
 }
 
-export const Experience = () => {
+export const Experience = ({ userStars = [] }) => {
   return (
     <>
       <Suspense fallback={null}>
         <SkyBox />
-        <MyStars />
+        {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
+        <UserAddedStars stars={userStars} />
         <ambientLight intensity={1} />
         <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>

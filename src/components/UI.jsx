@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const UI = () => {
+export const UI = ({ onSend }) => {
   // メニューの開閉状態
   const [menuOpen, setMenuOpen] = useState(false);
   // 日記モーダルの開閉状態
@@ -10,6 +10,9 @@ export const UI = () => {
 
   // 送信ハンドラー
   const handleSend = () => {
+    if (onSend && diaryText.trim() !== '') {
+      onSend(diaryText);
+    }
     console.log("Diary Entry Sent:", diaryText);
     setDiaryText('');
     setDiaryOpen(false);
