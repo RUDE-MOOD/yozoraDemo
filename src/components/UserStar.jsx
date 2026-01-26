@@ -4,7 +4,8 @@ import { extend, useFrame } from '@react-three/fiber'
 import { useRef, useMemo } from 'react'
 
 // --- SingleStarMaterial ---
-// Adapted from MyStarMaterial for single usage with Uniforms instead of Attributes for individual properties
+// MyStarMaterialを単一の星用に調整したシェーダー
+// 個別のプロパティ（Attributes）の代わりに、Uniformsを使用して各値を設定します
 const SingleStarMaterial = shaderMaterial(
   {
     time: 0,
@@ -33,19 +34,19 @@ const SingleStarMaterial = shaderMaterial(
       vec2 uv = vUv - 0.5;
       float d = length(uv);
 
-      // Glow
+      // Glow (発光)
       float core = exp(-d * 6.0);
       float center = exp(-d * d * 80.0);
       core = core * 0.6 + center * 0.9;
 
-      // Spikes
+      // Spikes (光条/レンズフレア)
       float spikeH = 0.02 / (abs(uv.y) + 0.02) * (1.0 - smoothstep(0.0, 0.4, abs(uv.x)));
       float spikeV = 0.02 / (abs(uv.x) + 0.02) * (1.0 - smoothstep(0.0, 0.4, abs(uv.y)));
       float spikes = pow(spikeH + spikeV, 1.5);
 
       float brightness = (core * 1.2 + spikes * 0.8) * baseBrightness;
 
-      // Twinkle
+      // Twinkle (瞬き)
       float twinkle = sin(time * 1.5 + random * 10.0) * 0.15 + 0.85;
       brightness *= twinkle;
 
@@ -86,9 +87,9 @@ export function UserStar({ position, color, scale, random, date }) {
             random={random}
           />
         </mesh>
-        {/* Date Label */}
+        {/* 日付ラベル */}
         <Text
-          position={[0, -scale * 0.6, 0]} // Position below the star
+          position={[0, -scale * 0.6, 0]} // 星の下に配置
           fontSize={0.5}
           color="white"
           anchorX="center"

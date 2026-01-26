@@ -11,10 +11,10 @@ function App() {
 
   const handleAddStar = (text) => {
     const now = new Date();
-    // Format date: YY/MM/DD HH:mm (e.g. 26/1/26 16:25)
-    // Month is 0-indexed, so add 1.
-    // getYear() returns year minus 1900, getFullYear() returns 2026.
-    // We want '26', so slice last 2 digits of full year.
+    // 日付のフォーマット: YY/MM/DD HH:mm (例: 26/1/26 16:25)
+    // Monthは0始まりなので+1する
+    // getYear() は1900年からの経過年数、getFullYear() は2026を返す
+    // '26'が欲しいので、full yearの末尾2桁を切り出す
     const year = now.getFullYear().toString().slice(-2);
     const month = now.getMonth() + 1;
     const day = now.getDate();
@@ -22,13 +22,14 @@ function App() {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const dateStr = `${year}/${month}/${day} ${hours}:${minutes}`;
 
-    // Random Position
-    // Constrain to -300~300 (X) and -150~150 (Y) to ensure they are within the camera's reachable area (FrameLimiter).
+    // ランダムな位置設定
+    // カメラの移動可能範囲内(-300~300, -150~150)に収まるように制限する
+    // これにより、生成された星にカメラで確実に近づけるようにする
     const x = (Math.random() - 0.5) * 600;
     const y = (Math.random() - 0.5) * 300;
     const z = -10 + (Math.random() - 0.5) * 15;
 
-    // Random Color logic from MyStars
+    // ランダムな色設定 (MyStarsと同じロジック)
     const randomType = Math.random();
     const color = new THREE.Color();
     if (randomType > 0.9) {
@@ -48,7 +49,7 @@ function App() {
       scale: 2.0 + Math.random() * 4.0,
       random: Math.random(),
       date: dateStr,
-      text: text // storing the diary text too just in case
+      text: text // 日記のテキストも念のため保存
     };
 
     setUserStars((prev) => [...prev, newStar]);
