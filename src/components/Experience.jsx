@@ -13,7 +13,7 @@ const FrameLimiter = () => {
     // Hard limits for position (panning)
     // Background is 1000x500. 
     // Skybox valid area is roughly -500..500.
-    // We clamp slightly wider than star generation (-300..300) to allow centering stars at the edge.
+    // We clamp slightly wider than star generation (-320..320) to allow centering stars at the edge.
     // Max visible width at max zoom (Z=100) is approx 250 units.
     // 320 + 125 = 445 < 500, so edges are still hidden.
     camera.position.x = THREE.MathUtils.clamp(camera.position.x, -320, 320);

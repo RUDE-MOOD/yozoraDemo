@@ -3,6 +3,12 @@ import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef, useMemo } from 'react'
 
+
+
+// 注意！！！！！
+// このコンポーネントは今使っていないです！！！！
+// 今はUserAddedStarsコンポーネントを使用しています
+
 // --- MyStarMaterial: 星の描画を行うシェーダー ---
 // shaderMaterialを使ってThree.jsのShaderMaterialを作成しています。
 // 頂点シェーダー(Vertex Shader)とフラグメントシェーダー(Fragment Shader)で構成されています。
