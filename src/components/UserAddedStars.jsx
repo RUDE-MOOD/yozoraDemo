@@ -23,7 +23,7 @@
 */
 import { UserStar } from './UserStar'
 
-export function UserAddedStars({ stars }) {
+export function UserAddedStars({ stars, onStarClick }) {
   return (
     <group name="Layer6_UserStars">
       {stars.map((star) => (
@@ -34,6 +34,8 @@ export function UserAddedStars({ stars }) {
           scale={star.scale}
           random={star.random}
           date={star.date}
+          starData={star}
+          onStarClick={onStarClick}
         />
       ))}
     </group>

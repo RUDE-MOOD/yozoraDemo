@@ -1,12 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { StarDetailModal } from './StarDetailModal';
 
-export const UI = ({ onSend }) => {
+export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
   const [menuOpen, setMenuOpen] = useState(false);
   // 日記モーダルの開閉状態
   const [diaryOpen, setDiaryOpen] = useState(false);
   // 日記の入力テキスト
   const [diaryText, setDiaryText] = useState('');
+  // 星の詳細確認モーダルの開閉状態
+  const [starOpen, setStarOpen] = useState(false);
+  // 選択された星のデータ
+  const [selectedStarData, setSelectedStarData] = useState(null);
+
+  // 星の詳細を表示する関数
+  const showStarDetails = (starData) => {
+    console.log('showStarDetails called with:', starData);
+    setSelectedStarData(starData);
+    setStarOpen(true);
+  };
+
+  // 親コンポーネントにコールバックを渡す
+  useEffect(() => {
+    if (onStarClick) {
+      console.log('Setting star click handler');
+      onStarClick(showStarDetails);
+    }
+  }, []); // 依存配列を空にして、マウント時のみ実行
 
   // 送信ハンドラー
   const handleSend = () => {
@@ -120,6 +140,16 @@ export const UI = ({ onSend }) => {
           </div>
         </div>
       )}
+
+      {/* --- 星の詳細確認モーダル (Star Detail Modal) --- */}
+      <StarDetailModal
+        isOpen={starOpen}
+        onClose={() => {
+          setStarOpen(false);
+          setSelectedStarData(null);
+        }}
+        starData={selectedStarData}
+      />
     </>
   );
 };

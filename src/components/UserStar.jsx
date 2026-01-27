@@ -64,7 +64,7 @@ const SingleStarMaterial = shaderMaterial(
 
 extend({ SingleStarMaterial })
 
-export function UserStar({ position, color, scale, random, date }) {
+export function UserStar({ position, color, scale, random, date, starData, onStarClick }) {
   const materialRef = useRef()
 
   useFrame((state, delta) => {
@@ -75,9 +75,18 @@ export function UserStar({ position, color, scale, random, date }) {
 
   const handleClick = (e) => {
     e.stopPropagation();
-    console.log('Star clicked!');
+    console.log('=== Star clicked! ===');
     console.log(`日付：${date}、座標:${position}`);
+    console.log('onStarClick:', onStarClick);
+    console.log('starData:', starData);
 
+    // モーダルを開く
+    if (onStarClick && starData) {
+      console.log('Calling onStarClick with starData');
+      onStarClick(starData);
+    } else {
+      console.warn('onStarClick or starData is missing!');
+    }
   };
 
   return (

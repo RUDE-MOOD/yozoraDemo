@@ -8,6 +8,8 @@ import { Leva } from "leva";
 
 function App() {
   const [userStars, setUserStars] = useState([]);
+  // 星の詳細表示関数への参照を保持（関数を状態として保存）
+  const [starClickHandler, setStarClickHandler] = useState(() => null);
 
   const handleAddStar = (text) => {
     const now = new Date();
@@ -55,6 +57,12 @@ function App() {
     setUserStars((prev) => [...prev, newStar]);
   };
 
+  // 星クリックハンドラーをセットする関数
+  const handleSetStarClickHandler = (handler) => {
+    console.log('handleSetStarClickHandler called with:', handler);
+    setStarClickHandler(() => handler);
+  };
+
   return (
     <>
       <Leva hidden />
@@ -64,10 +72,10 @@ function App() {
         dpr={[1, 2]} // Optimize for mobile (clamp at 2x)
       >
         <color attach="background" args={['#101020']} />
-        <Experience userStars={userStars} />
+        <Experience userStars={userStars} onStarClick={starClickHandler} />
         <Effects />
       </Canvas>
-      <UI onSend={handleAddStar} />
+      <UI onSend={handleAddStar} onStarClick={handleSetStarClickHandler} />
     </>
   );
 }

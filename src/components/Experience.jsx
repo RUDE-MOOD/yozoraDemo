@@ -22,13 +22,13 @@ const FrameLimiter = () => {
   return null;
 }
 
-export const Experience = ({ userStars = [] }) => {
+export const Experience = ({ userStars = [], onStarClick }) => {
   return (
     <>
       <Suspense fallback={null}>
         <SkyBox />
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
-        <UserAddedStars stars={userStars} />
+        <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />
         <fog attach="fog" args={['#101020', 10, 150]} />
       </Suspense>
