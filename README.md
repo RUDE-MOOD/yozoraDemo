@@ -11,11 +11,20 @@
 2.dreiライブラリのTextを作って星の情報を画面上に表示する✅️
 3.UIを追加して、入力欄を追加✅️
 
-4.生成された星をクリックして、詳細情報が表示できるように
-5.ディレクトリ構造を整理する(apis,store(zustand?),pages,router,utilsなど)
-6.GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
-7.重み付けのアルゴリズムを作る
-8.ユーザー新規登録を実装、supabaseを使ってデータベースを構築する
+
+4.ディレクトリ構造を整理する(apis,store(zustand?),pages,router,store,utilsなど)
+src/
+├── apis/       # Supabase, Geminiとの通信ロジック
+├── components/ # Effects, Experience, MyStars, UI などの部品
+├── router/     # ルーター（画面遷移制御）
+├── store/      # Zustand（星のデータやユーザー情報の管理）
+├── pages/      # メイン画面以外のページ
+├── utils/      # 感情スコア計算、request、日付フォーマットなどの関数
+└── App.js      # 全体の統合
+5.生成された星をクリックして、詳細情報が表示できるように
+6.ユーザー新規登録を実装、supabaseを使ってデータベースを構築する
+7.GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
+8.重み付けのアルゴリズムを作る
 
 ＝＝＝ビジュアル系＝＝＝
 後回し
