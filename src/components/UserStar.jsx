@@ -73,10 +73,17 @@ export function UserStar({ position, color, scale, random, date }) {
     }
   })
 
+  const handleClick = (e) => {
+    e.stopPropagation();
+    console.log('Star clicked!');
+    console.log(`日付：${date}、座標:${position}`);
+
+  };
+
   return (
     <group position={position}>
       <Billboard>
-        <mesh scale={[scale, scale, 1]}>
+        <mesh scale={[scale, scale, 1]} onClick={handleClick}>
           <planeGeometry args={[1, 1]} />
           <singleStarMaterial
             ref={materialRef}
