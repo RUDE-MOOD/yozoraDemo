@@ -74,7 +74,9 @@ export function UserStar({ position, color, scale, random, date, starData, onSta
   })
 
   const handleClick = (e) => {
+    // クリックされた星の情報しか表示されない
     e.stopPropagation();
+    // ＝＝＝＝＝＝＝＝＝＝＝
     console.log('=== Star clicked! ===');
     console.log(`日付：${date}、座標:${position}`);
     console.log('onStarClick:', onStarClick);

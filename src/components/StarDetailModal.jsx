@@ -1,3 +1,165 @@
+/*
+  [星の詳細モーダル表示フロー - ユーザーが星をクリックしてから詳細が表示されるまで]
+
+  ＝＝＝ 概要 ＝＝＝
+  このコンポーネントは、ユーザーが3D空間上の星をクリックした際に、
+  その星の詳細情報（生成時刻、座標、大きさ、色、日記テキスト）を表示するモーダルです。
+  複数のコンポーネントを経由したデータフローにより実現されています。
+
+  ＝＝＝ データフロー（全体像） ＝＝＝
+  
+  1. [ユーザーアクション] 
+     ユーザーが3D空間上の星（UserStarコンポーネント）をクリック
+     ↓
+  2. [UserStar.jsx - handleClick関数]
+     クリックイベントが発火し、onStarClick(starData)を呼び出す
+     ↓
+  3. [UserAddedStars.jsx]
+     各UserStarに渡されたonStarClickをそのまま親へ伝達
+     ↓
+  4. [Experience.jsx]
+     UserAddedStarsから受け取ったonStarClickをさらに親へ伝達
+     ↓
+  5. [App.jsx - starClickHandler]
+     Experienceから受け取ったonStarClickをUIコンポーネントへ渡す
+     ↓
+  6. [UI.jsx - showStarDetails関数]
+     starDataを受け取り、以下の2つのステートを更新:
+     - setSelectedStarData(starData) → モーダルに表示するデータをセット
+     - setStarOpen(true) → モーダルを開く
+     ↓
+  7. [StarDetailModal.jsx - このコンポーネント]
+     isOpen={true}とstarData={...}を受け取り、モーダルを表示
+
+  ＝＝＝ 詳細な実装フロー ＝＝＝
+
+  【ステップ1: 初期化（アプリ起動時）】
+  
+  App.jsx:
+    - starClickHandlerステートを初期化（useState(() => null)）
+    - UIコンポーネントにhandleSetStarClickHandlerを渡す
+  
+  UI.jsx:
+    - useEffectでマウント時に実行
+    - onStarClick(showStarDetails)を呼び出し、showStarDetails関数を親に渡す
+  
+  App.jsx:
+    - handleSetStarClickHandlerが呼ばれる
+    - setStarClickHandler(() => showStarDetails)で関数を保存
+    - この関数がExperience → UserAddedStars → UserStarへと伝達される
+
+  【ステップ2: 星のクリック（ユーザーアクション）】
+  
+  UserStar.jsx:
+    ```javascript
+    const handleClick = (e) => {
+      e.stopPropagation(); // イベントの伝播を止める
+      
+      // デバッグログ
+      console.log('=== Star clicked! ===');
+      console.log('onStarClick:', onStarClick);
+      console.log('starData:', starData);
+      
+      // モーダルを開く
+      if (onStarClick && starData) {
+        console.log('Calling onStarClick with starData');
+        onStarClick(starData); // ← ここで親に星のデータを渡す
+      }
+    };
+    ```
+    
+    starDataの中身:
+    {
+      id: 1706345678901,           // タイムスタンプベースのユニークID
+      position: [125.45, -67.32, -8.91], // 3D座標 [X, Y, Z]
+      color: { r: 0.65, g: 0.54, b: 0.98 }, // RGB色情報（0.0～1.0）
+      scale: 4.23,                 // 星の大きさ（2.0～6.0）
+      random: 0.742,               // 瞬きアニメーション用のランダム値
+      date: '26/1/27 16:02',       // 生成日時（YY/MM/DD HH:mm形式）
+      text: '今日はいい天気だった' // ユーザーが入力した日記テキスト
+    }
+
+  【ステップ3: データの伝達（UserStar → UI）】
+  
+  UserAddedStars.jsx:
+    - UserStarから受け取ったonStarClick呼び出しをそのまま親へ伝達
+    - 特に処理は行わず、トンネリング（props drilling）の役割
+  
+  Experience.jsx:
+    - 同様にonStarClickをそのまま親へ伝達
+  
+  App.jsx:
+    - starClickHandlerに保存されているshowStarDetails関数が実行される
+    - この関数はUI.jsxで定義されたもの
+
+  【ステップ4: モーダルの表示（UI.jsx）】
+  
+  UI.jsx - showStarDetails関数:
+    ```javascript
+    const showStarDetails = (starData) => {
+      console.log('showStarDetails called with:', starData);
+      setSelectedStarData(starData); // モーダルに表示するデータをセット
+      setStarOpen(true);             // モーダルを開く
+    };
+    ```
+    
+    ステート更新:
+    - selectedStarData: null → { id: ..., position: [...], ... }
+    - starOpen: false → true
+
+  【ステップ5: モーダルのレンダリング（StarDetailModal.jsx）】
+  
+  このコンポーネント（StarDetailModal）:
+    ```javascript
+    <StarDetailModal
+      isOpen={starOpen}           // true
+      onClose={() => {            // モーダルを閉じる関数
+        setStarOpen(false);
+        setSelectedStarData(null);
+      }}
+      starData={selectedStarData} // 星の詳細データ
+    />
+    ```
+    
+    表示処理:
+    1. isOpenとstarDataをチェック（両方trueの場合のみ表示）
+    2. starDataから各情報を取り出して表示:
+       - date → 生成時刻セクション
+       - position[0,1,2] → X/Y/Z座標セクション
+       - scale → 大きさセクション（プログレスバー付き）
+       - color → 色セクション（HEX変換 + カラープレビュー）
+       - text → 日記テキストセクション（最大高さ制限 + スクロール可能）
+
+  ＝＝＝ 技術的なポイント ＝＝＝
+
+  1. **関数を状態として保存**
+     App.jsxでuseState(() => null)を使い、関数を状態として保存。
+     setStarClickHandler(() => handler)の形式で更新。
+
+  2. **Props Drilling（プロップスドリリング）**
+     onStarClickを複数のコンポーネント階層を経由して伝達。
+     UserStar → UserAddedStars → Experience → App → UI → StarDetailModal
+
+  3. **イベント伝播の制御**
+     e.stopPropagation()で、星のクリックイベントが背景に伝わらないようにする。
+
+  4. **条件付きレンダリング**
+     if (!isOpen || !starData) return null;
+     モーダルが閉じている、またはデータがない場合は何も表示しない。
+
+  5. **データ変換**
+     - colorToHex: RGB(0.0～1.0) → HEX形式(#RRGGBB)
+     - formatCoordinate: 数値 → 小数点2桁の文字列
+
+  ＝＝＝ デザイン仕様 ＝＝＝
+
+  - **レスポンシブ**: max-w-md（最大幅448px）、モバイル・デスクトップ両対応
+  - **グラスモーフィズム**: 半透明背景 + backdrop-blur-2xl
+  - **グラデーション**: from-[#151530]/90 to-[#2a2a50]/90（紫→青）
+  - **アイコン**: 各セクションに色分けされたアイコン（🕐📍📏🎨📝）
+  - **アニメーション**: ホバーエフェクト、スムーズな開閉（300ms）
+*/
+
 /**
  * 星の詳細確認モーダル (Star Detail Modal)
  * ユーザーが作成した星の詳細情報を表示するモーダルコンポーネント
@@ -154,6 +316,25 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                             <p className="text-white/95 text-sm font-mono tracking-wider">{colorToHex(starData.color)}</p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 日記テキスト */}
+                    <div className="group">
+                        <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-200">
+                                <svg className="w-5 h-5 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-white/50 text-xs tracking-wider mb-2 font-sans">日記</p>
+                                <div className="bg-black/30 rounded-lg px-4 py-3 border border-white/10 max-h-32 overflow-y-auto">
+                                    <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                        {starData.text || '（テキストなし）'}
+                                    </p>
                                 </div>
                             </div>
                         </div>

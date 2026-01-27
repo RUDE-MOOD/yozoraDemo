@@ -49,7 +49,7 @@ function App() {
       position: [x, y, z],
       color: color,
       scale: 2.0 + Math.random() * 4.0,
-      random: Math.random(),
+      random: Math.random(), // UserStar.jsxのシェーダー用のランダム値（星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬く））
       date: dateStr,
       text: text // 日記のテキストも念のため保存
     };
