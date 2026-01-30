@@ -1,61 +1,16 @@
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
-import * as THREE from "three";
 import { Experience } from "./components/Experience";
 import { Effects } from "./components/Effects";
 import { UI } from "./components/UI";
 import { Leva } from "leva";
+import { useStarStore } from './store/useStarStore';
 
 function App() {
-  const [userStars, setUserStars] = useState([]);
+  // Zustand storeから星のデータと追加関数を取得
+  const { stars, addStar } = useStarStore();
   // 星の詳細表示関数への参照を保持（関数を状態として保存）
   const [starClickHandler, setStarClickHandler] = useState(() => null);
-
-  const handleAddStar = (text) => {
-    const now = new Date();
-    // 日付のフォーマット: YY/MM/DD HH:mm (例: 26/1/26 16:25)
-    // Monthは0始まりなので+1する
-    // getYear() は1900年からの経過年数、getFullYear() は2026を返す
-    // '26'が欲しいので、full yearの末尾2桁を切り出す
-    const year = now.getFullYear().toString().slice(-2);
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const dateStr = `${year}/${month}/${day} ${hours}:${minutes}`;
-
-    // ランダムな位置設定
-    // カメラの移動可能範囲内(-300~300, -150~150)に収まるように制限する
-    // これにより、生成された星にカメラで確実に近づけるようにする
-    const x = (Math.random() - 0.5) * 600;
-    const y = (Math.random() - 0.5) * 300;
-    const z = -10 + (Math.random() - 0.5) * 15;
-
-    // ランダムな色設定 (MyStarsと同じロジック)
-    const randomType = Math.random();
-    const color = new THREE.Color();
-    if (randomType > 0.9) {
-      color.setHSL(0.8 + Math.random() * 0.15, 0.9, 0.8);
-    } else if (randomType > 0.75) {
-      color.setHSL(0.08 + Math.random() * 0.12, 0.9, 0.8);
-    } else if (randomType > 0.5) {
-      color.setHSL(0.45 + Math.random() * 0.1, 0.8, 0.8);
-    } else {
-      color.setHSL(0.6 + Math.random() * 0.1, 0.6 + Math.random() * 0.4, 0.8 + Math.random() * 0.2);
-    }
-
-    const newStar = {
-      id: Date.now(),
-      position: [x, y, z],
-      color: color,
-      scale: 2.0 + Math.random() * 4.0,
-      random: Math.random(), // UserStar.jsxのシェーダー用のランダム値（星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬く））
-      date: dateStr,
-      text: text // 日記のテキストも念のため保存
-    };
-
-    setUserStars((prev) => [...prev, newStar]);
-  };
 
   // 星クリックハンドラーをセットする関数
   const handleSetStarClickHandler = (handler) => {
@@ -72,10 +27,10 @@ function App() {
         dpr={[1, 2]} // Optimize for mobile (clamp at 2x)
       >
         <color attach="background" args={['#101020']} />
-        <Experience userStars={userStars} onStarClick={starClickHandler} />
+        <Experience userStars={stars} onStarClick={starClickHandler} />
         <Effects />
       </Canvas>
-      <UI onSend={handleAddStar} onStarClick={handleSetStarClickHandler} />
+      <UI onSend={addStar} onStarClick={handleSetStarClickHandler} />
     </>
   );
 }

@@ -36,7 +36,7 @@ src/
    - グラスモーフィズム + グラデーション（紫→青）の宇宙テーマ
    - 各情報セクションに色分けされたアイコン（🕐📍📏🎨📝）
    - データフロー：UserStar → UserAddedStars → Experience → App → UI → StarDetailModal
-6.ユーザー新規登録を実装（supabaseテストのため）、supabaseを使ってデータベースを構築する
+6.星のデータをsupabaseに保存し、userStarsステートを更新する
 7.GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
 8.重み付けのアルゴリズムを作る
 9.音声ガイド追加（画面を開く時とか、日記を書き終える時とか、音声ファイルを再生、ローカル保存）
@@ -136,3 +136,17 @@ HTMLオーバーレイとして実装されたユーザーインターフェー�
    - データフロー: `UserStar` → `UserAddedStars` → `Experience` → `App` → `UI` → `StarDetailModal`
    - `StarDetailModal`が開き、星の詳細情報（生成時刻、座標、大きさ、色、日記テキスト）を表示。
 5. **Result**: ユーザーの想い（日記）が、可視化された「星」となってプラネタリウムの一部になり、いつでもクリックして振り返ることができる。
+
+
+
+#　データベース構造
+## 星データテーブル (t_stars)
+| コラム | データ型(supabaseの選択肢で設置する) | ディフォルト値|説明 |
+|--------|----------|------|------|
+| id🔑 | uuid | gen_random_uuid() | UUIDで生成されたユニークなID |
+| position | jsonb | NULL | 位置 |
+| color | jsonb | NULL | 色 |
+| scale | Float4 | NULL | 大きさ |
+| random | Float4 | NULL | 星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬くようにするため） |
+| date | timestamptz | now() | 生成日時 |
+| text | text | NULL | 日記テキスト |
