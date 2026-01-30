@@ -232,7 +232,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-white/50 text-xs tracking-wider mb-1 font-sans">生成時刻</p>
-                                <p className="text-white/95 text-base font-mono tracking-wide">{starData.date}</p>
+                                <p className="text-white/95 text-base font-mono tracking-wide">{starData.display_date}</p>
                             </div>
                         </div>
                     </div>

@@ -202,7 +202,7 @@ export function UserAddedStars({ stars, onStarClick }) {
           color={star.color}
           scale={star.scale}
           random={star.random}
-          date={star.date}
+          date={star.display_date}         // 表示用の日付
           starData={star}
           onStarClick={onStarClick}
         />

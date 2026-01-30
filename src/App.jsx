@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Experience } from "./components/Experience";
 import { Effects } from "./components/Effects";
 import { UI } from "./components/UI";
@@ -8,8 +8,14 @@ import { useStarStore } from './store/useStarStore';
 
 function App() {
   // Zustand storeから星のデータと追加関数を取得
-  const { stars, addStar } = useStarStore();
+  const { stars, addStar, fetchStars } = useStarStore();
   // 星の詳細表示関数への参照を保持（関数を状態として保存）
+
+  // 起動時にsupabaseから星のデータを読み込む
+  useEffect(() => {
+    fetchStars();
+  }, []);
+
   const [starClickHandler, setStarClickHandler] = useState(() => null);
 
   // 星クリックハンドラーをセットする関数

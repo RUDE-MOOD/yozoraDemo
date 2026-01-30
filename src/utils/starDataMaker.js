@@ -40,7 +40,8 @@ export const starDataMaker = ({ text }) => {
         color: color,
         scale: 2.0 + Math.random() * 4.0,
         random: Math.random(),
-        date: dateStr,
+        created_at: now.toISOString(),  // データベース用、ISOフォーマット
+        display_date: dateStr,          // 表示用、YY/MM/DD HH:mm
         text: text
     };
     return starData;
