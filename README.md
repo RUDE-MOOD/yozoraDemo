@@ -157,14 +157,32 @@ HTMLオーバーレイとして実装されたユーザーインターフェー�
 
 
 # Gemini APIの使用
+## 概要
+APIキーを安全に扱うため、クライアントサイドではなく **Supabase Edge Functions** 経由で Gemini API を呼び出します。
 
-APIキーを安全に扱うために、ユーザーの入力内容から星の座標などへの変換は、supabaseのエッジファンクションで行う。
+## Edge Function の構成 (`supabase/functions/analyze-diary/`)
+- **API**: Google Gemini 2.5 Flash
+- **機能**: ユーザーの日記テキストを受け取り、`emotion`（7つの感情）と `feedback`（励ましのメッセージ）を返します。
+- **認証**: Supabase の Anon Key で保護されています。
 
-## 導入
+## セットアップ手順
+1. **Gemini API キーの取得**: [Google AI Studio](https://aistudio.google.com/apikey) で取得
+2. **Secret の設定**: Supabase Dashboard > Edge Functions > Secrets に `GEMINI_API_KEY` を設定
+3. **デプロイ（注意⚠️プロンプトが記載したindex.tsを編集するたびに再デプロイが必要）**: 以下のコマンドでクラウドに反映
+   ```bash
+   npx supabase functions deploy analyze-diary
+   ```
+
+## 動作確認
+PowerShell での文字化けを防ぐため、専用の Node.js スクリプトを使用します。
+
 ```bash
-npm install @google/genai  # gemini本体
-#エッジファンクションを使うため、supabase関連をインストール
-npx supabase init
-npm i supabase --save-dev 
+# テスト実行
+node test-api.js
 ```
+
+## GEMINIプロンプト更新時のフロー
+1. `index.ts` を修正
+2. `npx supabase functions deploy analyze-diary` でデプロイ
+3. `node test-api.js` で動作確認
 
