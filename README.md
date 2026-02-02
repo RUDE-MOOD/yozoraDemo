@@ -154,3 +154,17 @@ HTMLオーバーレイとして実装されたユーザーインターフェー�
 | created_at | timestamptz | NULL | ISOフォーマットの生成日時（データベース保存用） |
 | display_date | text | NULL | YY/MM/DD HH:mmフォーマットの生成日時（画面表示用） |
 | text | text | NULL | 日記テキスト |
+
+
+# Gemini APIの使用
+
+APIキーを安全に扱うために、ユーザーの入力内容から星の座標などへの変換は、supabaseのエッジファンクションで行う。
+
+## 導入
+```bash
+npm install @google/genai  # gemini本体
+#エッジファンクションを使うため、supabase関連をインストール
+npx supabase init
+npm i supabase --save-dev 
+```
+
