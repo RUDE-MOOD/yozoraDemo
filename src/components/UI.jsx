@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StarDetailModal } from './StarDetailModal';
+import { supabase } from '../supabaseClient';
 
 export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
@@ -12,6 +13,8 @@ export const UI = ({ onSend, onStarClick }) => {
   const [starOpen, setStarOpen] = useState(false);
   // 選択された星のデータ
   const [selectedStarData, setSelectedStarData] = useState(null);
+  // 送信時、重複送信を防ぐためのフラグ
+  const [isSending, setIsSending] = useState(false);
 
   // 星の詳細を表示する関数
   const showStarDetails = (starData) => {
@@ -29,13 +32,51 @@ export const UI = ({ onSend, onStarClick }) => {
   }, []); // 依存配列を空にして、マウント時のみ実行
 
   // 送信ハンドラー
-  const handleSend = () => {
-    if (onSend && diaryText.trim() !== '') {
-      onSend(diaryText);
+  const handleSend = async () => {
+    // 連打防止
+    if (isSending) return;
+    // 空文字列チェック
+    if (diaryText.trim() === '') return;
+    // 送信開始
+    setIsSending(true);
+
+    try {
+      let analysisResult = null;
+      // 1. Gemini APIを呼び出す (Supabase Edge Function)
+      // 注意: 開発環境では時々タイムアウトすることがあるので、その場合はnullのまま進む
+      try {
+        // エッジファンクションを応用して、body内に日記のテキストを送信する
+        const { data, error } = await supabase.functions.invoke('analyze-diary', {
+          body: { diaryText }
+        });
+        if (error) {
+          console.error("Gemini API Error:", error);
+        } else {
+          console.log("✅ Analysis Result:", data);
+          if (data && data.success) {
+            analysisResult = data;
+          }
+        }
+      } catch (apiError) {
+        console.error("API Call Failed:", apiError);
+      }
+      // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
+      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(text, analysisResult)
+      if (onSend) {
+        await onSend(diaryText, analysisResult);
+      }
+      console.log("Diary Entry Saved!");
+
+      // 3. フォームをリセットして閉じる
+      setDiaryText('');
+      setDiaryOpen(false);
+
+    } catch (error) {
+      console.error("Critical Error in handleSend:", error);
+      alert("エラーが発生しました。もう一度お試しください。");
+    } finally {
+      setIsSending(false);
     }
-    console.log("Diary Entry Sent:", diaryText);
-    setDiaryText('');
-    setDiaryOpen(false);
   };
 
   return (
