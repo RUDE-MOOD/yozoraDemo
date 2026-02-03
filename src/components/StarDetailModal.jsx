@@ -170,6 +170,10 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
     // モーダルが開いていない、またはデータがない場合は何も表示しない
     if (!isOpen || !starData) return null;
 
+    // データベースから感情と褒め言葉を取得する
+    const analysis = starData.analysis_data || {};
+    const hasAnalysis = analysis.emotion && analysis.feedback; // 戻り値はtrue/false
+
     // 色をRGBからHEX形式に変換する関数
     const colorToHex = (color) => {
         if (!color) return '#FFFFFF';
@@ -320,6 +324,52 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                             </div>
                         </div>
                     </div>
+
+
+                    {/* --- AI分析結果 (あれば表示) --- */}
+                    {hasAnalysis && (
+                        <>
+                            {/* 感情 */}
+                            <div className="group">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-400/30 flex items-center justify-center group-hover:bg-orange-500/30 transition-colors duration-200">
+                                        <svg className="w-5 h-5 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-white/50 text-xs tracking-wider mb-1 font-sans">感情</p>
+                                        <div className="inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                                            <p className="text-orange-200 text-sm font-medium tracking-wide">
+                                                {analysis.emotion}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 褒め言葉 */}
+                            <div className="group">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors duration-200">
+                                        <svg className="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-white/50 text-xs tracking-wider mb-2 font-sans">星からの手紙</p>
+                                        <div className="bg-indigo-900/20 rounded-lg px-4 py-3 border border-indigo-500/20 relative">
+                                            {/* 小さな装飾 */}
+                                            <div className="absolute -top-1 left-6 w-2 h-2 bg-indigo-500/20 rotate-45 transform border-l border-t border-indigo-500/20"></div>
+                                            <p className="text-indigo-100/90 text-sm leading-relaxed italic">
+                                                "{analysis.feedback}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {/* 日記テキスト */}
                     <div className="group">
