@@ -7,7 +7,7 @@
 2.レイヤーを積み上げること ✅️
 
 ＝＝＝BugFix＝＝＝
-1.星を作成したら、最上階のレイヤーを超えて画面外に出てしまう
+1.星を作成したら、最上階のレイヤーを超えて画面外に出てしまう✅️
 2.カメラ移動時に、「ラグる」という感覚がする
 
 ＝＝＝advanced機能＝＝＝
@@ -20,7 +20,7 @@
 3.UIを追加して、入力欄を追加✅️
 
 
-4.ディレクトリ構造を整理する(apis,store(zustand?),pages,router,store,utilsなど)
+4.ディレクトリ構造を整理する(apis,store,pages,router,utilsなど)
 src/
 ├── apis/       # Supabase, Geminiとの通信ロジック
 ├── components/ # Effects, Experience, MyStars, UI などの部品
@@ -28,6 +28,7 @@ src/
 ├── store/      # Zustand（星のデータやユーザー情報の管理）
 ├── pages/      # メイン画面以外のページ
 ├── utils/      # 感情スコア計算、request、日付フォーマットなどの関数
+├── supabase/   # supabase関連（EdgeFunction、GEMINIへのプロンプトをここに書く）
 └── App.js      # 全体の統合
 5.生成された星をクリックして、詳細情報が表示できるように✅️
    - StarDetailModalコンポーネントを新規作成
@@ -156,7 +157,7 @@ HTMLオーバーレイとして実装されたユーザーインターフェー�
 | text | text | NULL | 日記テキスト |
 
 
-# Gemini APIの使用
+# Gemini APIの使用 (テスト用のTEST-APIを実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
 ## 概要
 APIキーを安全に扱うため、クライアントサイドではなく **Supabase Edge Functions** 経由で Gemini API を呼び出します。
 
