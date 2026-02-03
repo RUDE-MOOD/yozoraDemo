@@ -42,8 +42,8 @@ src/
 8.重み付けのアルゴリズムを作る
 9.音声ガイド追加（画面を開く時とか、日記を書き終える時とか、音声ファイルを再生、ローカル保存）
 ＝＝＝ビジュアル系＝＝＝
-後回し
-...
+1.shadertoyからStarNestを入れ直す（skybox交換）　https://www.shadertoy.com/view/XlfGRj
+
 ```
 ## Development Tools
 このプロジェクトは **Antigravity + Skills** AI を使用して開発されました。
