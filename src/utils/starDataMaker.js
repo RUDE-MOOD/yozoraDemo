@@ -34,8 +34,19 @@ export const starDataMaker = ({ text }) => {
     } else {
         color.setHSL(0.6 + Math.random() * 0.1, 0.6 + Math.random() * 0.4, 0.8 + Math.random() * 0.2);
     }
+    // UUID生成 (HTTP環境では crypto.randomUUID が使えない場合があるためのフォールバック)
+    const generateUUID = () => {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
     const starData = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         position: [x, y, z],
         color: color,
         scale: 2.0 + Math.random() * 4.0,
