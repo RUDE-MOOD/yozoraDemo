@@ -8,7 +8,7 @@ import { useStarStore } from './store/useStarStore';
 
 function App() {
   // Zustand storeから星のデータと追加関数を取得
-  const { stars, addStar, fetchStars } = useStarStore();
+  const { stars, addStar, fetchStars, focusTarget } = useStarStore();
   // 星の詳細表示関数への参照を保持（関数を状態として保存）
 
   // 起動時にsupabaseから星のデータを読み込む
@@ -33,7 +33,7 @@ function App() {
         dpr={[1, 2]} // Optimize for mobile (clamp at 2x)
       >
         <color attach="background" args={['#101020']} />
-        <Experience userStars={stars} onStarClick={starClickHandler} />
+        <Experience userStars={stars} onStarClick={starClickHandler} focusTarget={focusTarget} />
         <Effects />
       </Canvas>
       <UI onSend={addStar} onStarClick={handleSetStarClickHandler} />

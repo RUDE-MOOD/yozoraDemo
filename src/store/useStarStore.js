@@ -4,7 +4,8 @@ import { supabase } from '../supabaseClient';
 import { Color } from 'three';
 
 export const useStarStore = create((set) => ({
-    stars: [],
+    // カメラがフォーカスすべきターゲット位置 (null または [x, y, z])
+    focusTarget: null,
 
     // supabaseから星のデータを読み込む
     fetchStars: async () => {
@@ -51,10 +52,14 @@ export const useStarStore = create((set) => ({
             ...newStar,
             analysis_data: analysisResult
         };
-        // 成功したら、画面を更新する
-        set((state) => ({ stars: [...state.stars, starForShow] }));
+        // 成功したら、画面を更新し、カメラのフォーカス対象を設定する
+        set((state) => ({
+            stars: [...state.stars, starForShow],
+            focusTarget: newStar.position
+        }));
     },
 
-
+    // フォーカスをリセットする関数 (必要に応じて)
+    resetFocus: () => set({ focusTarget: null }),
 
 }));

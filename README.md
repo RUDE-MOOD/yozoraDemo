@@ -40,10 +40,10 @@ src/
    - 各情報セクションに色分けされたアイコン（🕐📍📏🎨📝）
    - データフロー：UserStar → UserAddedStars → Experience → App → UI → StarDetailModal
 6.星のデータをsupabaseに保存し、userStarsステートを更新する✅️
-7.GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
+7.GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように✅️
 8.重み付けのアルゴリズムを作る
 9.音声ガイド追加（画面を開く時とか、日記を書き終える時とか、音声ファイルを再生、ローカル保存）
-10.日記を書き終えたら、画面が自動的に出来立ての星のポジションへ移動する
+10.日記を書き終えたら、画面が自動的に出来立ての星のポジションへ移動する✅️
 ＝＝＝ビジュアル系＝＝＝
 1.shadertoyからStarNestを入れ直す（skybox交換）　https://www.shadertoy.com/view/XlfGRj
 
@@ -158,6 +158,7 @@ HTMLオーバーレイとして実装されたユーザーインターフェー�
 | created_at | timestamptz | NULL | ISOフォーマットの生成日時（データベース保存用） |
 | display_date | text | NULL | YY/MM/DD HH:mmフォーマットの生成日時（画面表示用） |
 | text | text | NULL | 日記テキスト |
+| analysis_data | jsonb | NULL | Gemini APIからの分析結果（感情、褒め言葉など） |
 
 
 # Gemini APIの使用 (テスト用のTEST-APIを実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)

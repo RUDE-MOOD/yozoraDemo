@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { SkyBox } from "./SkyBox";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
-import { Suspense } from "react";
+import { Suspense, useRef, useEffect } from "react";
 
 
 // Custom component to clamp camera position manually
@@ -22,7 +22,18 @@ const FrameLimiter = () => {
   return null;
 }
 
-export const Experience = ({ userStars = [], onStarClick }) => {
+export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
+  const cameraControlsRef = useRef();
+
+  useEffect(() => {
+    if (focusTarget && cameraControlsRef.current) {
+      const [x, y, z] = focusTarget;
+      // カメラを星の少し手前(Z+20)に移動し、星の位置(x,y,z)を見る
+      // true = smooth transition (animation)
+      cameraControlsRef.current.setLookAt(x, y, z + 20, x, y, z, true);
+    }
+  }, [focusTarget]);
+
   return (
     <>
       <Suspense fallback={null}>
@@ -36,6 +47,7 @@ export const Experience = ({ userStars = [], onStarClick }) => {
       <FrameLimiter />
 
       <CameraControls
+        ref={cameraControlsRef}
         minZoom={0.5}        // 最小ズーム倍率 (これ以上縮小できない)
         maxZoom={2}          // 最大ズーム倍率 (これ以上拡大できない)
         minDistance={10}     // カメラの最小距離 (被写体に近づける限界)
