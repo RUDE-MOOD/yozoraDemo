@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
+import { useThemeStore } from '../store/useThemeStore';
 
 export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
@@ -15,6 +16,9 @@ export const UI = ({ onSend, onStarClick }) => {
   const [selectedStarData, setSelectedStarData] = useState(null);
   // 送信時、重複送信を防ぐためのフラグ
   const [isSending, setIsSending] = useState(false);
+
+  // テーマ変更関数
+  const { setTheme } = useThemeStore();
 
   // 星の詳細を表示する関数
   const showStarDetails = (starData) => {
@@ -103,6 +107,33 @@ export const UI = ({ onSend, onStarClick }) => {
             >
               日記を書く
             </button>
+
+            {/* テーマ変更セクション */}
+            <div className="border-t border-white/10 my-1 mx-2"></div>
+            <p className="text-white/50 text-[10px] uppercase tracking-widest px-5 py-2 font-sans">Theme</p>
+            <div className="flex justify-around px-4 pb-4">
+              {/* Purple Theme */}
+              <button
+                onClick={() => setTheme('purple')}
+                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(85,26,139,0.5)]"
+                style={{ backgroundColor: '#551a8b' }}
+                title="Purple"
+              />
+              {/* Blue Theme */}
+              <button
+                onClick={() => setTheme('blue')}
+                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(0,119,190,0.5)]"
+                style={{ backgroundColor: '#0077be' }}
+                title="Blue"
+              />
+              {/* Green Theme */}
+              <button
+                onClick={() => setTheme('green')}
+                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(46,139,87,0.5)]"
+                style={{ backgroundColor: '#2e8b57' }}
+                title="Green"
+              />
+            </div>
           </div>
         )}
       </div>

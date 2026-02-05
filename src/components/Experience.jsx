@@ -52,6 +52,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
         maxZoom={2}          // 最大ズーム倍率 (これ以上拡大できない)
         minDistance={10}     // カメラの最小距離 (被写体に近づける限界)
         maxDistance={100}    // カメラの最大距離 (被写体から離れられる限界 - これで黒い背景が見えるのを防ぐ)
+        // dollySpeed={-1}      // ズーム速度 (-1 にするとピンチ操作の方向が反転します)
         azimuthRotateSpeed={0} // 水平方向の回転速度 (0 = 回転無効)
         polarRotateSpeed={0}   // 垂直方向の回転速度 (0 = 回転無効)
         truckSpeed={5}         // 平行移動(ドラッグ)の速度

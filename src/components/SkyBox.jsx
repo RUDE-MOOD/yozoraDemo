@@ -3,6 +3,9 @@ import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 
+// テーマ変更用
+import { useThemeStore } from '../store/useThemeStore'
+
 // --- Layer 1: Background Shader (Vertical Gradient) ---
 const BackgroundMaterial = shaderMaterial(
   {
@@ -236,6 +239,8 @@ export function SkyBox() {
   const starsRef = useRef()
   const fogRef = useRef()
 
+  const { currentTheme } = useThemeStore()
+
   useFrame((state, delta) => {
     if (fluidRef.current) fluidRef.current.time += delta
     if (starsRef.current) starsRef.current.time += delta
@@ -252,7 +257,10 @@ export function SkyBox() {
       */}
       <mesh position={[0, 0, -50]} name="Layer1_Background">
         <planeGeometry args={[1000, 500]} />
-        <backgroundMaterial colorTop="#000000" colorBottom="#101035" />
+        <backgroundMaterial
+          colorTop={currentTheme.colorTop}
+          colorBottom={currentTheme.colorBottom}
+        />
       </mesh>
 
       {/* 2. Fluid Layer (Milky Way) - Slightly closer */}
@@ -266,8 +274,8 @@ export function SkyBox() {
         <planeGeometry args={[1000, 500]} />
         <fluidMaterial
           ref={fluidRef}
-          colorA="#101035"
-          colorB="#551a8b"
+          colorA={currentTheme.colorA}
+          colorB={currentTheme.colorB}
           transparent
           blending={THREE.AdditiveBlending} // 加算合成: 光り輝くような表現
           depthWrite={false}
@@ -305,7 +313,7 @@ export function SkyBox() {
         <planeGeometry args={[1000, 500]} />
         <fogMaterial
           ref={fogRef}
-          color="#aaaaff"
+          color={currentTheme.color}
           opacity={0.1}
           transparent
           depthWrite={false}
