@@ -47,6 +47,8 @@ src/
 11.azureVMでデプロイ✅️
 ＝＝＝ビジュアル系＝＝＝
 1.shadertoyからStarNestを入れ直す（skybox交換）　https://www.shadertoy.com/view/XlfGRj
+2.ディフォルトの色合い3パターン出す
+
 
 ```
 ## Development Tools
@@ -98,6 +100,19 @@ CameraControlsを使用し、ズームや移動の制限（最小・最大距離
 4. **Fog**: 奥行きを出すための霧
 各レイヤーは専用のシェーダーで描画され、軽量かつ表現豊かに実装。
 
+## SkyBoxの色合いはどうやって決めたの？
+1. Layer1 Backgroundの宇宙背景の色を決める
+   <br>255行　
+   backgroundMaterial colorTop="#000000" colorBottom="#101035" 
+   <br>
+   colorTopは上部の色、colorBottomは下部の色<br>
+2. Layer2 Fluidの動いている天の川の色を決める<br>
+   269~270行 <colorA="#101035" colorB="#551a8b" /><br>
+   colorAはメインな色、colorBは輝く部分の色<br>
+3. Layer3 Starsの背景の遠い星の色を決める<br>
+   289行 <color="#ffffff" /><br>
+4. Layer4 Fogの薄い霧の色を決める<br>
+   308行 <color="#aaaaff" /><br>
 
 ## MyStars
 レイヤー5に相当する、ユーザー自身の星を描画するコンポーネント。
