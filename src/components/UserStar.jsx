@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { shaderMaterial, Billboard, Text } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
-import { useRef, useMemo } from 'react'
+import { useRef } from 'react'
 
 // --- SingleStarMaterial ---
 // MyStarMaterialを単一の星用に調整したシェーダー
