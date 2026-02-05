@@ -1,4 +1,0 @@
-VITE_SUPABASE_URL = SUPABASE URLをここに記入
-VITE_SUPABASE_PUBLISHABLE_KEY = PUBLISHABLE_KEYをここに記入
-
-# 記入完了したら、.env exampleを.envに変更してください

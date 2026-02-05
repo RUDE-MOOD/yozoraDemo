@@ -6,6 +6,8 @@ import { useThemeStore } from '../store/useThemeStore';
 export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
   const [menuOpen, setMenuOpen] = useState(false);
+  // ユーザーメニューの開閉状態
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   // 日記モーダルの開閉状態
   const [diaryOpen, setDiaryOpen] = useState(false);
   // 日記の入力テキスト
@@ -103,7 +105,8 @@ export const UI = ({ onSend, onStarClick }) => {
                 setMenuOpen(false);
                 setDiaryOpen(true);
               }}
-              className="w-full text-left px-5 py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
             >
               日記を書く
             </button>
@@ -134,6 +137,65 @@ export const UI = ({ onSend, onStarClick }) => {
                 title="Green"
               />
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* --- ユーザーメニュー (User Menu) - 左下 --- */}
+      <div className="fixed bottom-6 left-6 z-[1000]">
+        <button
+          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
+        >
+          {/* 人のアイコン (User Icon) */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+            />
+          </svg>
+        </button>
+
+        {userMenuOpen && (
+          <div className="absolute bottom-12 left-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-left">
+            <button
+              onClick={() => {
+                setUserMenuOpen(false);
+                // TODO: プロフィール機能
+              }}
+              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+            >
+              テーマ
+            </button>
+            <button
+              onClick={() => {
+                setUserMenuOpen(false);
+                // TODO: 設定機能
+              }}
+              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+            >
+              ログ
+            </button>
+            <button
+              onClick={() => {
+                setUserMenuOpen(false);
+                // TODO: ログアウト機能
+              }}
+              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+            >
+              設定
+            </button>
           </div>
         )}
       </div>
