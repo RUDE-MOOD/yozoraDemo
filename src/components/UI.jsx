@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
 import { useThemeStore } from '../store/useThemeStore';
+import { ThemeSelectionModal } from './ThemeSelectionModal';
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
@@ -53,6 +54,8 @@ export const UI = ({ onSend, onStarClick }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   // 日記モーダルの開閉状態
   const [diaryOpen, setDiaryOpen] = useState(false);
+  // テーマ選択モーダルの開閉状態
+  const [themeModalOpen, setThemeModalOpen] = useState(false);
   // スライダーの値（0-100）
   const [moodValues, setMoodValues] = useState(INITIAL_MOOD_VALUES);
   // 星の詳細確認モーダルの開閉状態
@@ -164,33 +167,6 @@ export const UI = ({ onSend, onStarClick }) => {
             >
               日記を書く
             </button>
-
-            {/* テーマ変更セクション */}
-            <div className="border-t border-white/10 my-1 mx-2"></div>
-            <p className="text-white/50 text-[10px] uppercase tracking-widest px-5 py-2 font-sans">Theme</p>
-            <div className="flex justify-around px-4 pb-4">
-              {/* Purple Theme */}
-              <button
-                onClick={() => setTheme('purple')}
-                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(85,26,139,0.5)]"
-                style={{ backgroundColor: '#551a8b' }}
-                title="Purple"
-              />
-              {/* Blue Theme */}
-              <button
-                onClick={() => setTheme('blue')}
-                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(0,119,190,0.5)]"
-                style={{ backgroundColor: '#0077be' }}
-                title="Blue"
-              />
-              {/* Green Theme */}
-              <button
-                onClick={() => setTheme('green')}
-                className="w-6 h-6 rounded-full border border-white/20 hover:scale-110 transition-transform shadow-[0_0_10px_rgba(46,139,87,0.5)]"
-                style={{ backgroundColor: '#2e8b57' }}
-                title="Green"
-              />
-            </div>
           </div>
         )}
       </div>
@@ -223,7 +199,7 @@ export const UI = ({ onSend, onStarClick }) => {
             <button
               onClick={() => {
                 setUserMenuOpen(false);
-                // TODO: プロフィール機能
+                setThemeModalOpen(true);
               }}
               className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
               style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
@@ -338,6 +314,12 @@ export const UI = ({ onSend, onStarClick }) => {
           </div>
         </div>
       )}
+
+      {/* --- テーマ選択モーダル (Theme Selection Modal) --- */}
+      <ThemeSelectionModal
+        isOpen={themeModalOpen}
+        onClose={() => setThemeModalOpen(false)}
+      />
 
       {/* --- 星の詳細確認モーダル (Star Detail Modal) --- */}
       <StarDetailModal
