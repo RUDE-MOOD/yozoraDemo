@@ -25,12 +25,86 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 import { GoogleGenerativeAI } from "npm:@google/generative-ai@0.21.0"
 
-console.log("Gemini Diary Analyzer Function started!")
+console.log("Gemini Mood Analyzer Function started!")
 
 // フロントエンドリクエスト用のCORSヘッダー
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// ムード値に基づいて感情を判定（5つの指標を使用）
+function determineEmotion(moodValues: { 
+  comfort: number; 
+  intensity: number; 
+  connection: number;
+  control: number;
+  energy: number;
+}): string {
+  const { comfort, intensity, connection, control, energy } = moodValues
+
+  // 感情の判定ロジック
+  // comfort: 心地よさ (0=つらい, 100=心地よい)
+  // intensity: 感情の強さ (0=無感情, 100=抑えきれない)
+  // connection: つながり (0=孤独, 100=つながっている)
+  // control: コントロール (0=混乱, 100=冷静)
+  // energy: エネルギー (0=疲労, 100=活力)
+
+  // 低エネルギー + 低コントロール = 疲弊状態
+  if (energy < 30 && control < 30) {
+    return '疲弊'
+  }
+
+  // 低強度 + 高コントロール = 平穏
+  if (intensity < 30 && control >= 50) {
+    return '平穏'
+  }
+
+  // 高comfort + 高connection = 愛
+  if (comfort >= 70 && connection >= 70) {
+    return '愛'
+  }
+
+  // 高comfort + 高energy = 興奮
+  if (comfort >= 70 && energy >= 70 && intensity >= 50) {
+    return '興奮'
+  }
+
+  // 高comfort = 喜び
+  if (comfort >= 70) {
+    return '喜び'
+  }
+
+  // 低comfort + 低connection = 悲しみ
+  if (comfort <= 30 && connection <= 30) {
+    return '悲しみ'
+  }
+
+  // 低comfort + 高intensity + 低control = 怒り
+  if (comfort <= 30 && intensity >= 70 && control <= 40) {
+    return '怒り'
+  }
+
+  // 低comfort + 低control = 不安
+  if (comfort <= 30 && control <= 40) {
+    return '不安'
+  }
+
+  // 低comfort = 不安（デフォルト）
+  if (comfort <= 30) {
+    return '不安'
+  }
+
+  // 中間的な状態
+  if (connection >= 60) {
+    return '愛'
+  }
+
+  if (energy >= 60) {
+    return '活力'
+  }
+
+  return '平穏'
 }
 
 Deno.serve(async (req) => {
@@ -47,12 +121,12 @@ Deno.serve(async (req) => {
     }
 
     // 2. リクエストボディを解析
-    const { diaryText } = await req.json()
-    if (!diaryText || typeof diaryText !== 'string') {
+    const { moodValues } = await req.json()
+    if (!moodValues || typeof moodValues !== 'object') {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'diaryText is required and must be a string'
+          error: 'moodValues is required and must be an object with comfort, intensity, connection, control, energy'
         }),
         {
           status: 400,
@@ -61,36 +135,35 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log(`Analyzing diary: "${diaryText.substring(0, 50)}..."`)
+    const { comfort, intensity, connection, control, energy } = moodValues
+    console.log(`Analyzing mood: comfort=${comfort}, intensity=${intensity}, connection=${connection}, control=${control}, energy=${energy}`)
+
+    // 感情を判定
+    const emotion = determineEmotion(moodValues)
 
     // 3. Gemini AIを初期化
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
-    // 4. 感情分析プロンプトを作成
-    const prompt = `あなたは優しく共感的なカウンセラーです。以下の日記を読んで、感情を正確に分析し、ユーザーを励ましてください。
+    // 4. フィードバック生成プロンプトを作成
+    const prompt = `あなたは優しく共感的なカウンセラーです。ユーザーが今日の気持ちを5つのスライダーで記録しました。
 
-日記テキスト: "${diaryText}"
+【今日の気持ち】
+- 心地よさ: ${comfort}/100 (0=とてもつらい、100=とても心地いい)
+- 感情の強さ: ${intensity}/100 (0=無感情、100=抑えきれない)
+- つながり: ${connection}/100 (0=孤独、100=つながっている)
+- コントロール: ${control}/100 (0=混乱、100=冷静)
+- エネルギー: ${energy}/100 (0=疲労、100=活力)
 
-【感情の定義】
-- 喜び：楽しい、嬉しい、幸せ、満足などのポジティブな感情
-- 悲しみ：悲しい、寂しい、落ち込んでいる、失望などのネガティブな感情
-- 怒り：腹が立つ、イライラする、不満などの怒りの感情
-- 不安：心配、恐れ、緊張、不安などの感情
-- 愛：愛情、感謝、温かさ、親しみなどの感情
-- 興奮：ワクワク、ドキドキ、高揚感などの感情
-- 平穏：穏やか、リラックス、落ち着いているなどの感情
+判定された感情: ${emotion}
 
-以下のJSON形式で回答してください（他の説明は一切不要です）：
+この気持ちの状態に対して、温かく共感的なフィードバックメッセージを1-2文で生成してください。
+ユーザーの気持ちを受け止め、前向きな言葉をかけてください。
+
+回答は以下のJSON形式のみで返してください（他の説明は不要です）：
 {
-  "emotion": "喜び" または "悲しみ" または "怒り" または "不安" または "愛" または "興奮" または "平穏",
-  "feedback": "ユーザーへの温かく励ましのメッセージ（1-2文で簡潔に）"
-}
-
-重要：
-- 日記の内容を注意深く読み、本当に表現されている感情を選んでください
-- 「楽しい」「嬉しい」などの言葉があれば「喜び」を選んでください
-- feedbackは必ず肯定的で、ユーザーの気持ちに寄り添い、前向きな言葉をかけてください`
+  "feedback": "フィードバックメッセージ"
+}`
 
     // 5. Gemini APIを呼び出し
     const result = await model.generateContent(prompt)
@@ -100,26 +173,20 @@ Deno.serve(async (req) => {
     console.log(`Gemini response: ${text}`)
 
     // 6. JSONレスポンスを解析
-    // マークダウンコードブロックがあれば削除
     const cleanedText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     const analysisResult = JSON.parse(cleanedText)
 
-    // 7. レスポンスを検証
-    const validEmotions = ['喜び', '悲しみ', '怒り', '不安', '愛', '興奮', '平穏']
-    if (!analysisResult.emotion || !validEmotions.includes(analysisResult.emotion)) {
-      throw new Error('Invalid emotion value')
-    }
     if (!analysisResult.feedback || typeof analysisResult.feedback !== 'string') {
       throw new Error('Invalid feedback value')
     }
 
-    // 8. 成功レスポンスを返す
+    // 7. 成功レスポンスを返す
     return new Response(
       JSON.stringify({
         success: true,
-        emotion: analysisResult.emotion,
+        emotion: emotion,
         feedback: analysisResult.feedback,
-        analyzedText: diaryText
+        moodValues: moodValues
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

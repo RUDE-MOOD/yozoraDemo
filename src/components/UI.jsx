@@ -3,6 +3,49 @@ import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
 import { useThemeStore } from '../store/useThemeStore';
 
+// スライダー質問の定義（5つ）
+const MOOD_QUESTIONS = [
+  {
+    id: 'comfort',
+    question: '今の気持ちはどれくらい心地いい？',
+    leftLabel: 'とてもつらい',
+    rightLabel: 'とても心地いい',
+  },
+  {
+    id: 'intensity',
+    question: '気持ちはどれくらい強く動いている？',
+    leftLabel: '無感情',
+    rightLabel: '抑えきれない',
+  },
+  {
+    id: 'connection',
+    question: '人や世界とのつながりを感じている？',
+    leftLabel: '孤独',
+    rightLabel: 'つながっている',
+  },
+  {
+    id: 'control',
+    question: '自分をコントロールできている？',
+    leftLabel: '混乱',
+    rightLabel: '冷静',
+  },
+  {
+    id: 'energy',
+    question: 'エネルギーはどれくらいある？',
+    leftLabel: '疲労',
+    rightLabel: '活力',
+  },
+];
+
+// 初期スライダー値
+const INITIAL_MOOD_VALUES = {
+  comfort: 50,
+  intensity: 50,
+  connection: 50,
+  control: 50,
+  energy: 50,
+};
+
 export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,8 +53,8 @@ export const UI = ({ onSend, onStarClick }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   // 日記モーダルの開閉状態
   const [diaryOpen, setDiaryOpen] = useState(false);
-  // 日記の入力テキスト
-  const [diaryText, setDiaryText] = useState('');
+  // スライダーの値（0-100）
+  const [moodValues, setMoodValues] = useState(INITIAL_MOOD_VALUES);
   // 星の詳細確認モーダルの開閉状態
   const [starOpen, setStarOpen] = useState(false);
   // 選択された星のデータ
@@ -21,6 +64,20 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // テーマ変更関数
   const { setTheme } = useThemeStore();
+
+  // スライダー値の更新
+  const handleSliderChange = (id, value) => {
+    setMoodValues(prev => ({ ...prev, [id]: value }));
+  };
+
+  // 今日の日付をフォーマット
+  const getFormattedDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
+  };
 
   // 星の詳細を表示する関数
   const showStarDetails = (starData) => {
@@ -41,19 +98,16 @@ export const UI = ({ onSend, onStarClick }) => {
   const handleSend = async () => {
     // 連打防止
     if (isSending) return;
-    // 空文字列チェック
-    if (diaryText.trim() === '') return;
     // 送信開始
     setIsSending(true);
 
     try {
       let analysisResult = null;
       // 1. Gemini APIを呼び出す (Supabase Edge Function)
-      // 注意: 開発環境では時々タイムアウトすることがあるので、その場合はnullのまま進む
+      // スライダー値からフィードバックを生成
       try {
-        // エッジファンクションを応用して、body内に日記のテキストを送信する
         const { data, error } = await supabase.functions.invoke('analyze-diary', {
-          body: { diaryText }
+          body: { moodValues }
         });
         if (error) {
           console.error("Gemini API Error:", error);
@@ -67,14 +121,14 @@ export const UI = ({ onSend, onStarClick }) => {
         console.error("API Call Failed:", apiError);
       }
       // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
-      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(text, analysisResult)
+      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(moodValues, analysisResult)
       if (onSend) {
-        await onSend(diaryText, analysisResult);
+        await onSend(moodValues, analysisResult);
       }
-      console.log("Diary Entry Saved!");
+      console.log("Mood Entry Saved!");
 
       // 3. フォームをリセットして閉じる
-      setDiaryText('');
+      setMoodValues(INITIAL_MOOD_VALUES);
       setDiaryOpen(false);
 
     } catch (error) {
@@ -200,7 +254,7 @@ export const UI = ({ onSend, onStarClick }) => {
         )}
       </div>
 
-      {/* --- 日記モーダル (Diary Modal) --- */}
+      {/* --- 日記モーダル (Mood Diary Modal) --- */}
       {diaryOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* 背景のバックドロップ (クリックで閉じる) */}
@@ -210,65 +264,75 @@ export const UI = ({ onSend, onStarClick }) => {
           ></div>
 
           {/* モーダルコンテンツ */}
-          <div className="relative w-full max-w-sm mx-8 bg-gradient-to-b from-[#151530]/80 to-[#2a2a50]/80 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100">
+          <div className="relative w-full max-w-sm mx-4 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[85vh] overflow-y-auto">
 
-            {/* ヘッダーと閉じるボタン */}
-            <div className="relative text-center mb-8 mt-2 flex items-center justify-center">
-              <h2 className="text-white/90 font-sans text-lg tracking-[0.2em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-                今日のこと
+            {/* ヘッダー: 日付と閉じるボタン */}
+            <div className="relative text-center mb-6 flex items-center justify-center">
+              <h2 className="text-white/90 font-sans text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                {getFormattedDate()}
               </h2>
 
-              {/* 閉じる "X" ボタン - ヘッダー行に対して相対配置 */}
+              {/* 閉じる "X" ボタン */}
               <button
                 onClick={() => setDiaryOpen(false)}
-                className="absolute right-0 text-white/40 hover:text-white transition-colors"
+                className="absolute right-0 text-white/50 hover:text-white transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            {/* テキスト入力コンテナ (アニメーション用) */}
-            <div className="relative w-full h-56 bg-black/20 rounded-2xl overflow-hidden mb-2">
+            {/* スライダー質問リスト */}
+            <div className="space-y-6">
+              {MOOD_QUESTIONS.map((q) => (
+                <div key={q.id} className="space-y-2">
+                  {/* 質問テキスト */}
+                  <p className="text-white/90 text-sm font-sans tracking-wide text-center">
+                    {q.question}
+                  </p>
 
-              {/* レイヤー1: 表示レイヤー (テキストアニメーション) */}
-              <div
-                className="absolute inset-0 p-6 font-sans text-base leading-relaxed text-white/90 whitespace-pre-wrap break-words pointer-events-none"
-                aria-hidden="true"
-              >
-                {diaryText.split('').map((char, index) => (
-                  <span
-                    key={index}
-                    // inline-blockだと折り返しがずれるためinlineに変更
-                    className="animate-char inline"
-                    style={{ animationDelay: '0ms' }}
-                  >
-                    {char}
-                  </span>
-                ))}
-                {/* 文字がない時のプレースホルダー表示 */}
-                {diaryText.length === 0 && (
-                  <span className="text-white/30">今日はどんな星を見つけましたか？...</span>
-                )}
-              </div>
+                  {/* スライダー */}
+                  <div className="relative px-1">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={moodValues[q.id]}
+                      onChange={(e) => handleSliderChange(q.id, parseInt(e.target.value))}
+                      className="mood-slider w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
+                      }}
+                    />
+                  </div>
 
-              {/* レイヤー2: 入力レイヤー (透明だが操作可能) */}
-              <textarea
-                value={diaryText}
-                onChange={(e) => setDiaryText(e.target.value)}
-                className="absolute inset-0 w-full h-full p-6 bg-transparent text-transparent caret-white resize-none focus:outline-none focus:ring-1 focus:ring-white/10 rounded-2xl font-sans text-base leading-relaxed"
-                spellCheck={false}
-              />
+                  {/* ラベル */}
+                  <div className="flex justify-between text-white/50 text-xs font-sans">
+                    <span>{q.leftLabel}</span>
+                    <span>{q.rightLabel}</span>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* フッターボタン */}
-            <div className="flex justify-end items-center mt-6">
+            {/* フッター: 送信ボタン（矢印） */}
+            <div className="flex justify-end items-center mt-8">
               <button
                 onClick={handleSend}
-                className="px-10 py-3 bg-gradient-to-r from-blue-500/80 to-purple-500/80 hover:from-blue-400 hover:to-purple-400 text-white rounded-full shadow-lg shadow-purple-500/30 transition-all duration-300 transform hover:scale-105 tracking-widest text-sm font-medium border border-white/20"
+                disabled={isSending}
+                className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300 disabled:opacity-50"
               >
-                送信
+                {isSending ? (
+                  <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>

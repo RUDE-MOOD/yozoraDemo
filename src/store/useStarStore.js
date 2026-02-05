@@ -32,11 +32,11 @@ export const useStarStore = create((set) => ({
     },
 
     // UIから星を追加する
-
-    //  analysis_result = null は、エラー回避するための初期値
-    addStar: async (text, analysisResult = null) => {
-        const newStar = starDataMaker({ text });
-        // THREE.Colorインスタンスを{r,g,b}の普通オブジェクトに変換してから保存、同様にfetchStarsでもrgbをColorインスタンスに変換しないといけない
+    // moodValues = { comfort, intensity, connection } (各0-100)
+    // analysisResult = null は、エラー回避するための初期値
+    addStar: async (moodValues, analysisResult = null) => {
+        const newStar = starDataMaker({ moodValues });
+        // THREE.Colorインスタンスを{r,g,b}の普通オブジェクトに変換してから保存
         const upstar = {
             ...newStar,
             color: { r: newStar.color.r, g: newStar.color.g, b: newStar.color.b },
@@ -46,7 +46,6 @@ export const useStarStore = create((set) => ({
         // データベースに保存
         const { error } = await supabase.from('t_stars').insert(upstar);
         if (error) throw error
-
 
         const starForShow = {
             ...newStar,
