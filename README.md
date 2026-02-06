@@ -208,8 +208,11 @@ API キーを安全に扱うため、クライアントサイドではなく **S
 2. **Secret の設定**: Supabase Dashboard > Edge Functions > Secrets に `GEMINI_API_KEY` を設定
 3. **デプロイ（注意 ⚠️ プロンプトが記載した index.ts を編集するたびに再デプロイが必要）**: 以下のコマンドでクラウドに反映
    ```bash
-   npx supabase functions deploy analyze-diary
+   npx supabase functions deploy analyze-diary --no-verify-jwt
+   # または
+   npm run deploy:analyze-diary
    ```
+   - `--no-verify-jwt`: 401 Unauthorized を防ぐため、ログインなしで anon key のみで呼び出せるようにする
 
 ## 動作確認
 

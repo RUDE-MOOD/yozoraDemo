@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
 import { ThemeSelectionModal } from './ThemeSelectionModal';
+import { getFallbackAnalysis } from '../utils/fallbackAnalysis';
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
@@ -113,27 +114,29 @@ export const UI = ({ onSend, onStarClick }) => {
     setIsSending(true);
 
     try {
+      const goodThings = { goodThing1, goodThing2, goodThing3 };
       let analysisResult = null;
       // 1. Gemini APIを呼び出す (Supabase Edge Function)
-      // スライダー値からフィードバックを生成
+      // スライダー値と今日のいいことから星からの手紙を生成
       try {
         const { data, error } = await supabase.functions.invoke('analyze-diary', {
-          body: { moodValues }
+          body: { moodValues, goodThings }
         });
         if (error) {
           console.error("Gemini API Error:", error);
-        } else {
+        } else if (data && data.success) {
           console.log("✅ Analysis Result:", data);
-          if (data && data.success) {
-            analysisResult = data;
-          }
+          analysisResult = data;
+        }
+        // API失敗時はフォールバックで星からの手紙を生成
+        if (!analysisResult) {
+          analysisResult = getFallbackAnalysis(moodValues, goodThings);
         }
       } catch (apiError) {
         console.error("API Call Failed:", apiError);
+        analysisResult = getFallbackAnalysis(moodValues, goodThings);
       }
       // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
-      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(moodValues, analysisResult, goodThings)
-      const goodThings = { goodThing1, goodThing2, goodThing3 };
       if (onSend) {
         await onSend(moodValues, analysisResult, goodThings);
       }

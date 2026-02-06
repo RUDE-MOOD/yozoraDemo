@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:analyze-diary": "supabase functions deploy analyze-diary --no-verify-jwt"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

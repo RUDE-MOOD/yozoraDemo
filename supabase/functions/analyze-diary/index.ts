@@ -126,7 +126,8 @@ Deno.serve(async (req) => {
     }
 
     // 2. リクエストボディを解析
-    const { moodValues } = await req.json()
+    const body = await req.json()
+    const { moodValues, goodThings } = body || {}
     if (!moodValues || typeof moodValues !== 'object') {
       return new Response(
         JSON.stringify({
@@ -141,7 +142,13 @@ Deno.serve(async (req) => {
     }
 
     const { emotional, motivation, social, physical, fulfillment } = moodValues
-    console.log(`Analyzing mood: emotional=${emotional}, motivation=${motivation}, social=${social}, physical=${physical}, fulfillment=${fulfillment}`)
+    const goodThingsList = goodThings
+      ? [goodThings.goodThing1, goodThings.goodThing2, goodThings.goodThing3]
+          .filter((s): s is string => !!s && typeof s === 'string')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : []
+    console.log(`Analyzing mood: emotional=${emotional}, motivation=${motivation}, social=${social}, physical=${physical}, fulfillment=${fulfillment}, goodThings=${goodThingsList.length}`)
 
     // 感情を判定
     const emotion = determineEmotion(moodValues)
@@ -150,8 +157,11 @@ Deno.serve(async (req) => {
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
-    // 4. フィードバック生成プロンプトを作成
-    const prompt = `あなたは優しく共感的なカウンセラーです。ユーザーが今日の気持ちを5つのスライダーで記録しました。
+    // 4. フィードバック生成プロンプトを作成（星からの手紙として）
+    const goodThingsSection = goodThingsList.length > 0
+      ? `\n【今日のいいこと】\n${goodThingsList.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n`
+      : ''
+    const prompt = `あなたは宇宙の星のように優しく見守る存在です。ユーザーが今日の気持ちを5つのスライダーで記録しました。
 
 【今日の気持ち】
 - 情緒的安定性: ${emotional}/100 (0=つらい・どんより、100=心地いい・穏やか)
@@ -160,12 +170,12 @@ Deno.serve(async (req) => {
 - 生体的メカニズム: ${physical}/100 (0=ずっしり重たい、100=すっきり軽やか)
 - 刺激の受容: ${fulfillment}/100 (0=退屈・マンネリ、100=新鮮・充実していた)
 
-判定された状態: ${emotion}
+判定された感情の状態: ${emotion}${goodThingsSection}
 
-この気持ちの状態に対して、温かく共感的なフィードバックメッセージを1-2文で生成してください。
-ユーザーの気持ちを受け止め、前向きな言葉をかけてください。
+この気持ち${goodThingsList.length > 0 ? 'と今日のいいこと' : ''}に対して「星からの手紙」として、温かく共感的なメッセージを1-2文で生成してください。
+${goodThingsList.length > 0 ? '今日のいいことに触れつつ、' : ''}ユーザーの気持ちをそのまま受け止め、前向きになれる言葉をかけてください。夜空の星が語りかけるような優しいトーンで。
 
-回答は以下のJSON形式のみで返してください（他の説明は不要です）：
+回答は以下のJSON形式のみで返してください（他の説明やマークダウンは不要です）：
 {
   "feedback": "フィードバックメッセージ"
 }`
@@ -206,7 +216,7 @@ Deno.serve(async (req) => {
         success: false,
         error: error.message || 'Unknown error occurred',
         details: error.toString()
-      }),￥’
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -9,11 +9,9 @@ import * as THREE from "three";
  *   - social: 社会的適応（孤独・物足りない ↔ 充足感・満タン）
  *   - physical: 生体的メカニズム（ずっしり重たい ↔ すっきり軽やか）
  *   - fulfillment: 刺激の受容（退屈・マンネリ ↔ 新鮮・充実していた）
- * @param {Object} [params.goodThings] - 今日のいいこと（PC入力時）
- *   - goodThing1, goodThing2, goodThing3
  * @returns {Object} starData - 星のデータ
  */
-export const starDataMaker = ({ moodValues, goodThings }) => {
+export const starDataMaker = ({ moodValues }) => {
 
     const now = new Date();
     // 日付のフォーマット: YY/MM/DD HH:mm (例: 26/1/26 16:25)
@@ -53,15 +51,6 @@ export const starDataMaker = ({ moodValues, goodThings }) => {
         });
     };
 
-    // 今日のいいことからテキストを生成（改行区切り）
-    const text = goodThings
-        ? [goodThings.goodThing1, goodThings.goodThing2, goodThings.goodThing3]
-            .filter(Boolean)
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .join('\n') || null
-        : null;
-
     const starData = {
         id: generateUUID(),
         position: [x, y, z],
@@ -70,8 +59,7 @@ export const starDataMaker = ({ moodValues, goodThings }) => {
         random: Math.random(),
         created_at: now.toISOString(),
         display_date: dateStr,
-        mood_values: moodValues,  // スライダー値を保存
-        ...(text && { text })    // テキストがあれば追加
+        mood_values: moodValues  // スライダー値を保存
     };
     return starData;
 };

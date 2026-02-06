@@ -22,10 +22,11 @@ export const useStarStore = create((set) => ({
             return;
         }
 
-        // rgbをColorインスタンスに還元する
+        // rgbをColorインスタンスに還元し、mood_valuesをanalysis_dataから復元
         const starsWithColor = data.map(star => ({
             ...star,
-            color: new Color(star.color.r, star.color.g, star.color.b)
+            color: new Color(star.color.r, star.color.g, star.color.b),
+            mood_values: star.analysis_data?.moodValues ?? star.mood_values ?? null,
         }));
 
         set({ stars: starsWithColor });
@@ -34,15 +35,30 @@ export const useStarStore = create((set) => ({
     // UIから星を追加する
     // moodValues = { emotional, motivation, social, physical, fulfillment } (各0-100)
     // analysisResult = null は、エラー回避するための初期値
-    // goodThings = { goodThing1, goodThing2, goodThing3 } (PC入力時のみ)
+    // goodThings = { goodThing1, goodThing2, goodThing3 } （3つのいいこと）
     addStar: async (moodValues, analysisResult = null, goodThings = null) => {
-        const newStar = starDataMaker({ moodValues, goodThings });
-        // THREE.Colorインスタンスを{r,g,b}の普通オブジェクトに変換してから保存
+        const newStar = starDataMaker({ moodValues });
+
+        // analysis_data: moodValues + Gemini結果 + goodThings（t_starsにmood_valuesカラムがないためここに格納）
+        const analysisData = {
+            moodValues,
+            ...(analysisResult || {}),
+            ...(goodThings && (goodThings.goodThing1 || goodThings.goodThing2 || goodThings.goodThing3)
+                ? { goodThings }
+                : {}),
+        };
+
+        // t_starsの実際のカラムのみ挿入（id, position, color, scale, random, created_at, display_date, analysis_data）
         const upstar = {
-            ...newStar,
+            id: newStar.id,
+            position: newStar.position,
             color: { r: newStar.color.r, g: newStar.color.g, b: newStar.color.b },
-            analysis_data: analysisResult
-        }
+            scale: newStar.scale,
+            random: newStar.random,
+            created_at: newStar.created_at,
+            display_date: newStar.display_date,
+            analysis_data: analysisData,
+        };
 
         // データベースに保存
         const { error } = await supabase.from('t_stars').insert(upstar);
@@ -50,7 +66,7 @@ export const useStarStore = create((set) => ({
 
         const starForShow = {
             ...newStar,
-            analysis_data: analysisResult
+            analysis_data: analysisData,
         };
         // 成功したら、画面を更新し、カメラのフォーカス対象を設定する
         set((state) => ({
