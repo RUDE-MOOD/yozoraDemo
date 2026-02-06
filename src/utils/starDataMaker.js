@@ -3,7 +3,12 @@ import * as THREE from "three";
 /**
  * ムードデータから星を生成する
  * @param {Object} params - パラメータ
- * @param {Object} params.moodValues - スライダー値 { comfort, intensity, connection, control, energy } (各0-100)
+ * @param {Object} params.moodValues - スライダー値 (各0-100)
+ *   - emotional: 情緒的安定性（つらい・どんより ↔ 心地いい・穏やか）
+ *   - motivation: 動因の充足（無気力・不完全燃焼 ↔ やりきった・満足）
+ *   - social: 社会的適応（孤独・物足りない ↔ 充足感・満タン）
+ *   - physical: 生体的メカニズム（ずっしり重たい ↔ すっきり軽やか）
+ *   - fulfillment: 刺激の受容（退屈・マンネリ ↔ 新鮮・充実していた）
  * @returns {Object} starData - 星のデータ
  */
 export const starDataMaker = ({ moodValues }) => {
@@ -29,11 +34,11 @@ export const starDataMaker = ({ moodValues }) => {
     // connection: つながり (0=孤独/明度低, 100=つながり/明度高)
     const color = generateMoodColor(moodValues);
 
-    // 感情の強さとエネルギーに応じてスケールを調整
+    // 充実感と体の状態に応じてスケールを調整
     const baseScale = 2.0;
-    const intensityBonus = (moodValues.intensity / 100) * 2.0;
-    const energyBonus = (moodValues.energy / 100) * 1.5;
-    const scale = baseScale + intensityBonus + energyBonus + Math.random() * 0.5;
+    const fulfillmentBonus = (moodValues.fulfillment / 100) * 2.0;
+    const physicalBonus = (moodValues.physical / 100) * 1.5;
+    const scale = baseScale + fulfillmentBonus + physicalBonus + Math.random() * 0.5;
 
     // UUID生成
     const generateUUID = () => {
@@ -61,30 +66,29 @@ export const starDataMaker = ({ moodValues }) => {
 
 /**
  * ムード値から色を生成
- * @param {Object} moodValues - { comfort, intensity, connection, control, energy }
+ * @param {Object} moodValues - { emotional, motivation, social, physical, fulfillment }
  * @returns {THREE.Color} 生成された色
  */
 function generateMoodColor(moodValues) {
-    const { comfort, intensity, connection, control, energy } = moodValues;
+    const { emotional, motivation, social, physical, fulfillment } = moodValues;
     const color = new THREE.Color();
 
-    // comfort (0-100) → 基本色相
-    // 0 (つらい): 青系 (0.6) → 100 (心地よい): 暖色系 (0.1)
-    let hue = 0.6 - (comfort / 100) * 0.5;
+    // emotional (情緒的安定性 0-100) → 基本色相
+    // 0 (つらい・どんより): 青系 (0.6) → 100 (心地いい・穏やか): 暖色系 (0.1)
+    let hue = 0.6 - (emotional / 100) * 0.5;
 
-    // control: コントロール度合いで色相を微調整
-    // 高いcontrolは色を安定させる（紫〜青方向へ）
-    // 低いcontrolは色を不安定に（赤〜オレンジ方向へ）
-    const controlShift = ((control - 50) / 100) * 0.1;
-    hue = Math.max(0, Math.min(1, hue + controlShift));
+    // motivation (動因の充足): やりきり度合いで色相を微調整
+    // 高いmotivationは達成感の暖色方向へ
+    const motivationShift = ((motivation - 50) / 100) * 0.1;
+    hue = Math.max(0, Math.min(1, hue - motivationShift));
 
-    // intensity (0-100) → saturation (彩度)
-    // 0 (無感情): 0.3 → 100 (抑えきれない): 1.0
-    const saturation = 0.3 + (intensity / 100) * 0.7;
+    // fulfillment (刺激の受容 0-100) → saturation (彩度)
+    // 0 (退屈・マンネリ): 0.3 → 100 (新鮮・充実): 1.0
+    const saturation = 0.3 + (fulfillment / 100) * 0.7;
 
-    // connection + energy → lightness (明度)
-    // つながりとエネルギーの組み合わせで明るさを決定
-    const avgBrightness = (connection + energy) / 2;
+    // social + physical → lightness (明度)
+    // 社会的充足と体の軽やかさの組み合わせで明るさを決定
+    const avgBrightness = (social + physical) / 2;
     const lightness = 0.4 + (avgBrightness / 100) * 0.5;
 
     color.setHSL(hue, saturation, lightness);

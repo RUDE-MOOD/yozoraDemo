@@ -383,92 +383,113 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                 <div className="flex-1 min-w-0">
                                     <p className="text-white/50 text-xs tracking-wider mb-3 font-sans">気持ちの記録</p>
                                     <div className="space-y-3">
-                                        {/* 心地よさ */}
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between text-xs">
-                                                <span className="text-white/40">心地よさ</span>
-                                                <span className="text-white/60 font-mono">{starData.mood_values.comfort}%</span>
-                                            </div>
-                                            <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full transition-all duration-500"
-                                                    style={{ width: `${starData.mood_values.comfort}%` }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between text-[10px] text-white/30">
-                                                <span>とてもつらい</span>
-                                                <span>とても心地いい</span>
-                                            </div>
-                                        </div>
-                                        {/* 感情の強さ */}
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between text-xs">
-                                                <span className="text-white/40">感情の強さ</span>
-                                                <span className="text-white/60 font-mono">{starData.mood_values.intensity}%</span>
-                                            </div>
-                                            <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-gray-400 to-orange-400 rounded-full transition-all duration-500"
-                                                    style={{ width: `${starData.mood_values.intensity}%` }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between text-[10px] text-white/30">
-                                                <span>無感情</span>
-                                                <span>抑えきれない</span>
-                                            </div>
-                                        </div>
-                                        {/* つながり */}
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between text-xs">
-                                                <span className="text-white/40">つながり</span>
-                                                <span className="text-white/60 font-mono">{starData.mood_values.connection}%</span>
-                                            </div>
-                                            <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
-                                                <div
-                                                    className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500"
-                                                    style={{ width: `${starData.mood_values.connection}%` }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between text-[10px] text-white/30">
-                                                <span>孤独</span>
-                                                <span>つながっている</span>
-                                            </div>
-                                        </div>
-                                        {/* コントロール */}
-                                        {starData.mood_values.control !== undefined && (
+                                        {/* 情緒的安定性 */}
+                                        {starData.mood_values.emotional !== undefined && (
                                             <div className="space-y-1">
                                                 <div className="flex justify-between text-xs">
-                                                    <span className="text-white/40">コントロール</span>
-                                                    <span className="text-white/60 font-mono">{starData.mood_values.control}%</span>
+                                                    <span className="text-white/40">情緒的安定性</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.emotional}%</span>
+                                                </div>
+                                                <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
+                                                    <div
+                                                        className="h-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full transition-all duration-500"
+                                                        style={{ width: `${starData.mood_values.emotional}%` }}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-between text-[10px] text-white/30">
+                                                    <span>つらい・どんより</span>
+                                                    <span>心地いい・穏やか</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* 動因の充足 */}
+                                        {starData.mood_values.motivation !== undefined && (
+                                            <div className="space-y-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-white/40">動因の充足</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.motivation}%</span>
+                                                </div>
+                                                <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
+                                                    <div
+                                                        className="h-full bg-gradient-to-r from-gray-400 to-orange-400 rounded-full transition-all duration-500"
+                                                        style={{ width: `${starData.mood_values.motivation}%` }}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-between text-[10px] text-white/30">
+                                                    <span>無気力・不完全燃焼</span>
+                                                    <span>やりきった・満足</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* 社会的適応 */}
+                                        {starData.mood_values.social !== undefined && (
+                                            <div className="space-y-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-white/40">社会的適応</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.social}%</span>
+                                                </div>
+                                                <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
+                                                    <div
+                                                        className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500"
+                                                        style={{ width: `${starData.mood_values.social}%` }}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-between text-[10px] text-white/30">
+                                                    <span>孤独・物足りない</span>
+                                                    <span>充足感・満タン</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* 生体的メカニズム */}
+                                        {starData.mood_values.physical !== undefined && (
+                                            <div className="space-y-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-white/40">生体的メカニズム</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.physical}%</span>
                                                 </div>
                                                 <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
                                                     <div
                                                         className="h-full bg-gradient-to-r from-red-400 to-cyan-400 rounded-full transition-all duration-500"
-                                                        style={{ width: `${starData.mood_values.control}%` }}
+                                                        style={{ width: `${starData.mood_values.physical}%` }}
                                                     />
                                                 </div>
                                                 <div className="flex justify-between text-[10px] text-white/30">
-                                                    <span>混乱</span>
-                                                    <span>冷静</span>
+                                                    <span>ずっしり重たい</span>
+                                                    <span>すっきり軽やか</span>
                                                 </div>
                                             </div>
                                         )}
-                                        {/* エネルギー */}
-                                        {starData.mood_values.energy !== undefined && (
+                                        {/* 刺激の受容 */}
+                                        {starData.mood_values.fulfillment !== undefined && (
                                             <div className="space-y-1">
                                                 <div className="flex justify-between text-xs">
-                                                    <span className="text-white/40">エネルギー</span>
-                                                    <span className="text-white/60 font-mono">{starData.mood_values.energy}%</span>
+                                                    <span className="text-white/40">刺激の受容</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.fulfillment}%</span>
                                                 </div>
                                                 <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
                                                     <div
                                                         className="h-full bg-gradient-to-r from-slate-400 to-yellow-400 rounded-full transition-all duration-500"
-                                                        style={{ width: `${starData.mood_values.energy}%` }}
+                                                        style={{ width: `${starData.mood_values.fulfillment}%` }}
                                                     />
                                                 </div>
                                                 <div className="flex justify-between text-[10px] text-white/30">
-                                                    <span>疲労</span>
-                                                    <span>活力</span>
+                                                    <span>退屈・マンネリ</span>
+                                                    <span>新鮮・充実していた</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* 旧形式との後方互換性 */}
+                                        {starData.mood_values.comfort !== undefined && (
+                                            <div className="space-y-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-white/40">心地よさ</span>
+                                                    <span className="text-white/60 font-mono">{starData.mood_values.comfort}%</span>
+                                                </div>
+                                                <div className="h-2 bg-black/30 rounded-full overflow-hidden border border-white/10">
+                                                    <div
+                                                        className="h-full bg-gradient-to-r from-blue-400 to-green-400 rounded-full transition-all duration-500"
+                                                        style={{ width: `${starData.mood_values.comfort}%` }}
+                                                    />
                                                 </div>
                                             </div>
                                         )}

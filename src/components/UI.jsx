@@ -1,50 +1,49 @@
 import { useState, useEffect } from 'react';
 import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
-import { useThemeStore } from '../store/useThemeStore';
 import { ThemeSelectionModal } from './ThemeSelectionModal';
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
   {
-    id: 'comfort',
-    question: '今の気持ちはどれくらい心地いい？',
-    leftLabel: 'とてもつらい',
-    rightLabel: 'とても心地いい',
+    id: 'emotional',      // 情緒的安定性
+    question: '今の気持ちは心地いい？',
+    leftLabel: 'つらい・どんより',
+    rightLabel: '心地いい・穏やか',
   },
   {
-    id: 'intensity',
-    question: '気持ちはどれくらい強く動いている？',
-    leftLabel: '無感情',
-    rightLabel: '抑えきれない',
+    id: 'motivation',     // 動因の充足
+    question: '今日は「自分らしく」過ごせた？',
+    leftLabel: '無気力・不完全燃焼',
+    rightLabel: 'やりきった・満足',
   },
   {
-    id: 'connection',
-    question: '人や世界とのつながりを感じている？',
-    leftLabel: '孤独',
-    rightLabel: 'つながっている',
+    id: 'social',         // 社会的適応
+    question: '今日の「心の満たされ方」は？',
+    leftLabel: '孤独・物足りない',
+    rightLabel: '充足感・満タン',
   },
   {
-    id: 'control',
-    question: '自分をコントロールできている？',
-    leftLabel: '混乱',
-    rightLabel: '冷静',
+    id: 'physical',       // 生体的メカニズム
+    question: '今の「体」の状態は？',
+    leftLabel: 'ずっしり重たい',
+    rightLabel: 'すっきり軽やか',
   },
   {
-    id: 'energy',
-    question: 'エネルギーはどれくらいある？',
-    leftLabel: '疲労',
-    rightLabel: '活力',
+    id: 'fulfillment',    // 刺激の受容
+    question: '今日の「充実感」はどうだった？',
+    leftLabel: '退屈・マンネリ',
+    rightLabel: '新鮮・充実していた',
   },
 ];
 
 // 初期スライダー値
 const INITIAL_MOOD_VALUES = {
-  comfort: 50,
-  intensity: 50,
-  connection: 50,
-  control: 50,
-  energy: 50,
+  emotional: 50,    // 情緒的安定性
+  motivation: 50,   // 動因の充足
+  social: 50,       // 社会的適応
+  physical: 50,     // 生体的メカニズム
+  fulfillment: 50,  // 刺激の受容
 };
 
 export const UI = ({ onSend, onStarClick }) => {
@@ -64,9 +63,6 @@ export const UI = ({ onSend, onStarClick }) => {
   const [selectedStarData, setSelectedStarData] = useState(null);
   // 送信時、重複送信を防ぐためのフラグ
   const [isSending, setIsSending] = useState(false);
-
-  // テーマ変更関数
-  const { setTheme } = useThemeStore();
 
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
@@ -240,7 +236,10 @@ export const UI = ({ onSend, onStarClick }) => {
           ></div>
 
           {/* モーダルコンテンツ */}
-          <div className="relative w-full max-w-sm mx-4 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] p-6 shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[85vh] overflow-y-auto">
+          <div 
+            className="relative w-full max-w-sm mx-6 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[85vh] overflow-y-auto"
+            style={{ padding: '20px 20px' }}
+          >
 
             {/* ヘッダー: 日付と閉じるボタン */}
             <div className="relative text-center mb-6 flex items-center justify-center">
