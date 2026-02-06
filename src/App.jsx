@@ -3,12 +3,15 @@ import { useState, useEffect } from "react";
 import { Experience } from "./components/Experience";
 import { Effects } from "./components/Effects";
 import { UI } from "./components/UI";
-import { Leva } from "leva";
+import { Leva, useControls } from "leva";
 import { useStarStore } from './store/useStarStore';
 
 function App() {
   // Zustand storeから星のデータと追加関数を取得
   const { stars, addStar, fetchStars, focusTarget } = useStarStore();
+
+  // Dummy control to ensure Leva panel appears
+  useControls({ debugPanel: true });
   // 星の詳細表示関数への参照を保持（関数を状態として保存）
 
   // 起動時にsupabaseから星のデータを読み込む
@@ -26,7 +29,7 @@ function App() {
 
   return (
     <>
-      <Leva hidden />
+      <Leva />
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         style={{ width: '100%', height: '100%' }}

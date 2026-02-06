@@ -4,11 +4,11 @@
 
 const themeData = {
     purple: {
-        "colorTop": "#240046",
-        "colorBottom": "#110022",
-        "colorA": "#1a0b2e",
-        "colorB": "#7000cc",
-        "color": "#c4b5fd",
+        colorTop: "#8900f2",
+        colorBottom: "#bc00dd",
+        colorA: "#1a0b2e",
+        colorB: "#be95c4",
+        color: "#b388eb",
     },
     blue: {
         "colorTop": "#000000",
