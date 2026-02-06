@@ -1,6 +1,7 @@
-# ノスタージア WEB3Dのデモです
+# ノスタージア WEB3D のデモです
 
 # TODO LIST
+
 ```bash
 ＝＝＝やり直し＝＝＝
 1.ドーム形を立方体にする ✅️
@@ -51,18 +52,17 @@ src/
 3.レイヤー3の遠い星を大きくする
 
 ```
+
 ## Development Tools
+
 このプロジェクトは **Antigravity + Skills** AI を使用して開発されました。
-- **Antigravity**: 高度なエージェントAIによるコーディング支援
-- **Skills**: R3F (React Three Fiber) に特化した専門知識モジュール（Geometry, Postprocessing, Shadersなど）を活用し、ベストプラクティスに沿った実装を行っています。
 
-
+- **Antigravity**: 高度なエージェント AI によるコーディング支援
+- **Skills**: R3F (React Three Fiber) に特化した専門知識モジュール（Geometry, Postprocessing, Shaders など）を活用し、ベストプラクティスに沿った実装を行っています。
 
 # 環境初期化
-1.git cloneまたはソースコードをダウンロードする<br>
-2.フォルダーパスのターミナルを開いてyarnでライブラリを初期化（学校のネットワークでうまくできない場合はテザリングなど別のネット環境でリトライ）<br>
-3.初期化ができ次第、yarn devで実行する<br>
 
+1.git clone またはソースコードをダウンロードする<br> 2.フォルダーパスのターミナルを開いて yarn でライブラリを初期化（学校のネットワークでうまくできない場合はテザリングなど別のネット環境でリトライ）<br> 3.初期化ができ次第、yarn dev で実行する<br>
 
 <h2>レイヤー構造</h2>
 <h4>プラネタリウム自体が７つのレイヤーでできている。</h4>
@@ -78,123 +78,141 @@ src/
 <p>こういう風にレイヤー毎に分けると、各要素を独立させレイヤー同士の直接依存が生じず拡張性を高めることができる。レイヤー毎の描画トグル・テーマの切り替え・低スペック端末向けのパフォーマンス描画モードも実装可能。</p>
 
 # コンポーネント
+
 ## Experience
+
 各コンポーネントを組み立てるためのメインコンテナ。
-CameraControlsを使用し、ズームや移動の制限（最小・最大距離、パン範囲）を設定済み。
+CameraControls を使用し、ズームや移動の制限（最小・最大距離、パン範囲）を設定済み。
 スマホなどのタッチ操作（ピンチズーム）にも対応。
 
-
 ## Effects
+
 `@react-three/postprocessing`を使用した映像効果を担当。
+
 - **Bloom**: 星の輝きを強調し、光暈（ハロー）を追加。
 - **Noise**: フィルムライクな粒子感を加え、デジタル的な冷たさを軽減。
 - **Vignette**: 画面四隅を減光させ、視線を中央へ誘導しつつ没入感を高める。
-- **ToneMapping**: HDRレンダリングの色調を補正（ACESFilmic）し、白飛びを抑えつつコントラストを確保。
+- **ToneMapping**: HDR レンダリングの色調を補正（ACESFilmic）し、白飛びを抑えつつコントラストを確保。
 
 ## SkyBox
-以前のSkydome（半球体）から変更し、複数の平面レイヤーを重ねた構造（Cuboid的アプローチ）。
-以下の4層で深みのある夜空を表現：
+
+以前の Skydome（半球体）から変更し、複数の平面レイヤーを重ねた構造（Cuboid 的アプローチ）。
+以下の 4 層で深みのある夜空を表現：
+
 1. **Background**: 宇宙のベースカラー
 2. **Fluid**: 天の川のような流体ノイズ
 3. **Stars**: 瞬く遠景の星々
 4. **Fog**: 奥行きを出すための霧
-各レイヤーは専用のシェーダーで描画され、軽量かつ表現豊かに実装。
+   各レイヤーは専用のシェーダーで描画され、軽量かつ表現豊かに実装。
 
-## SkyBoxの色合いはどうやって決めたの？
-1. Layer1 Backgroundの宇宙背景の色を決める
-   <br>255行　
-   backgroundMaterial colorTop="#000000" colorBottom="#101035" 
+## SkyBox の色合いはどうやって決めたの？
+
+1. Layer1 Background の宇宙背景の色を決める
+   <br>255 行　
+   backgroundMaterial colorTop="#000000" colorBottom="#101035"
    <br>
-   colorTopは上部の色、colorBottomは下部の色<br>
-2. Layer2 Fluidの動いている天の川の色を決める<br>
-   269~270行 <colorA="#101035" colorB="#551a8b" /><br>
-   colorAはメインな色、colorBは輝く部分の色<br>
-3. Layer3 Starsの背景の遠い星の色を決める<br>
-   289行 <color="#ffffff" /><br>
-4. Layer4 Fogの薄い霧の色を決める<br>
-   308行 <color="#aaaaff" /><br>
+   colorTop は上部の色、colorBottom は下部の色<br>
+2. Layer2 Fluid の動いている天の川の色を決める<br>
+   269~270 行 <colorA="#101035" colorB="#551a8b" /><br>
+   colorA はメインな色、colorB は輝く部分の色<br>
+3. Layer3 Stars の背景の遠い星の色を決める<br>
+   289 行 <color="#ffffff" /><br>
+4. Layer4 Fog の薄い霧の色を決める<br>
+   308 行 <color="#aaaaff" /><br>
 
 ## MyStars
-レイヤー5に相当する、ユーザー自身の星を描画するコンポーネント。
-- **InstancedMesh**: 1000個以上の星を軽量に描画するためにインスタンシング技術を使用。
+
+レイヤー 5 に相当する、ユーザー自身の星を描画するコンポーネント。
+
+- **InstancedMesh**: 1000 個以上の星を軽量に描画するためにインスタンシング技術を使用。
 - **Custom Shader**: 円形の光核と十字のレンズフレア（光条）を持つ独自のシェーダーで描画。
 - **Attributes**: 星ごとに個別の位置、色（青、シアン、ゴールド、ピンク）、サイズ、瞬きのタイミング（位相）を持つ。
 - **Billboarding**: シェーダー内で頂点計算を行い、常にカメラの方を向くように制御。
 
 ## UI
-HTMLオーバーレイとして実装されたユーザーインターフェース。
+
+HTML オーバーレイとして実装されたユーザーインターフェース。
+
 - **TailwindCSS**: グラスモーフィズム（すりガラス）デザインを採用し、夜空の雰囲気にマッチさせた。
 - **Components**:
-    - **Menu Button**: 画面右上に配置された3点リーダーボタン。
-    - **Diary Modal**: 「日記を書く」を選択すると出現する入力フォーム。テキスト入力時に文字がふわっと現れるアニメーション演出付き。
-    - **Star Detail Modal**: 星をクリックすると表示される詳細情報モーダル。
-        - **表示情報**: 生成時刻、3D座標(X/Y/Z)、大きさ、色(HEXコード + カラープレビュー)、日記テキスト
-        - **デザイン**: グラスモーフィズム + グラデーション背景（紫→青）、各セクションに色分けされたアイコン
-        - **レスポンシブ**: モバイル・デスクトップ両対応、タッチターゲット最適化
-        - **アニメーション**: ホバーエフェクト、スムーズな開閉トランジション(300ms)
-- **App Integration**: `<Canvas>`の外側に配置され、3Dシーンの上に重なって表示される。
+  - **Menu Button**: 画面右上に配置された 3 点リーダーボタン。
+  - **Diary Modal**: 「日記を書く」を選択すると出現する入力フォーム。テキスト入力時に文字がふわっと現れるアニメーション演出付き。
+  - **Star Detail Modal**: 星をクリックすると表示される詳細情報モーダル。
+    - **表示情報**: 生成時刻、3D 座標(X/Y/Z)、大きさ、色(HEX コード + カラープレビュー)、日記テキスト
+    - **デザイン**: グラスモーフィズム + グラデーション背景（紫 → 青）、各セクションに色分けされたアイコン
+    - **レスポンシブ**: モバイル・デスクトップ両対応、タッチターゲット最適化
+    - **アニメーション**: ホバーエフェクト、スムーズな開閉トランジション(300ms)
+- **App Integration**: `<Canvas>`の外側に配置され、3D シーンの上に重なって表示される。
 
 ## UserAddedStars
+
 ユーザーが日記を書くことで追加される星のレイヤー。
-- **User Interaction**: UIの日記フォームから送信されたデータに基づき、リアルタイムに生成される。
-- **Properties**: 
-    - **Randomness**: 位置、色、サイズ、瞬きのパターンがランダムに割り当てられる。
-    - **Date Label**: `@react-three/drei`の`Text`コンポーネントを使用し、星の下に生成日時（例: "26/1/26 16:25"）を表示。
+
+- **User Interaction**: UI の日記フォームから送信されたデータに基づき、リアルタイムに生成される。
+- **Properties**:
+  - **Randomness**: 位置、色、サイズ、瞬きのパターンがランダムに割り当てられる。
+  - **Date Label**: `@react-three/drei`の`Text`コンポーネントを使用し、星の下に生成日時（例: "26/1/26 16:25"）を表示。
 - **Camera Integration**: 生成エリアはカメラの移動制限範囲内に収まるように計算されており、確実に近づいて鑑賞できる。
 
 # 日記から星へ
+
 「日記を書く」ことは、ただ記録を残すだけでなく、夜空に新しい星を打ち上げる行為としてデザインされています。
 
-1. **Input**: ユーザーがUIの日記モードでテキストを入力し、「送信」を押す。
+1. **Input**: ユーザーが UI の日記モードでテキストを入力し、「送信」を押す。
 2. **State Update**: `App.jsx`で管理されている`userStars`ステートに、新しい星のデータ（日時、ランダムな座標・色・サイズ）が追加される。
-3. **Render**: 
+3. **Render**:
    - `Experience`コンポーネント内の`UserAddedStars`が更新を検知。
-   - 新しい`UserStar`コンポーネントが3D空間上の指定座標に出現。
+   - 新しい`UserStar`コンポーネントが 3D 空間上の指定座標に出現。
    - 独自のシェーダーマテリアルで輝き始め、ビルボード化されたテキストで日付が表示される。
-4. **Interaction**: 
+4. **Interaction**:
    - ユーザーが星をクリックすると、`UserStar`の`handleClick`が発火。
    - データフロー: `UserStar` → `UserAddedStars` → `Experience` → `App` → `UI` → `StarDetailModal`
    - `StarDetailModal`が開き、星の詳細情報（生成時刻、座標、大きさ、色、日記テキスト）を表示。
 5. **Result**: ユーザーの想い（日記）が、可視化された「星」となってプラネタリウムの一部になり、いつでもクリックして振り返ることができる。
 
-
-
 # データベース接続
-.env exampleに参照
+
+.env example に参照
 
 # データベース構造
+
 ## 星データテーブル (t_stars)
-| コラム | データ型(supabaseの選択肢で設置する) | ディフォルト値|説明 |
-|--------|----------|------|------|
-| id🔑 | uuid | NULL | UUIDで生成されたユニークなID |
-| position | jsonb | NULL | 位置 |
-| color | jsonb | NULL | 色 |
-| scale | Float4 | NULL | 大きさ |
-| random | Float4 | NULL | 星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬くようにするため） |
-| created_at | timestamptz | NULL | ISOフォーマットの生成日時（データベース保存用） |
-| display_date | text | NULL | YY/MM/DD HH:mmフォーマットの生成日時（画面表示用） |
-| text | text | NULL | 日記テキスト |
-| analysis_data | jsonb | NULL | Gemini APIからの分析結果（感情、褒め言葉など） |
 
+| コラム        | データ型(supabase の選択肢で設置する) | ディフォルト値 | 説明                                                                                       |
+| ------------- | ------------------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| id🔑          | uuid                                  | NULL           | UUID で生成されたユニークな ID                                                             |
+| position      | jsonb                                 | NULL           | 位置                                                                                       |
+| color         | jsonb                                 | NULL           | 色                                                                                         |
+| scale         | Float4                                | NULL           | 大きさ                                                                                     |
+| random        | Float4                                | NULL           | 星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬くようにするため） |
+| created_at    | timestamptz                           | NULL           | ISO フォーマットの生成日時（データベース保存用）                                           |
+| display_date  | text                                  | NULL           | YY/MM/DD HH:mm フォーマットの生成日時（画面表示用）                                        |
+| text          | text                                  | NULL           | 日記テキスト                                                                               |
+| analysis_data | jsonb                                 | NULL           | Gemini API からの分析結果（感情、褒め言葉など）                                            |
 
-# Gemini APIの使用 (テスト用のTEST-APIを実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
+# Gemini API の使用 (テスト用の TEST-API を実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
+
 ## 概要
-APIキーを安全に扱うため、クライアントサイドではなく **Supabase Edge Functions** 経由で Gemini API を呼び出します。
+
+API キーを安全に扱うため、クライアントサイドではなく **Supabase Edge Functions** 経由で Gemini API を呼び出します。
 
 ## Edge Function の構成 (`supabase/functions/analyze-diary/`)
+
 - **API**: Google Gemini 2.5 Flash
-- **機能**: ユーザーの日記テキストを受け取り、`emotion`（7つの感情）と `feedback`（励ましのメッセージ）を返します。
+- **機能**: ユーザーの日記テキストを受け取り、`emotion`（7 つの感情）と `feedback`（励ましのメッセージ）を返します。
 - **認証**: Supabase の Anon Key で保護されています。
 
 ## セットアップ手順
+
 1. **Gemini API キーの取得**: [Google AI Studio](https://aistudio.google.com/apikey) で取得
 2. **Secret の設定**: Supabase Dashboard > Edge Functions > Secrets に `GEMINI_API_KEY` を設定
-3. **デプロイ（注意⚠️プロンプトが記載したindex.tsを編集するたびに再デプロイが必要）**: 以下のコマンドでクラウドに反映
+3. **デプロイ（注意 ⚠️ プロンプトが記載した index.ts を編集するたびに再デプロイが必要）**: 以下のコマンドでクラウドに反映
    ```bash
    npx supabase functions deploy analyze-diary
    ```
 
 ## 動作確認
+
 PowerShell での文字化けを防ぐため、専用の Node.js スクリプトを使用します。
 
 ```bash
@@ -202,13 +220,14 @@ PowerShell での文字化けを防ぐため、専用の Node.js スクリプト
 node test-api.js
 ```
 
-## GEMINIプロンプト更新時のフロー
+## GEMINI プロンプト更新時のフロー
+
 1. `index.ts` を修正
 2. `npx supabase functions deploy analyze-diary` でデプロイ
 3. `node test-api.js` で動作確認
 
-
 # プロンプト
+
 ```
 あなたは優しく共感的なカウンセラーです。以下の日記を読んで、感情を正確に分析し、ユーザーを励ましてください。
 
@@ -234,3 +253,16 @@ node test-api.js
 - 「楽しい」「嬉しい」などの言葉があれば「喜び」を選んでください
 - feedbackは必ず肯定的で、ユーザーの気持ちに寄り添い、前向きな言葉をかけてください
 ```
+
+#github コミットメッセージ命名規約
+
+fix：バグ修正
+hotfix：クリティカルなバグ修正
+add：新規（ファイル）機能追加
+update：機能修正（バグではない）
+change：仕様変更
+clean：整理（リファクタリング等）
+disable：無効化（コメントアウト等）
+remove：削除（ファイル）
+upgrade：バージョンアップ
+revert：変更取り消し
