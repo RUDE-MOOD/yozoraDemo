@@ -1,14 +1,14 @@
 // skyboxの色合いを変える関数
-// ディフォルトのやつを除いて、3パターン用意する
+// ディフォルトのやつを除いて、2パターン用意する
 // 1.ディフォルトテーマ（紫色）　2.青色テーマ　3.緑色テーマ
 
 const themeData = {
     purple: {
-        "colorTop": "#000000",
-        "colorBottom": "#101035",
-        "colorA": "#101035",
-        "colorB": "#551a8b",
-        "color": "#aaaaff",
+        "colorTop": "#240046",
+        "colorBottom": "#110022",
+        "colorA": "#1a0b2e",
+        "colorB": "#7000cc",
+        "color": "#c4b5fd",
     },
     blue: {
         "colorTop": "#000000",

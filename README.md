@@ -47,8 +47,8 @@ src/
 11.azureVMでデプロイ✅️
 ＝＝＝ビジュアル系＝＝＝
 1.shadertoyからStarNestを入れ直す（skybox交換）　https://www.shadertoy.com/view/XlfGRj
-2.ディフォルトの色合い3パターン出す
-
+2.ディフォルトの色合い3パターン出す✅️
+3.レイヤー3の遠い星を大きくする
 
 ```
 ## Development Tools
