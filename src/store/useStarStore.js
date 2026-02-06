@@ -32,10 +32,11 @@ export const useStarStore = create((set) => ({
     },
 
     // UIから星を追加する
-    // moodValues = { comfort, intensity, connection } (各0-100)
+    // moodValues = { emotional, motivation, social, physical, fulfillment } (各0-100)
     // analysisResult = null は、エラー回避するための初期値
-    addStar: async (moodValues, analysisResult = null) => {
-        const newStar = starDataMaker({ moodValues });
+    // goodThings = { goodThing1, goodThing2, goodThing3 } (PC入力時のみ)
+    addStar: async (moodValues, analysisResult = null, goodThings = null) => {
+        const newStar = starDataMaker({ moodValues, goodThings });
         // THREE.Colorインスタンスを{r,g,b}の普通オブジェクトに変換してから保存
         const upstar = {
             ...newStar,

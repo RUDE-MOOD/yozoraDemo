@@ -63,6 +63,12 @@ export const UI = ({ onSend, onStarClick }) => {
   const [selectedStarData, setSelectedStarData] = useState(null);
   // 送信時、重複送信を防ぐためのフラグ
   const [isSending, setIsSending] = useState(false);
+  // 今日のいいこと
+  const [goodThing1, setGoodThing1] = useState('');
+  const [goodThing2, setGoodThing2] = useState('');
+  const [goodThing3, setGoodThing3] = useState('');
+  // スマホ用: 0=スライダー, 1=テキスト入力
+  const [mobileDiaryStep, setMobileDiaryStep] = useState(0);
 
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
@@ -76,6 +82,12 @@ export const UI = ({ onSend, onStarClick }) => {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}/${month}/${day}`;
+  };
+
+  // 日記モーダルを閉じる（ステップもリセット）
+  const closeDiaryModal = () => {
+    setDiaryOpen(false);
+    setMobileDiaryStep(0);
   };
 
   // 星の詳細を表示する関数
@@ -120,14 +132,19 @@ export const UI = ({ onSend, onStarClick }) => {
         console.error("API Call Failed:", apiError);
       }
       // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
-      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(moodValues, analysisResult)
+      // onSendはApp.jsxで定義した関数（親はuseStarStoreのaddStarメソッド）で、引数は(moodValues, analysisResult, goodThings)
+      const goodThings = { goodThing1, goodThing2, goodThing3 };
       if (onSend) {
-        await onSend(moodValues, analysisResult);
+        await onSend(moodValues, analysisResult, goodThings);
       }
       console.log("Mood Entry Saved!");
 
       // 3. フォームをリセットして閉じる
       setMoodValues(INITIAL_MOOD_VALUES);
+      setGoodThing1('');
+      setGoodThing2('');
+      setGoodThing3('');
+      setMobileDiaryStep(0);
       setDiaryOpen(false);
 
     } catch (error) {
@@ -228,87 +245,169 @@ export const UI = ({ onSend, onStarClick }) => {
 
       {/* --- 日記モーダル (Mood Diary Modal) --- */}
       {diaryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center md:items-center">
           {/* 背景のバックドロップ (クリックで閉じる) */}
           <div
             className="absolute inset-0 bg-[#050510]/60 backdrop-blur-sm transition-opacity duration-300"
-            onClick={() => setDiaryOpen(false)}
+            onClick={closeDiaryModal}
           ></div>
 
           {/* モーダルコンテンツ */}
           <div 
-            className="relative w-full max-w-sm mx-6 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-[32px] shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[85vh] overflow-y-auto"
-            style={{ padding: '20px 20px' }}
+            className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0 min-h-[70vh] md:min-h-0"
+            style={{ padding: '24px' }}
           >
 
-            {/* ヘッダー: 日付と閉じるボタン */}
-            <div className="relative text-center mb-6 flex items-center justify-center">
-              <h2 className="text-white/90 font-sans text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            {/* ヘッダー: スマホは戻る矢印+日付、PCは日付+X */}
+            <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
+              {/* 左: スマホ戻る / PCはスペース */}
+              <div className="w-12 flex-shrink-0 flex md:hidden">
+                <button
+                  type="button"
+                  onClick={() => (mobileDiaryStep === 1 ? setMobileDiaryStep(0) : closeDiaryModal())}
+                  className="flex items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
+                  aria-label={mobileDiaryStep === 1 ? '戻る' : '閉じる'}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              </div>
+              <div className="hidden md:block w-12 flex-shrink-0" />
+
+              {/* 中央: 日付 */}
+              <h2 className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
                 {getFormattedDate()}
               </h2>
 
-              {/* 閉じる "X" ボタン */}
-              <button
-                onClick={() => setDiaryOpen(false)}
-                className="absolute right-0 text-white/50 hover:text-white transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              {/* 右: PCは閉じるX / スマホはスペース（左右バランス用） */}
+              <div className="w-12 flex-shrink-0 flex justify-end">
+                <button
+                  type="button"
+                  onClick={closeDiaryModal}
+                  className="hidden md:flex items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors"
+                  aria-label="閉じる"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            {/* スライダー質問リスト */}
-            <div className="space-y-6">
-              {MOOD_QUESTIONS.map((q) => (
-                <div key={q.id} className="space-y-2">
-                  {/* 質問テキスト */}
-                  <p className="text-white/90 text-sm font-sans tracking-wide text-center">
-                    {q.question}
-                  </p>
+            <div>
+              {/* コンテンツ: スマホはステップ切替、PCは左右2カラムで全表示 */}
+              <div className="flex flex-col md:flex-row md:gap-8">
+                {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
+                <div
+                  className={`flex-1 space-y-6 min-w-0 ${
+                    mobileDiaryStep === 1 ? 'hidden md:block' : 'block'
+                  }`}
+                >
+                  {MOOD_QUESTIONS.map((q) => (
+                    <div key={q.id} className="space-y-2">
+                      <p className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left">
+                        {q.question}
+                      </p>
+                      <div className="relative px-1">
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={moodValues[q.id]}
+                          onChange={(e) => handleSliderChange(q.id, parseInt(e.target.value))}
+                          className="mood-slider w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-white/50 text-xs font-sans">
+                        <span>{q.leftLabel}</span>
+                        <span>{q.rightLabel}</span>
+                      </div>
+                    </div>
+                  ))}
 
-                  {/* スライダー */}
-                  <div className="relative px-1">
+                  {/* スマホステップ0: →ボタンで次へ */}
+                  <div className="flex md:hidden justify-end items-center mt-8">
+                    <button
+                      onClick={() => setMobileDiaryStep(1)}
+                      className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300"
+                      aria-label="次へ"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
+                <div
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
+                    mobileDiaryStep === 0 ? 'hidden md:flex' : 'flex'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                      今日のいいこと1 <span className="text-white/50">(必須)</span>
+                    </label>
                     <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={moodValues[q.id]}
-                      onChange={(e) => handleSliderChange(q.id, parseInt(e.target.value))}
-                      className="mood-slider w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
-                      }}
+                      type="text"
+                      value={goodThing1}
+                      onChange={(e) => setGoodThing1(e.target.value)}
+                      placeholder=""
+                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                      今日のいいこと2 <span className="text-white/50">(任意)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={goodThing2}
+                      onChange={(e) => setGoodThing2(e.target.value)}
+                      placeholder=""
+                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                      今日のいいこと3 <span className="text-white/50">(任意)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={goodThing3}
+                      onChange={(e) => setGoodThing3(e.target.value)}
+                      placeholder=""
+                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
                     />
                   </div>
 
-                  {/* ラベル */}
-                  <div className="flex justify-between text-white/50 text-xs font-sans">
-                    <span>{q.leftLabel}</span>
-                    <span>{q.rightLabel}</span>
+                  {/* 打ち上げボタン */}
+                  <div className="mt-6 md:mt-auto flex justify-center md:justify-start">
+                    <button
+                      onClick={handleSend}
+                      disabled={isSending || !goodThing1.trim()}
+                      className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    >
+                      {isSending ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          送信中...
+                        </span>
+                      ) : (
+                        '打ち上げ'
+                      )}
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* フッター: 送信ボタン（矢印） */}
-            <div className="flex justify-end items-center mt-8">
-              <button
-                onClick={handleSend}
-                disabled={isSending}
-                className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300 disabled:opacity-50"
-              >
-                {isSending ? (
-                  <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                )}
-              </button>
+              </div>
             </div>
           </div>
         </div>

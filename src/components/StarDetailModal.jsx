@@ -499,8 +499,8 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                         </div>
                     )}
 
-                    {/* 旧日記テキスト（後方互換性のため） */}
-                    {starData.text && !starData.mood_values && (
+                    {/* 今日のいいこと・日記テキスト */}
+                    {starData.text && (
                         <div className="group">
                             <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-200">
