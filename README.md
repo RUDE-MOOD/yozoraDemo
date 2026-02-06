@@ -187,8 +187,7 @@ HTML オーバーレイとして実装されたユーザーインターフェー
 | random        | Float4                                | NULL           | 星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬くようにするため） |
 | created_at    | timestamptz                           | NULL           | ISO フォーマットの生成日時（データベース保存用）                                           |
 | display_date  | text                                  | NULL           | YY/MM/DD HH:mm フォーマットの生成日時（画面表示用）                                        |
-| text          | text                                  | NULL           | 日記テキスト                                                                               |
-| analysis_data | jsonb                                 | NULL           | Gemini API からの分析結果（感情、褒め言葉など）                                            |
+| analysis_data | jsonb                                 | NULL           | Gemini API からの分析結果（感情、褒め言葉、今日のいいこと goodThings など）                |
 
 # Gemini API の使用 (テスト用の TEST-API を実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
 

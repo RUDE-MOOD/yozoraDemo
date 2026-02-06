@@ -509,8 +509,8 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                         </div>
                     )}
 
-                    {/* 今日のいいこと・日記テキスト */}
-                    {(starData.text || (starData.analysis_data?.goodThings && (starData.analysis_data.goodThings.goodThing1 || starData.analysis_data.goodThings.goodThing2 || starData.analysis_data.goodThings.goodThing3))) && (
+                    {/* 今日のいいこと */}
+                    {starData.analysis_data?.goodThings && (starData.analysis_data.goodThings.goodThing1 || starData.analysis_data.goodThings.goodThing2 || starData.analysis_data.goodThings.goodThing3) && (
                         <div className="group">
                             <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-200">
@@ -522,7 +522,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                     <p className="text-white/50 text-xs tracking-wider mb-2 font-sans">今日のいいこと</p>
                                     <div className="bg-black/30 rounded-lg px-4 py-3 border border-white/10 max-h-32 overflow-y-auto">
                                         <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                            {starData.text || (starData.analysis_data?.goodThings && [starData.analysis_data.goodThings.goodThing1, starData.analysis_data.goodThings.goodThing2, starData.analysis_data.goodThings.goodThing3].filter(Boolean).join('\n'))}
+                                            {[starData.analysis_data.goodThings.goodThing1, starData.analysis_data.goodThings.goodThing2, starData.analysis_data.goodThings.goodThing3].filter(Boolean).join('\n')}
                                         </p>
                                     </div>
                                 </div>
