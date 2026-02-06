@@ -166,13 +166,23 @@
  * レスポンシブデザイン対応（モバイル・デスクトップ両対応）
  */
 
+import { getFallbackAnalysis } from '../utils/fallbackAnalysis';
+
 export const StarDetailModal = ({ isOpen, onClose, starData }) => {
     // モーダルが開いていない、またはデータがない場合は何も表示しない
     if (!isOpen || !starData) return null;
 
-    // データベースから感情と褒め言葉を取得する
+    // データベースから感情と褒め言葉を取得（なければフォールバック生成）
     const analysis = starData.analysis_data || {};
-    const hasAnalysis = analysis.emotion && analysis.feedback; // 戻り値はtrue/false
+    const moodValuesForAnalysis = analysis.moodValues ?? starData.mood_values;
+    let displayAnalysis = null;
+    if (analysis.emotion && analysis.feedback) {
+        displayAnalysis = { emotion: analysis.emotion, feedback: analysis.feedback };
+    } else if (moodValuesForAnalysis) {
+        const fallback = getFallbackAnalysis(moodValuesForAnalysis, analysis.goodThings);
+        displayAnalysis = { emotion: fallback.emotion, feedback: fallback.feedback };
+    }
+    const hasAnalysis = !!displayAnalysis;
 
     // 色をRGBからHEX形式に変換する関数
     const colorToHex = (color) => {
@@ -341,7 +351,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                         <p className="text-white/50 text-xs tracking-wider mb-1 font-sans">感情</p>
                                         <div className="inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 rounded-lg">
                                             <p className="text-orange-200 text-sm font-medium tracking-wide">
-                                                {analysis.emotion}
+                                                {displayAnalysis.emotion}
                                             </p>
                                         </div>
                                     </div>
@@ -362,7 +372,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                             {/* 小さな装飾 */}
                                             <div className="absolute -top-1 left-6 w-2 h-2 bg-indigo-500/20 rotate-45 transform border-l border-t border-indigo-500/20"></div>
                                             <p className="text-indigo-100/90 text-sm leading-relaxed italic">
-                                                "{analysis.feedback}"
+                                                "{displayAnalysis.feedback}"
                                             </p>
                                         </div>
                                     </div>
@@ -500,7 +510,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                     )}
 
                     {/* 今日のいいこと・日記テキスト */}
-                    {starData.text && (
+                    {(starData.text || (starData.analysis_data?.goodThings && (starData.analysis_data.goodThings.goodThing1 || starData.analysis_data.goodThings.goodThing2 || starData.analysis_data.goodThings.goodThing3))) && (
                         <div className="group">
                             <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-green-500/20 border border-green-400/30 flex items-center justify-center group-hover:bg-green-500/30 transition-colors duration-200">
@@ -509,10 +519,10 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                                     </svg>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-white/50 text-xs tracking-wider mb-2 font-sans">日記</p>
+                                    <p className="text-white/50 text-xs tracking-wider mb-2 font-sans">今日のいいこと</p>
                                     <div className="bg-black/30 rounded-lg px-4 py-3 border border-white/10 max-h-32 overflow-y-auto">
                                         <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                            {starData.text}
+                                            {starData.text || (starData.analysis_data?.goodThings && [starData.analysis_data.goodThings.goodThing1, starData.analysis_data.goodThings.goodThing2, starData.analysis_data.goodThings.goodThing3].filter(Boolean).join('\n'))}
                                         </p>
                                     </div>
                                 </div>
