@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
+import { DistantStars } from './DistantStars'
 
 // テーマ変更用
 import { useThemeStore } from '../store/useThemeStore'
@@ -109,67 +110,7 @@ const FluidMaterial = shaderMaterial(
   `
 )
 
-// --- Layer 3: Distant Stars Shader ---
-const StarsMaterial = shaderMaterial(
-  {
-    time: 0,
-    color: new THREE.Color('#ffffff'),
-    size: 2.0,
-    density: 20.0
-  },
-  // Vertex Shader
-  `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  // Fragment Shader
-  `
-    uniform float time;
-    uniform vec3 color;
-    uniform float size;
-    uniform float density;
-    varying vec2 vUv;
 
-    float hash21(vec2 p) {
-        p = fract(p * vec2(123.34, 456.21));
-        p += dot(p, p + 45.32);
-        return fract(p.x * p.y);
-    }
-
-    void main() {
-        vec2 uv = vUv * density;
-        vec2 id = floor(uv);
-        vec2 gv = fract(uv) - 0.5;
-
-        float h = hash21(id); 
-        
-        // Jitter position to break grid alignment
-        // Use a different hash or offset based on id
-        float shiftX = hash21(id + vec2(1.0, 0.0)) - 0.5;
-        float shiftY = hash21(id + vec2(0.0, 1.0)) - 0.5;
-        gv += vec2(shiftX, shiftY) * 0.8; // Random offset up to 0.4 units
-
-        // Size variation
-        float r = size * 0.01 * h; 
-        
-        // Twinkle
-        float twinkle = sin(time * 2.0 + h * 100.0) * 0.5 + 0.5;
-        r *= 0.5 + 0.5 * twinkle;
-
-        float d = length(gv);
-        float circle = smoothstep(r, r - 0.01, d);
-
-        float alpha = circle * h; 
-
-        if (alpha < 0.01) discard;
-
-        gl_FragColor = vec4(color, alpha);
-    }
-  `
-)
 
 // --- Layer 4: Fog/Volume Shader ---
 const FogMaterial = shaderMaterial(
@@ -232,18 +173,16 @@ const FogMaterial = shaderMaterial(
   `
 )
 
-extend({ BackgroundMaterial, FluidMaterial, StarsMaterial, FogMaterial })
+extend({ BackgroundMaterial, FluidMaterial, FogMaterial })
 
 export function SkyBox() {
   const fluidRef = useRef()
-  const starsRef = useRef()
   const fogRef = useRef()
 
   const { currentTheme } = useThemeStore()
 
   useFrame((state, delta) => {
     if (fluidRef.current) fluidRef.current.time += delta
-    if (starsRef.current) starsRef.current.time += delta
     if (fogRef.current) fogRef.current.time += delta
   })
 
@@ -282,25 +221,8 @@ export function SkyBox() {
         />
       </mesh>
 
-      {/* 3. Distant Stars - Static noise with Twinkle */}
-      {/* 
-         第三層: 遠景の星レイヤー
-         瞬く星々を描画。
-         position Z: -30
-         density: 星の密度 (値が大きいほど星が増える)
-         size: 星の大きさ
-      */}
-      <mesh position={[0, 0.02, -30]} name="Layer3_DistantStars">
-        <planeGeometry args={[1000, 500]} />
-        <starsMaterial
-          ref={starsRef}
-          color="#ffffff"
-          density={160.0} // 星の数を調整 (以前は40.0)
-          size={1.5}      // 星のサイズ
-          transparent
-          depthWrite={false}
-        />
-      </mesh>
+      {/* 3. Distant Stars - 独立コンポーネント */}
+      <DistantStars />
 
       {/* 4. Fog Layer - Volume illusion */}
       {/* 

@@ -2,24 +2,25 @@ import * as THREE from 'three'
 import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
+import { DistantStars } from './DistantStars'
 
 // FBM Nebula Shader — faithful port from GLSL Sandbox
 // Uses virtual resolution to replicate gl_FragCoord coordinate space exactly
 const NebulaMaterial = shaderMaterial(
-    {
-        time: 0,
-        resolution: new THREE.Vector2(1920, 1080),
-    },
-    // Vertex Shader
-    `
+  {
+    time: 0,
+    resolution: new THREE.Vector2(1920, 1080),
+  },
+  // Vertex Shader
+  `
     varying vec2 vUv;
     void main() {
       vUv = uv;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-    // Fragment Shader — kept as close to the original as possible
-    `
+  // Fragment Shader — kept as close to the original as possible
+  `
     precision highp float;
 
     uniform float time;
@@ -107,28 +108,32 @@ const NebulaMaterial = shaderMaterial(
 extend({ NebulaMaterial })
 
 export function SkyBoxUpGrade() {
-    const materialRef = useRef()
-    const { size } = useThree()
+  const materialRef = useRef()
+  const { size } = useThree()
 
-    useFrame(({ clock }) => {
-        if (materialRef.current) {
-            materialRef.current.time = clock.elapsedTime
-            // Pass actual canvas pixel resolution to match original coordinate space
-            materialRef.current.resolution.set(
-                size.width * window.devicePixelRatio,
-                size.height * window.devicePixelRatio
-            )
-        }
-    })
+  useFrame(({ clock }) => {
+    if (materialRef.current) {
+      materialRef.current.time = clock.elapsedTime
+      // Pass actual canvas pixel resolution to match original coordinate space
+      materialRef.current.resolution.set(
+        size.width * window.devicePixelRatio,
+        size.height * window.devicePixelRatio
+      )
+    }
+  })
 
-    return (
-        <mesh position={[0, 0, -50]}>
-            <planeGeometry args={[1000, 500]} />
-            <nebulaMaterial
-                ref={materialRef}
-                key={NebulaMaterial.key}
-                depthWrite={false}
-            />
-        </mesh>
-    )
+  return (
+    <group name="SkyBoxUpGrade">
+      <mesh position={[0, 0, -50]}>
+        <planeGeometry args={[1000, 500]} />
+        <nebulaMaterial
+          ref={materialRef}
+          key={NebulaMaterial.key}
+          depthWrite={false}
+        />
+      </mesh>
+      {/* 遠景の星 — z=-5でカメラに近い → 星が大きく見える */}
+      <DistantStars position={[0, 0, -5]} />
+    </group>
+  )
 }

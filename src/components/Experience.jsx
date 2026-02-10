@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
 import { SkyBox } from "./SkyBox";
 import { SkyBoxUpGrade } from "./skyBoxUpGrade";
+import { DistantStars } from "./DistantStars";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
 import { Suspense, useRef, useEffect } from "react";
