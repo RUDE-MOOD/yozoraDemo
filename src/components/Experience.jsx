@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
 import { SkyBox } from "./SkyBox";
 import { SkyBoxUpGrade } from "./skyBoxUpGrade";
+import { SkyBoxMixed } from "./skyBoxMixed";
 import { DistantStars } from "./DistantStars";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
@@ -41,7 +42,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   return (
     <>
       <Suspense fallback={null}>
-        {skyboxType === 'upgrade' ? <SkyBoxUpGrade /> : <SkyBox />}
+        {skyboxType === 'upgrade' ? <SkyBoxUpGrade /> : skyboxType === 'mixed' ? <SkyBoxMixed /> : <SkyBox />}
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />

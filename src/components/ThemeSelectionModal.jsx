@@ -13,6 +13,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
 
     const skyboxes = [
         { id: 'classic', name: 'クラシック' },
+        { id: 'mixed', name: 'ミックス' },
         { id: 'upgrade', name: 'ネビュラ' },
     ];
 
@@ -91,9 +92,13 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                                                 ? {
                                                     background: 'linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)',
                                                 }
-                                                : {
-                                                    background: 'radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)',
-                                                }
+                                                : skybox.id === 'mixed'
+                                                    ? {
+                                                        background: 'linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)',
+                                                    }
+                                                    : {
+                                                        background: 'radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)',
+                                                    }
                                         }
                                     />
                                 </div>

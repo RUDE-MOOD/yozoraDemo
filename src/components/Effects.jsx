@@ -10,8 +10,8 @@ import { useControls } from "leva";
 
 export const Effects = () => {
   const bloomProps = useControls('Effects.Bloom', {
-    luminanceThreshold: { value: 0.2, min: 0, max: 1, label: '輝度しきい値' },
-    intensity: { value: 1.5, min: 0, max: 10, label: '強度' },
+    luminanceThreshold: { value: 0.12, min: 0, max: 1, label: '輝度しきい値' },
+    intensity: { value: 1.1, min: 0, max: 10, label: '強度' },
     mipmapBlur: { value: true, label: 'ミップマップブラー' }
   }, { collapsed: true });
 
@@ -20,15 +20,15 @@ export const Effects = () => {
   }, { collapsed: true });
 
   const vignetteProps = useControls('Effects.Vignette', {
-    offset: { value: 0.35, min: 0, max: 1, label: 'オフセット' },
-    darkness: { value: 0.3, min: 0, max: 1, label: '暗さ' }
+    offset: { value: 0.48, min: 0, max: 1, label: 'オフセット' },
+    darkness: { value: 0.48, min: 0, max: 1, label: '暗さ' }
   }, { collapsed: true });
 
   const toneMappingProps = useControls('Effects.ToneMapping', {
-    middleGrey: { value: 0.6, min: 0, max: 1, label: 'ミドルグレー' },
-    maxLuminance: { value: 16.0, min: 0, max: 32, label: '最大輝度' },
-    averageLuminance: { value: 1.0, min: 0, max: 5, label: '平均輝度' },
-    adaptationRate: { value: 1.0, min: 0, max: 5, label: '適応速度' }
+    middleGrey: { value: 0.42, min: 0, max: 1, label: 'ミドルグレー' },
+    maxLuminance: { value: 19.6, min: 0, max: 32, label: '最大輝度' },
+    averageLuminance: { value: 1.45, min: 0, max: 5, label: '平均輝度' },
+    adaptationRate: { value: 2.90, min: 0, max: 5, label: '適応速度' }
   }, { collapsed: true });
 
   return (
