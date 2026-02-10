@@ -133,7 +133,7 @@ export function SkyBoxUpGrade() {
         />
       </mesh>
       {/* 遠景の星 — z=-5でカメラに近い → 星が大きく見える */}
-      <DistantStars position={[0, 0, -5]} />
+      <DistantStars position={[0, 0, -5]} size={2.5} />
     </group>
   )
 }
