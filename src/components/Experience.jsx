@@ -1,7 +1,7 @@
 import { CameraControls, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
-import { SkyBox } from "./SkyBox";
+import { SkyBoxUpGrade } from "./skyBoxUpGrade";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
 import { Suspense, useRef, useEffect } from "react";
@@ -37,7 +37,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   return (
     <>
       <Suspense fallback={null}>
-        <SkyBox />
+        <SkyBoxUpGrade />
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />

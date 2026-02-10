@@ -10,25 +10,25 @@ import { useControls } from "leva";
 
 export const Effects = () => {
   const bloomProps = useControls('Effects.Bloom', {
-    luminanceThreshold: { value: 0.2, min: 0, max: 1, label: 'Threshold' },
-    intensity: { value: 1.5, min: 0, max: 10, label: 'Intensity' },
-    mipmapBlur: { value: true, label: 'Mipmap Blur' }
+    luminanceThreshold: { value: 0.2, min: 0, max: 1, label: '輝度しきい値' },
+    intensity: { value: 1.5, min: 0, max: 10, label: '強度' },
+    mipmapBlur: { value: true, label: 'ミップマップブラー' }
   }, { collapsed: true });
 
   const noiseProps = useControls('Effects.Noise', {
-    opacity: { value: 0.05, min: 0, max: 1, step: 0.01, label: 'Opacity' }
+    opacity: { value: 0.05, min: 0, max: 1, step: 0.01, label: '不透明度' }
   }, { collapsed: true });
 
   const vignetteProps = useControls('Effects.Vignette', {
-    offset: { value: 0.35, min: 0, max: 1, label: 'Offset' },
-    darkness: { value: 0.3, min: 0, max: 1, label: 'Darkness' }
+    offset: { value: 0.35, min: 0, max: 1, label: 'オフセット' },
+    darkness: { value: 0.3, min: 0, max: 1, label: '暗さ' }
   }, { collapsed: true });
 
   const toneMappingProps = useControls('Effects.ToneMapping', {
-    middleGrey: { value: 0.6, min: 0, max: 1, label: 'Middle Grey' },
-    maxLuminance: { value: 16.0, min: 0, max: 32, label: 'Max Luminance' },
-    averageLuminance: { value: 1.0, min: 0, max: 5, label: 'Avg Luminance' },
-    adaptationRate: { value: 1.0, min: 0, max: 5, label: 'Adaptation Rate' }
+    middleGrey: { value: 0.6, min: 0, max: 1, label: 'ミドルグレー' },
+    maxLuminance: { value: 16.0, min: 0, max: 32, label: '最大輝度' },
+    averageLuminance: { value: 1.0, min: 0, max: 5, label: '平均輝度' },
+    adaptationRate: { value: 1.0, min: 0, max: 5, label: '適応速度' }
   }, { collapsed: true });
 
   return (
