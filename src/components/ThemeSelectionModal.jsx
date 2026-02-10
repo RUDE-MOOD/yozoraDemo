@@ -1,7 +1,7 @@
 import { useThemeStore } from '../store/useThemeStore';
 
 export const ThemeSelectionModal = ({ isOpen, onClose }) => {
-    const { currentThemeName, setTheme } = useThemeStore();
+    const { currentThemeName, setTheme, skyboxType, setSkyboxType } = useThemeStore();
 
     if (!isOpen) return null;
 
@@ -9,6 +9,11 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         { id: 'purple', name: 'Purple', img: '/thumbnails/theme-purple.png' },
         { id: 'blue', name: 'Blue', img: '/thumbnails/theme-blue.png' },
         { id: 'green', name: 'Green', img: '/thumbnails/theme-green.png' },
+    ];
+
+    const skyboxes = [
+        { id: 'classic', name: 'クラシック' },
+        { id: 'upgrade', name: 'ネビュラ' },
     ];
 
     return (
@@ -37,31 +42,74 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                     </button>
                 </div>
 
-                {/* Body - Thumbnails */}
-                <div className="p-8 flex justify-center gap-6">
-                    {themes.map((theme) => (
-                        <div
-                            key={theme.id}
-                            onClick={() => setTheme(theme.id)}
-                            className="flex flex-col items-center gap-3 cursor-pointer group"
-                        >
-                            {/* Thumbnail Container */}
-                            <div className={`relative w-28 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${currentThemeName === theme.id ? 'border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-white/20 group-hover:border-white/60'}`}>
-                                <img
-                                    src={theme.img}
-                                    alt={theme.name}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                            </div>
+                {/* Body - Theme Thumbnails */}
+                <div className="px-8 pt-6 pb-2">
+                    <p className="text-white/50 text-xs tracking-widest text-center mb-4">カラーテーマ</p>
+                    <div className={`flex justify-center gap-6 transition-opacity duration-300 ${skyboxType === 'upgrade' ? 'opacity-40 pointer-events-none' : ''}`}>
+                        {themes.map((theme) => (
+                            <div
+                                key={theme.id}
+                                onClick={() => setTheme(theme.id)}
+                                className="flex flex-col items-center gap-3 cursor-pointer group"
+                            >
+                                {/* Thumbnail Container */}
+                                <div className={`relative w-28 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${currentThemeName === theme.id ? 'border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-white/20 group-hover:border-white/60'}`}>
+                                    <img
+                                        src={theme.img}
+                                        alt={theme.name}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                </div>
 
-                            {/* Radio Button */}
-                            <div className="relative w-5 h-5 rounded-full border border-white/40 flex items-center justify-center">
-                                {currentThemeName === theme.id && (
-                                    <div className="w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
-                                )}
+                                {/* Radio Button */}
+                                <div className="relative w-5 h-5 rounded-full border border-white/40 flex items-center justify-center">
+                                    {currentThemeName === theme.id && (
+                                        <div className="w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                </div>
+
+                {/* Skybox Selection */}
+                <div className="px-8 pt-4 pb-6">
+                    <p className="text-white/50 text-xs tracking-widest text-center mb-4">背景タイプ</p>
+                    <div className="flex justify-center gap-6">
+                        {skyboxes.map((skybox) => (
+                            <div
+                                key={skybox.id}
+                                onClick={() => setSkyboxType(skybox.id)}
+                                className="flex flex-col items-center gap-3 cursor-pointer group"
+                            >
+                                {/* CSS-based preview card */}
+                                <div className={`relative w-28 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${skyboxType === skybox.id ? 'border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-white/20 group-hover:border-white/60'}`}>
+                                    <div
+                                        className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                                        style={
+                                            skybox.id === 'classic'
+                                                ? {
+                                                    background: 'linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)',
+                                                }
+                                                : {
+                                                    background: 'radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)',
+                                                }
+                                        }
+                                    />
+                                </div>
+
+                                {/* Label */}
+                                <span className="text-white/60 text-xs tracking-wider">{skybox.name}</span>
+
+                                {/* Radio Button */}
+                                <div className="relative w-5 h-5 rounded-full border border-white/40 flex items-center justify-center">
+                                    {skyboxType === skybox.id && (
+                                        <div className="w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" />
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Footer */}

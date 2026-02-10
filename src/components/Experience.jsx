@@ -1,10 +1,12 @@
 import { CameraControls, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from 'three';
+import { SkyBox } from "./SkyBox";
 import { SkyBoxUpGrade } from "./skyBoxUpGrade";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
 import { Suspense, useRef, useEffect } from "react";
+import { useThemeStore } from '../store/useThemeStore';
 
 
 // Custom component to clamp camera position manually
@@ -24,6 +26,7 @@ const FrameLimiter = () => {
 
 export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   const cameraControlsRef = useRef();
+  const skyboxType = useThemeStore((state) => state.skyboxType);
 
   useEffect(() => {
     if (focusTarget && cameraControlsRef.current) {
@@ -37,7 +40,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   return (
     <>
       <Suspense fallback={null}>
-        <SkyBoxUpGrade />
+        {skyboxType === 'upgrade' ? <SkyBoxUpGrade /> : <SkyBox />}
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />
