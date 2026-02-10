@@ -144,6 +144,12 @@ HTML オーバーレイとして実装されたユーザーインターフェー
 
 SkyBoxの代替として切り替え可能なシェーダー背景。GLSL Sandboxの星雲シェーダーをベースにした単一レイヤーの背景で、テーマ変更モーダルから選択できる。内部にDistantStarsを組み込んでいる。
 
+## SkyBoxMixed
+
+従来のSkyBoxの上に、SkyBoxUpGradeのネビュラシェーダーを半透明のフィルター（加算合成）として重ねたハイブリッド背景。
+- **Layering**: 下層にSkyBox、上層(z=-15)にネビュラフィルター(opacity=0.35)を配置。
+- **Visual**: SkyBoxの深みとネビュラの煌びやかさを両立。テーマカラーの影響も受ける。
+
 ## DistantStars
 
 遠景の瞬く星を描画する独立コンポーネント。SkyBoxとSkyBoxUpGradeの両方で共有される。ハッシュベースのノイズで星の位置・サイズ・瞬きを生成し、propsで`position`・`density`・`size`を調整可能。

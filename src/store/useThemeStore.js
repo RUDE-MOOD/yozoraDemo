@@ -5,12 +5,12 @@ import { themeData } from '../utils/changeTheme'
 export const useThemeStore = create(
     persist(
         (set) => ({
-            // Default to purple theme
-            currentTheme: themeData.purple,
-            currentThemeName: 'purple',
+            // Default to blue theme + mixed skybox
+            currentTheme: themeData.blue,
+            currentThemeName: 'blue',
 
             // Skybox type: 'classic' (layered) or 'upgrade' (shader)
-            skyboxType: 'classic',
+            skyboxType: 'mixed',
 
             // Action to change theme
             setTheme: (themeName) => {
