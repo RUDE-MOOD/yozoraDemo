@@ -106,7 +106,8 @@ export const useFutureMessageStore = create((set, get) => ({
         const unreadMsg = get().futureMessages;
 
         if (unreadMsg.length > 0) {
-            set({ isShootingStarVisible: true });
+            // isShootingStarLeavingをリセットしてから表示（前回の退場状態が残っていると即退場するバグ防止）
+            set({ isShootingStarVisible: true, isShootingStarLeaving: false });
         }
     },
 
@@ -150,7 +151,7 @@ export const useFutureMessageStore = create((set, get) => ({
     },
 
     // リセット/非表示関数
-    hideShootingStar: () => set({ isShootingStarVisible: false }),
+    hideShootingStar: () => set({ isShootingStarVisible: false, isShootingStarLeaving: false }),
 
     // 入力モーダルのUI状態
     isInputModalOpen: false,
