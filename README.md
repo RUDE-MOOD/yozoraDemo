@@ -40,7 +40,7 @@
 - [ ] 音声ガイド追加（画面を開く時とか、日記を書き終える時とか、音声ファイルを再生、ローカル保存）
 - [x] 日記を書き終えたら、画面が自動的に出来立ての星のポジションへ移動する
 - [x] azureVMでデプロイ
-- [ ] 未来の自分へのメッセージ機能：<br>
+- [x] 未来の自分へのメッセージ機能：<br>
 step1:ユーザーは普通の星より見た目が違う星（光が強い、色が違うなど、生成頻度：2日に1回）を発見、クリックすると未来の自分へのメッセージ入力欄が表示される。<br>
 step2:ユーザーが未来の自分へのメッセージを入力し、その星は画面上から消える（書いた文言は、未来メッセージ用の新しいテーブルに保存）。<br>
 step3:ユーザーが次の日記を書いた時、もしスライダーがオールマイナス（気分がダウンしている）だったら、未来の自分への星（あれば表示、なければ何もしない）が表示され（流れ星のようなアニメーション）、ユーザーがその星をクリックしたら過去自分のメッセージが見られる。<br>
@@ -175,6 +175,25 @@ SkyBoxの代替として切り替え可能なシェーダー背景。GLSL Sandbo
    - ユーザーが星をクリックすると、`StarDetailModal`が開き、感情分析結果・励ましメッセージ・今日のいいことなどの詳細情報を表示。
 6. **Result**: ユーザーの日々の気持ちと良かったことが、可視化された「星」となってプラネタリウムの一部になり、いつでもクリックして振り返ることができる。
 
+# 未来の自分へのメッセージ機能
+
+気分が落ち込んでいるとき、過去の自分からの温かいメッセージが流れ星に乗って届く機能。
+
+1. **FutureStar出現**: 2日に1回、ランダム座標に光り輝く特別な星が出現。左下ユーザーアイコンに青いバッジが点灯し、メニューから「✨ 未来への手紙」で星にフォーカスできる。
+2. **メッセージ入力**: 星をクリックすると入力モーダルが開き、未来の自分へのメッセージを書いて保存。星は消える。
+3. **流れ星トリガー**: 次の日記で全スライダーが50未満（気分ダウン）かつ未読メッセージがあれば、1.5秒遅延後に流れ星が飛来。
+4. **メッセージ表示**: 流れ星をクリックすると過去の自分からのメッセージが表示される。閲覧後、流れ星は8秒かけてゆっくり退場。
+
+### 新規ファイル
+
+| ファイル | 役割 |
+|---|---|
+| `FutureStar.jsx` | 未来への手紙用の特別な星。Billboard + シェーダーで光る演出。ランダム座標に出現 |
+| `ShootingStar.jsx` | 流れ星コンポーネント。カメラ相対位置から飛来し、ダブルTrail + 火花パーティクルで描画 |
+| `FutureMessageInputModal.jsx` | メッセージ入力用モーダルUI |
+| `FutureMessageDisplayModal.jsx` | 過去のメッセージ表示用モーダルUI |
+| `useFutureMessageStore.js` | 未来メッセージ機能のZustand Store（後述） |
+
 # データベース接続
 
 .env example に参照
@@ -193,6 +212,16 @@ SkyBoxの代替として切り替え可能なシェーダー背景。GLSL Sandbo
 | created_at    | timestamptz                           | NULL           | ISO フォーマットの生成日時（データベース保存用）                                           |
 | display_date  | text                                  | NULL           | YY/MM/DD HH:mm フォーマットの生成日時（画面表示用）                                        |
 | analysis_data | jsonb                                 | NULL           | Gemini API からの分析結果（感情、褒め言葉、今日のいいこと goodThings など）                |
+
+## 未来メッセージテーブル (t_future_messages)
+
+| コラム        | データ型 | ディフォルト値     | 説明                           |
+| ------------- | -------- | ------------------ | ------------------------------ |
+| id🔑          | uuid     | uuid_generate_v4() | UUID で生成されたユニークな ID |
+| message       | text     | NULL               | 未来の自分へのメッセージ本文   |
+| created_at    | timestamptz | now()           | メッセージの作成日時           |
+| display_date  | text     | NULL               | 表示用の日付文字列             |
+| is_read       | bool     | false              | 既読フラグ（流れ星で閲覧済みか）|
 
 # Gemini API の使用 (テスト用の TEST-API を実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
 
@@ -270,3 +299,50 @@ ${goodThingsList.length > 0 ? '今日のいいことに触れつつ、' : ''}ユ
 | `remove` | 削除（ファイル） |
 | `upgrade` | バージョンアップ |
 | `revert` | 変更取り消し |
+
+# Zustand Store
+
+## useStarStore
+
+星データの管理とカメラフォーカスの制御。
+
+| データ/メソッド | 種類 | 説明 |
+|---|---|---|
+| `focusTarget` | state | カメラのフォーカス先座標 `[x, y, z]` または `null` |
+| `fetchStars()` | method | supabaseから全星データを読み込み、ColorインスタンスとmoodValuesを復元 |
+| `addStar(moodValues, analysisResult, goodThings)` | method | 新しい星を生成しsupabaseに保存。画面更新 + カメラフォーカスも設定 |
+| `resetFocus()` | method | フォーカスをリセット |
+| `setFocusTarget(target)` | method | フォーカス先を設定（毎回新しい配列参照を生成） |
+
+## useFutureMessageStore
+
+未来の自分へのメッセージ機能の全ロジック管理。
+
+| データ/メソッド | 種類 | 説明 |
+|---|---|---|
+| `isFutureStarVisible` | state | 未来星が表示中か |
+| `isShootingStarVisible` | state | 流れ星が表示中か |
+| `futureStarPosition` | state | 未来星のランダム座標（UI側のカメラ移動に使用） |
+| `futureMessages` | state | 未読メッセージ一覧 |
+| `isInputModalOpen` | state | 入力モーダルの開閉 |
+| `isDisplayModalOpen` | state | 表示モーダルの開閉 |
+| `currentMessage` | state | 現在表示中のメッセージ |
+| `isShootingStarLeaving` | state | 流れ星が退場中か |
+| `checkFutureStarAvailability()` | method | 2日に1回の頻度チェック → 星の表示/非表示を決定 |
+| `saveFutureMessage(message)` | method | メッセージをsupabaseに保存し、星を非表示に |
+| `triggerShootingStarCheck(moodValues)` | method | 全スライダー<50 かつ 未読メッセージあり → 流れ星表示 |
+| `fetchUnreadMessages()` | method | supabaseから未読メッセージを取得 |
+| `markMessageAsRead(id)` | method | メッセージを既読に更新 |
+| `startShootingStarExit()` | method | 流れ星の退場アニメーション開始 |
+
+## useThemeStore
+
+テーマとSkyBox種類の管理。`localStorage`に永続化。
+
+| データ/メソッド | 種類 | 説明 |
+|---|---|---|
+| `currentTheme` | state | 現在のテーマオブジェクト |
+| `currentThemeName` | state | テーマ名（`blue` / `purple` / `green`） |
+| `skyboxType` | state | SkyBoxの種類（`classic` / `upgrade` / `mixed`） |
+| `setTheme(themeName)` | method | テーマを切り替え |
+| `setSkyboxType(type)` | method | SkyBoxの種類を切り替え |
