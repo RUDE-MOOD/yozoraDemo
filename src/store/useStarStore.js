@@ -78,7 +78,7 @@ export const useStarStore = create((set) => ({
     // フォーカスをリセットする関数 (必要に応じて)
     resetFocus: () => set({ focusTarget: null }),
 
-    // フォーカスを設定する関数
-    setFocusTarget: (target) => set({ focusTarget: target }),
+    // フォーカスを設定する関数（毎回新しい配列参照を生成してuseEffectを確実に発火させる）
+    setFocusTarget: (target) => set({ focusTarget: [...target] }),
 
 }));

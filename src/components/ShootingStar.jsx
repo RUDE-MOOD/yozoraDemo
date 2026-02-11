@@ -29,7 +29,7 @@ export function ShootingStar({ onOpenDisplayModal }) {
 
     // Speed factors
     const enterSpeed = 2.5 // Smooth interpolation speed
-    const exitSpeed = 4.0
+    const exitSpeed = 1.0  // ゆっくり退場
 
     // Subscribe to store to know when to exit
     // We need a way to trigger exit. The Modal will likely call a store action that we can listen to here?
@@ -37,12 +37,16 @@ export function ShootingStar({ onOpenDisplayModal }) {
     // Ideally, the store has a state `isShootingStarLeaving`.
     const { isShootingStarLeaving, hideShootingStar } = useFutureMessageStore()
 
+    // 退場タイマー
+    const exitTimer = useRef(0)
+
     useFrame((state, delta) => {
         if (!meshRef.current) return
 
         // If store says leaving and we are not yet exiting, switch phase
         if (isShootingStarLeaving && phase === 'idle') {
             setPhase('exiting')
+            exitTimer.current = 0
         }
 
         const currentPos = meshRef.current.position
@@ -55,20 +59,18 @@ export function ShootingStar({ onOpenDisplayModal }) {
                 setPhase('idle')
             }
         } else if (phase === 'idle') {
-            // Floating handles the subtle movement, we just ensure it stays near target
-            // (Float component wraps this mesh, so logic here acts on the inner mesh if needed, 
-            // but modifying ref position directly works if Float is parent? No, Float modifies its group)
-            // Actually, let's manually gently oscillate if we are not using Float wrapper for the main movement
-            // For now, just stay put, let Float wrapper handle the "hover"
+            // 待機中 - ユーザーのクリックを待つ
         } else if (phase === 'exiting') {
-            // Accelerate away
-            currentPos.lerp(exitPos, delta * exitSpeed)
-            // If far enough, hide completely
-            if (currentPos.distanceTo(startPos) > 300) { // Check distance from origin or just distance
-                if (currentPos.distanceTo(exitPos) < 10) {
-                    setPhase('gone')
-                    hideShootingStar() // Reset store state
-                }
+            // 加速しながら退場（8秒かけてゆっくり飛び去る）
+            exitTimer.current += delta
+            const t = Math.min(exitTimer.current / 8.0, 1.0) // 0→1 over 8 seconds
+            const accel = 1 + t * 1 // 加速度: 1x → 2x
+            currentPos.lerp(exitPos, delta * exitSpeed * accel)
+
+            // 8秒経過で完了
+            if (exitTimer.current > 8.0) {
+                setPhase('gone')
+                hideShootingStar()
             }
         }
     })

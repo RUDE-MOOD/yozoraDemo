@@ -304,30 +304,34 @@ export const UI = ({ onSend, onStarClick }) => {
       {debugOpen && (
         <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDebugOpen(false)}>
           <div className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">Debug Tools</h3>
+            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">デバッグツール</h3>
 
             <div className="space-y-2">
-              <p className="text-xs text-white/50">Future Star (Input)</p>
+              <p className="text-xs text-white/50">未来への手紙（入力）</p>
               <button
                 onClick={() => {
-                  debug_setFutureStarVisible(true);
-                  // Note: FutureStar位置はランダムなので、カメラ移動先は目安
-                  setFocusTarget([0, 0, -80]);
+                  if (!isFutureStarVisible) {
+                    debug_setFutureStarVisible(true);
+                  }
+                  setTimeout(() => {
+                    const pos = useFutureMessageStore.getState().futureStarPosition;
+                    if (pos) setFocusTarget(pos);
+                  }, 100);
                   setDebugOpen(false);
                 }}
                 className="w-full py-2 bg-blue-500/20 text-blue-200 rounded hover:bg-blue-500/40 text-sm"
               >
-                Force Create Star & Focus
+                {isFutureStarVisible ? '未来星にフォーカス' : '未来星を強制表示＆フォーカス'}
               </button>
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs text-white/50">Shooting Star (Retrieval)</p>
+              <p className="text-xs text-white/50">流れ星（過去のメッセージ取得）</p>
               <button
                 onClick={() => { debug_loadMockMessage(); debug_setShootingStarVisible(true); setDebugOpen(false); }}
                 className="w-full py-2 bg-pink-500/20 text-pink-200 rounded hover:bg-pink-500/40 text-sm"
               >
-                Force Shooting Star (Mock Msg)
+                流れ星を強制表示（モック）
               </button>
             </div>
 
@@ -335,7 +339,7 @@ export const UI = ({ onSend, onStarClick }) => {
               onClick={() => setDebugOpen(false)}
               className="w-full py-2 mt-4 bg-white/10 text-white rounded hover:bg-white/20 text-sm"
             >
-              Close
+              閉じる
             </button>
           </div>
         </div>
