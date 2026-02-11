@@ -26,6 +26,12 @@ const FutureStarWrapper = () => {
 
   useEffect(() => {
     checkFutureStarAvailability();
+    // 定期的に再チェック（60秒ごと）- メッセージ送信後も自動で星が再出現する
+    const interval = setInterval(() => {
+      checkFutureStarAvailability();
+    }, 60000); // 60秒
+    // タイマーを閉じる
+    return () => clearInterval(interval);
   }, []);
 
   // FutureStarの位置をランダムに生成（表示されるたびに新しい位置）
