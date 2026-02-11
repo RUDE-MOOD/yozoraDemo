@@ -77,6 +77,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // Future Message Store
   const {
+    isFutureStarVisible,
+    futureStarPosition,
     triggerShootingStarCheck,
     debug_setFutureStarVisible,
     debug_setShootingStarVisible,
@@ -216,7 +218,7 @@ export const UI = ({ onSend, onStarClick }) => {
       <div className="fixed bottom-6 left-6 z-[1000]">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
-          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
+          className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
           {/* 人のアイコン (User Icon) */}
           <svg
@@ -233,16 +235,33 @@ export const UI = ({ onSend, onStarClick }) => {
               d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
             />
           </svg>
+          {/* 未来への手紙バッジ (FutureStar通知ドット) */}
+          {isFutureStarVisible && (
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(100,210,255,0.8)] animate-pulse" />
+          )}
         </button>
 
         {userMenuOpen && (
           <div className="absolute bottom-12 left-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-left">
+            {/* 未来への手紙メニュー項目（FutureStarが表示中のみ） */}
+            {isFutureStarVisible && futureStarPosition && (
+              <button
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  setFocusTarget(futureStarPosition);
+                }}
+                className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+                style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              >
+                未来への手紙
+              </button>
+            )}
             <button
               onClick={() => {
                 setUserMenuOpen(false);
                 setThemeModalOpen(true);
               }}
-              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+              className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? ' border-t border-white/5' : ''}`}
               style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
             >
               テーマ

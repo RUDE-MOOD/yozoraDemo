@@ -18,6 +18,7 @@ const FutureStarWrapper = () => {
     isFutureStarVisible,
     checkFutureStarAvailability,
     setInputModalOpen,
+    setFutureStarPosition,
     isShootingStarVisible,
     futureMessages,
     openMessageDisplay
@@ -33,6 +34,13 @@ const FutureStarWrapper = () => {
     Math.random() * 300 - 150,  // y: -150 ~ 150
     -10                          // z: 固定
   ], [isFutureStarVisible]);
+
+  // ランダム位置をストアに保存（UI側でカメラ移動に使用）
+  useEffect(() => {
+    if (isFutureStarVisible) {
+      setFutureStarPosition(futureStarPos);
+    }
+  }, [futureStarPos, isFutureStarVisible]);
 
   return (
     <>

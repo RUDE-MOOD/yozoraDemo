@@ -22,6 +22,8 @@ export const useFutureMessageStore = create((set, get) => ({
     futureMessages: [],
     isFutureStarVisible: false,
     isShootingStarVisible: false,
+    futureStarPosition: null, // FutureStarのランダム位置を保持（UI側でカメラ移動に使用）
+    setFutureStarPosition: (pos) => set({ futureStarPosition: pos }),
     loading: false,
 
     // ステップ1: “未来の自分への星”を表示すべきか確認（頻度：2日に1回）
