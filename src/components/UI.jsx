@@ -3,6 +3,10 @@ import { StarDetailModal } from './StarDetailModal';
 import { supabase } from '../supabaseClient';
 import { ThemeSelectionModal } from './ThemeSelectionModal';
 import { getFallbackAnalysis } from '../utils/fallbackAnalysis';
+import { FutureMessageInputModal } from './FutureMessageInputModal';
+import { FutureMessageDisplayModal } from './FutureMessageDisplayModal';
+import { useFutureMessageStore } from '../store/useFutureMessageStore';
+import { useStarStore } from '../store/useStarStore';
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
@@ -71,6 +75,19 @@ export const UI = ({ onSend, onStarClick }) => {
   // スマホ用: 0=スライダー, 1=テキスト入力
   const [mobileDiaryStep, setMobileDiaryStep] = useState(0);
 
+  // Future Message Store
+  const {
+    triggerShootingStarCheck,
+    debug_setFutureStarVisible,
+    debug_setShootingStarVisible,
+    debug_loadMockMessage
+  } = useFutureMessageStore();
+
+  const { setFocusTarget } = useStarStore();
+
+  // Debug Modals
+  const [debugOpen, setDebugOpen] = useState(false);
+
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
     setMoodValues(prev => ({ ...prev, [id]: value }));
@@ -106,7 +123,7 @@ export const UI = ({ onSend, onStarClick }) => {
     }
   }, []); // 依存配列を空にして、マウント時のみ実行
 
-  // 送信ハンドラー
+  // handleSend
   const handleSend = async () => {
     // 連打防止
     if (isSending) return;
@@ -142,6 +159,11 @@ export const UI = ({ onSend, onStarClick }) => {
       }
       console.log("Mood Entry Saved!");
 
+      // カメラが日記星にフォーカスして安定してから流れ星チェック（1.5秒後）
+      setTimeout(() => {
+        triggerShootingStarCheck(moodValues);
+      }, 1500);
+
       // 3. フォームをリセットして閉じる
       setMoodValues(INITIAL_MOOD_VALUES);
       setGoodThing1('');
@@ -150,13 +172,16 @@ export const UI = ({ onSend, onStarClick }) => {
       setMobileDiaryStep(0);
       setDiaryOpen(false);
 
+      // 4. Trigger Check for Future Message (Shooting Star)
+      // We need to access the store (but hooks can't be used inside callbacks easily if not defined at top)
+      // So we assume the store hook is used in the component
     } catch (error) {
       console.error("Critical Error in handleSend:", error);
       alert("エラーが発生しました。もう一度お試しください。");
     } finally {
       setIsSending(false);
     }
-  };
+  };//handleSend
 
   return (
     <>
@@ -242,9 +267,60 @@ export const UI = ({ onSend, onStarClick }) => {
             >
               設定
             </button>
+            <button
+              onClick={() => {
+                setUserMenuOpen(false);
+                setDebugOpen(true);
+              }}
+              className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+            >
+              デバッグ
+            </button>
           </div>
         )}
       </div>
+
+      {/* --- Debug Panel --- */}
+      {debugOpen && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDebugOpen(false)}>
+          <div className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">Debug Tools</h3>
+
+            <div className="space-y-2">
+              <p className="text-xs text-white/50">Future Star (Input)</p>
+              <button
+                onClick={() => {
+                  debug_setFutureStarVisible(true);
+                  // Note: FutureStar位置はランダムなので、カメラ移動先は目安
+                  setFocusTarget([0, 0, -80]);
+                  setDebugOpen(false);
+                }}
+                className="w-full py-2 bg-blue-500/20 text-blue-200 rounded hover:bg-blue-500/40 text-sm"
+              >
+                Force Create Star & Focus
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-white/50">Shooting Star (Retrieval)</p>
+              <button
+                onClick={() => { debug_loadMockMessage(); debug_setShootingStarVisible(true); setDebugOpen(false); }}
+                className="w-full py-2 bg-pink-500/20 text-pink-200 rounded hover:bg-pink-500/40 text-sm"
+              >
+                Force Shooting Star (Mock Msg)
+              </button>
+            </div>
+
+            <button
+              onClick={() => setDebugOpen(false)}
+              className="w-full py-2 mt-4 bg-white/10 text-white rounded hover:bg-white/20 text-sm"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* --- 日記モーダル (Mood Diary Modal) --- */}
       {diaryOpen && (
@@ -256,7 +332,7 @@ export const UI = ({ onSend, onStarClick }) => {
           ></div>
 
           {/* モーダルコンテンツ */}
-          <div 
+          <div
             className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0 min-h-[70vh] md:min-h-0"
             style={{ padding: '24px' }}
           >
@@ -303,9 +379,8 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${
-                    mobileDiaryStep === 1 ? 'hidden md:block' : 'block'
-                  }`}
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? 'hidden md:block' : 'block'
+                    }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div key={q.id} className="space-y-2">
@@ -348,9 +423,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
-                    mobileDiaryStep === 0 ? 'hidden md:flex' : 'flex'
-                  }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? 'hidden md:flex' : 'flex'
+                    }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
@@ -431,6 +505,12 @@ export const UI = ({ onSend, onStarClick }) => {
         }}
         starData={selectedStarData}
       />
+
+      {/* --- 未来への手紙入力モーダル --- */}
+      <FutureMessageInputModal />
+
+      {/* --- 過去の自分からの手紙表示モーダル --- */}
+      <FutureMessageDisplayModal />
     </>
   );
 };

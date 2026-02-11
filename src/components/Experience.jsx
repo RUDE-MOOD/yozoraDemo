@@ -7,8 +7,56 @@ import { SkyBoxMixed } from "./skyBoxMixed";
 import { DistantStars } from "./DistantStars";
 import { MyStars } from "./MyStars";
 import { UserAddedStars } from "./UserAddedStars";
-import { Suspense, useRef, useEffect } from "react";
+import { Suspense, useRef, useEffect, useMemo } from "react";
 import { useThemeStore } from '../store/useThemeStore';
+import { FutureStar } from "./FutureStar";
+import { ShootingStar } from "./ShootingStar";
+import { useFutureMessageStore } from "../store/useFutureMessageStore";
+
+const FutureStarWrapper = () => {
+  const {
+    isFutureStarVisible,
+    checkFutureStarAvailability,
+    setInputModalOpen,
+    isShootingStarVisible,
+    futureMessages,
+    openMessageDisplay
+  } = useFutureMessageStore();
+
+  useEffect(() => {
+    checkFutureStarAvailability();
+  }, []);
+
+  // FutureStarの位置をランダムに生成（表示されるたびに新しい位置）
+  const futureStarPos = useMemo(() => [
+    Math.random() * 600 - 300,  // x: -300 ~ 300
+    Math.random() * 300 - 150,  // y: -150 ~ 150
+    -10                          // z: 固定
+  ], [isFutureStarVisible]);
+
+  return (
+    <>
+      {isFutureStarVisible && (
+        <FutureStar
+          position={futureStarPos}
+          onOpenInputModal={() => setInputModalOpen(true)}
+        />
+      )}
+
+      {isShootingStarVisible && (
+        <ShootingStar
+          onOpenDisplayModal={() => {
+            // Assuming fetchUnreadMessages was called before showing star
+            // and futureMessages[0] is the one we want to show
+            if (futureMessages && futureMessages.length > 0) {
+              openMessageDisplay(futureMessages[0]);
+            }
+          }}
+        />
+      )}
+    </>
+  );
+};
 
 
 // Custom component to clamp camera position manually
@@ -44,6 +92,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
       <Suspense fallback={null}>
         {skyboxType === 'upgrade' ? <SkyBoxUpGrade /> : skyboxType === 'mixed' ? <SkyBoxMixed /> : <SkyBox />}
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
+        <FutureStarWrapper />
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />
         <fog attach="fog" args={['#101020', 10, 150]} />
