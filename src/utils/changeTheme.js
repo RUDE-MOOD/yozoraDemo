@@ -25,11 +25,11 @@ const themeData = {
         "color": "#ccffcc",
     },
     space: {
-        "colorTop": "#000000",        // 完全な黒（無限の彼方）
-        "colorBottom": "#0d0221",     // 非常に深い紫（宇宙の深淵）
-        "colorA": "#240046",          // 濃い藍色（星雲のベース）
-        "colorB": "#5a189a",          // 鮮やかな紫（輝く星雲）
-        "color": "#e0aaff",           // 淡いラベンダー（フォグ・光）
+        "colorTop": "#000000",
+        "colorBottom": "#0d0221",
+        "colorA": "#240046",
+        "colorB": "#5a189a",
+        "color": "#e0aaff",
     },
     orange: {
         "colorTop": "#21050c",
