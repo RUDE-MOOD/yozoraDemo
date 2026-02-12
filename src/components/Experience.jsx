@@ -73,7 +73,7 @@ const FutureStarWrapper = () => {
 };
 
 
-// Custom component to clamp camera position manually
+// 最上階レイヤーのボーダー（見られる制限のサイズ）
 const FrameLimiter = () => {
   useFrame(({ camera }) => {
     // Hard limits for position (panning)
@@ -116,6 +116,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
 
       <CameraControls
         ref={cameraControlsRef}
+        makeDefault
         minZoom={0.5}        // 最小ズーム倍率 (これ以上縮小できない)
         maxZoom={2}          // 最大ズーム倍率 (これ以上拡大できない)
         minDistance={10}     // カメラの最小距離 (被写体に近づける限界)
