@@ -9,6 +9,9 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         { id: 'purple', name: 'Purple', img: '/thumbnails/theme-purple.png' },
         { id: 'blue', name: 'Blue', img: '/thumbnails/theme-blue.png' },
         { id: 'green', name: 'Green', img: '/thumbnails/theme-green.png' },
+        { id: 'space', name: 'Space', img: '/thumbnails/theme-space.png' },
+        { id: 'orange', name: 'Orange', img: '/thumbnails/theme-orange.png' },
+
     ];
 
     const skyboxes = [
@@ -46,7 +49,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                 {/* Body - Theme Thumbnails */}
                 <div className="px-8 pt-6 pb-2">
                     <p className="text-white/50 text-xs tracking-widest text-center mb-4">カラーテーマ</p>
-                    <div className={`flex justify-center gap-6 transition-opacity duration-300 ${skyboxType === 'upgrade' ? 'opacity-40 pointer-events-none' : ''}`}>
+                    <div className={`grid grid-cols-3 gap-x-6 gap-y-4 transition-opacity duration-300 place-items-center ${skyboxType === 'upgrade' ? 'opacity-40 pointer-events-none' : ''}`}>
                         {themes.map((theme) => (
                             <div
                                 key={theme.id}

@@ -23,7 +23,22 @@ const themeData = {
         "colorA": "#051a05",
         "colorB": "#2e8b57",
         "color": "#ccffcc",
-    }
+    },
+    space: {
+        "colorTop": "#000000",        // 完全な黒（無限の彼方）
+        "colorBottom": "#0d0221",     // 非常に深い紫（宇宙の深淵）
+        "colorA": "#240046",          // 濃い藍色（星雲のベース）
+        "colorB": "#5a189a",          // 鮮やかな紫（輝く星雲）
+        "color": "#e0aaff",           // 淡いラベンダー（フォグ・光）
+    },
+    orange: {
+        "colorTop": "#21050c",
+        "colorBottom": "#dc2f02",
+        "colorA": "#9d0208",
+        "colorB": "#faa307",
+        "color": "#ffba08",
+    },
+
 }
 
 export { themeData }
