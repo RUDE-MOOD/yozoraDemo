@@ -197,11 +197,14 @@ export function ShootingStar({ onOpenDisplayModal }) {
             currentPos.addScaledVector(exitDirection, exitSpeed * delta)
 
             // カメラが流星を追従（レイヤー境界内のみ）
+            // 進行方向に少しオフセット → 核心が画面中央〜やや右に映る
             const inBounds = Math.abs(currentPos.x) < 320 && Math.abs(currentPos.y) < 160
             if (controls && inBounds) {
+                const ox = exitDirection.x * 8
+                const oy = exitDirection.y * 8
                 controls.setLookAt(
-                    currentPos.x, currentPos.y, currentPos.z + 20,
-                    currentPos.x, currentPos.y, currentPos.z,
+                    currentPos.x + ox, currentPos.y + oy, currentPos.z + 20,
+                    currentPos.x + ox, currentPos.y + oy, currentPos.z,
                     true // smooth transition
                 )
             }
