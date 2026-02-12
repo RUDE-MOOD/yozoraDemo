@@ -518,36 +518,39 @@ export const UI = ({ onSend, onStarClick }) => {
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと1 <span className="text-white/50">(必須)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing1}
                       onChange={(e) => setGoodThing1(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと2 <span className="text-white/50">(任意)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing2}
                       onChange={(e) => setGoodThing2(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと3 <span className="text-white/50">(任意)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing3}
                       onChange={(e) => setGoodThing3(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
 
