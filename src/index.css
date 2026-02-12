@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* スクロールバー非表示ユーティリティ */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 * {
   margin: 0;
   padding: 0;
