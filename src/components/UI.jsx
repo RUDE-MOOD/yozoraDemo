@@ -90,6 +90,27 @@ export const UI = ({ onSend, onStarClick }) => {
   // Debug Modals
   const [debugOpen, setDebugOpen] = useState(false);
 
+  // フルスクリーン状態（PC用）
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // フルスクリーン状態の監視
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // フルスクリーン切り替え
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
     setMoodValues(prev => ({ ...prev, [id]: value }));
@@ -187,19 +208,36 @@ export const UI = ({ onSend, onStarClick }) => {
 
   return (
     <>
-      {/* --- トップナビゲーション (Top Navigation) --- */}
-      <div className="fixed top-6 right-6 z-[1000]">
+      {/* --- ロケットメニュー (Rocket Menu) - 右下 --- */}
+      <div className="fixed bottom-6 right-6 z-[1000]">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center gap-1 shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
-          <div className="w-1 h-1 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]"></div>
-          <div className="w-1 h-1 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]"></div>
-          <div className="w-1 h-1 bg-white rounded-full shadow-[0_0_5px_rgba(255,255,255,0.8)]"></div>
+          {/* ロケットアイコン (Rocket Icon) */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.5904 14.3696C15.6948 14.8128 15.75 15.275 15.75 15.75C15.75 19.0637 13.0637 21.75 9.75 21.75V16.9503M15.5904 14.3696C19.3244 11.6411 21.75 7.22874 21.75 2.25C16.7715 2.25021 12.3595 4.67586 9.63122 8.40975M15.5904 14.3696C13.8819 15.6181 11.8994 16.514 9.75 16.9503M9.63122 8.40975C9.18777 8.30528 8.72534 8.25 8.25 8.25C4.93629 8.25 2.25 10.9363 2.25 14.25H7.05072M9.63122 8.40975C8.38285 10.1183 7.48701 12.1007 7.05072 14.25M9.75 16.9503C9.64659 16.9713 9.54279 16.9912 9.43862 17.0101C8.53171 16.291 7.70991 15.4692 6.99079 14.5623C7.00969 14.4578 7.02967 14.3537 7.05072 14.25M4.81191 16.6408C3.71213 17.4612 3 18.7724 3 20.25C3 20.4869 3.0183 20.7195 3.05356 20.9464C3.28054 20.9817 3.51313 21 3.75 21C5.22758 21 6.53883 20.2879 7.35925 19.1881"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.5 9C16.5 9.82843 15.8284 10.5 15 10.5C14.1716 10.5 13.5 9.82843 13.5 9C13.5 8.17157 14.1716 7.5 15 7.5C15.8284 7.5 16.5 8.17157 16.5 9Z"
+            />
+          </svg>
         </button>
 
         {menuOpen && (
-          <div className="absolute top-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-down origin-top-right">
+          <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
             <button
               onClick={() => {
                 setMenuOpen(false);
@@ -214,8 +252,9 @@ export const UI = ({ onSend, onStarClick }) => {
         )}
       </div>
 
-      {/* --- ユーザーメニュー (User Menu) - 左下 --- */}
-      <div className="fixed bottom-6 left-6 z-[1000]">
+      {/* --- ユーザーメニュー (User Menu) --- */}
+      {/* モバイル: 左下 / PC: 右上（フルスクリーンボタン付き） */}
+      <div className="fixed bottom-6 left-6 md:bottom-auto md:left-auto md:top-6 md:right-6 z-[1000] flex items-center gap-[10px]">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
@@ -241,8 +280,27 @@ export const UI = ({ onSend, onStarClick }) => {
           )}
         </button>
 
+        {/* フルスクリーンボタン（PC専用） */}
+        <button
+          onClick={toggleFullscreen}
+          className="hidden md:flex w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
+          aria-label={isFullscreen ? '全画面を終了' : '全画面表示'}
+        >
+          {isFullscreen ? (
+            /* 全画面終了アイコン (ArrowsPointingInward) */
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+            </svg>
+          ) : (
+            /* 全画面アイコン (ArrowsPointingOutward) */
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            </svg>
+          )}
+        </button>
+
         {userMenuOpen && (
-          <div className="absolute bottom-12 left-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-left">
+          <div className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-0 md:right-auto w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left">
             {/* 未来への手紙メニュー項目（FutureStarが表示中のみ） */}
             {isFutureStarVisible && futureStarPosition && (
               <button
@@ -350,44 +408,45 @@ export const UI = ({ onSend, onStarClick }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center md:items-center">
           {/* 背景のバックドロップ (クリックで閉じる) */}
           <div
-            className="absolute inset-0 bg-[#050510]/60 backdrop-blur-sm transition-opacity duration-300"
+            className="absolute inset-0 bg-black/20 transition-opacity duration-300"
             onClick={closeDiaryModal}
           ></div>
 
           {/* モーダルコンテンツ */}
           <div
-            className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-gradient-to-b from-[#151530]/90 to-[#2a2a50]/90 backdrop-blur-2xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-blue-900/30 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0 min-h-[70vh] md:min-h-0"
+            className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-black/40 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0"
             style={{ padding: '24px' }}
           >
 
-            {/* ヘッダー: スマホは戻る矢印+日付、PCは日付+X */}
+            {/* ヘッダー: スマホは戻る矢印+日付+X、PCは日付+X */}
             <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
-              {/* 左: スマホ戻る / PCはスペース */}
-              <div className="w-12 flex-shrink-0 flex md:hidden">
-                <button
-                  type="button"
-                  onClick={() => (mobileDiaryStep === 1 ? setMobileDiaryStep(0) : closeDiaryModal())}
-                  className="flex items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
-                  aria-label={mobileDiaryStep === 1 ? '戻る' : '閉じる'}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
+              {/* 左: スマホstep1は戻る矢印 / それ以外はスペース */}
+              <div className="w-12 flex-shrink-0">
+                {mobileDiaryStep === 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setMobileDiaryStep(0)}
+                    className="flex md:hidden items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
+                    aria-label="戻る"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}
               </div>
-              <div className="hidden md:block w-12 flex-shrink-0" />
 
               {/* 中央: 日付 */}
               <h2 className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
                 {getFormattedDate()}
               </h2>
 
-              {/* 右: PCは閉じるX / スマホはスペース（左右バランス用） */}
+              {/* 右: 閉じるX（PC常時 + スマホstep0） */}
               <div className="w-12 flex-shrink-0 flex justify-end">
                 <button
                   type="button"
                   onClick={closeDiaryModal}
-                  className="hidden md:flex items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors"
+                  className={`items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors ${mobileDiaryStep === 0 ? 'flex' : 'hidden md:flex'}`}
                   aria-label="閉じる"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -410,16 +469,22 @@ export const UI = ({ onSend, onStarClick }) => {
                       <p className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left">
                         {q.question}
                       </p>
-                      <div className="relative px-1">
+                      <div className="relative px-3">
+                        {/* 左端ドット */}
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/80 z-[1]" />
+                        {/* 右端ドット */}
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/80 z-[1]" />
+                        {/* 中央インジケーター（50%） */}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
                         <input
                           type="range"
                           min="0"
                           max="100"
                           value={moodValues[q.id]}
                           onChange={(e) => handleSliderChange(q.id, parseInt(e.target.value))}
-                          className="mood-slider w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer"
+                          className="mood-slider w-full appearance-none cursor-pointer"
                           style={{
-                            background: `linear-gradient(to right, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
+                            background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
                           }}
                         />
                       </div>
@@ -453,45 +518,48 @@ export const UI = ({ onSend, onStarClick }) => {
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと1 <span className="text-white/50">(必須)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing1}
                       onChange={(e) => setGoodThing1(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと2 <span className="text-white/50">(任意)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing2}
                       onChange={(e) => setGoodThing2(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
                       今日のいいこと3 <span className="text-white/50">(任意)</span>
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={goodThing3}
                       onChange={(e) => setGoodThing3(e.target.value)}
+                      maxLength={300}
                       placeholder=""
-                      className="w-full px-4 py-4 md:py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:border-white/30 transition-colors"
+                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                      style={{ height: '80px' }}
                     />
                   </div>
 
                   {/* 打ち上げボタン */}
-                  <div className="mt-6 md:mt-auto flex justify-center md:justify-start">
+                  <div className="mt-6 md:mt-auto flex justify-center">
                     <button
                       onClick={handleSend}
                       disabled={isSending || !goodThing1.trim()}
-                      className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                      className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white/70 text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                     >
                       {isSending ? (
                         <span className="flex items-center justify-center gap-2">
