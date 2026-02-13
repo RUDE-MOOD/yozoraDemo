@@ -94,7 +94,7 @@ export const useFutureMessageStore = create((set, get) => ({
     triggerShootingStarCheck: async (moodValues) => {
         // 条件1: 全ての気分スライダーが"ネガティブ"（例: 50未満）であること
         // 必要に応じて閾値を調整
-        const isDepressed = Object.values(moodValues).every(val => val < 50);
+        const isDepressed = Object.values(moodValues).every(val => val < 25);
 
         if (!isDepressed) {
             set({ isShootingStarVisible: false });
