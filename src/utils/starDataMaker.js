@@ -71,26 +71,48 @@ export const starDataMaker = ({ moodValues }) => {
  */
 function generateMoodColor(moodValues) {
     const { emotional, motivation, social, physical, fulfillment } = moodValues;
-    const color = new THREE.Color();
 
-    // emotional (情緒的安定性 0-100) → 基本色相
-    // 0 (つらい・どんより): 青系 (0.6) → 100 (心地いい・穏やか): 暖色系 (0.1)
-    let hue = 0.6 - (emotional / 100) * 0.5;
+    // 【特殊ケース】全て100の場合 → ゴールド（黄金の輝き）
+    if (emotional === 100 && motivation === 100 && social === 100 && physical === 100 && fulfillment === 100) {
+        return new THREE.Color(0xFFD700);
+    }
 
-    // motivation (動因の充足): やりきり度合いで色相を微調整
-    // 高いmotivationは達成感の暖色方向へ
-    const motivationShift = ((motivation - 50) / 100) * 0.1;
-    hue = Math.max(0, Math.min(1, hue - motivationShift));
+    // 【特殊ケース】全て0の場合 → 明るめのグレー
+    if (emotional === 0 && motivation === 0 && social === 0 && physical === 0 && fulfillment === 0) {
+        return new THREE.Color(0xA0A0A5);
+    }
 
-    // fulfillment (刺激の受容 0-100) → saturation (彩度)
-    // 0 (退屈・マンネリ): 0.3 → 100 (新鮮・充実): 1.0
-    const saturation = 0.3 + (fulfillment / 100) * 0.7;
+    // 各ムードパラメータに対応する基本色
+    // emotional (心地よさ): 黄色
+    const c1 = { r: 1, g: 1, b: 0 };
+    // motivation (自分らしさ): 赤
+    const c2 = { r: 1, g: 0, b: 0 };
+    // social (心の充電): マゼンタ
+    const c3 = { r: 1, g: 0, b: 1 };
+    // physical (体の状態): シアン
+    const c4 = { r: 0, g: 1, b: 1 };
+    // fulfillment (充実感): 緑
+    const c5 = { r: 0, g: 1, b: 0 };
 
-    // social + physical → lightness (明度)
-    // 社会的充足と体の軽やかさの組み合わせで明るさを決定
-    const avgBrightness = (social + physical) / 2;
-    const lightness = 0.4 + (avgBrightness / 100) * 0.5;
+    // Calculate weighted sum
+    let r = 0, g = 0, b = 0;
 
-    color.setHSL(hue, saturation, lightness);
-    return color;
+    // Normalize weights (0-100 -> 0-1)
+    const w1 = emotional / 100;
+    const w2 = motivation / 100;
+    const w3 = social / 100;
+    const w4 = physical / 100;
+    const w5 = fulfillment / 100;
+
+    r = c1.r * w1 + c2.r * w2 + c3.r * w3 + c4.r * w4 + c5.r * w5;
+    g = c1.g * w1 + c2.g * w2 + c3.g * w3 + c4.g * w4 + c5.g * w5;
+    b = c1.b * w1 + c2.b * w2 + c3.b * w3 + c4.b * w4 + c5.b * w5;
+
+    // Normalize by max component to brighten
+    const max = Math.max(r, g, b);
+
+    // If max is 0 (all sliders 0), return lighter grey
+    if (max === 0) return new THREE.Color(0xA0A0A5);
+
+    return new THREE.Color(r / max, g / max, b / max);
 }
