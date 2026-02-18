@@ -21,20 +21,7 @@
 - [x] meshを作って一つの星を打ち上げる
 - [x] dreiライブラリのTextを作って星の情報を画面上に表示する
 - [x] UIを追加して、入力欄を追加
-- [x] ディレクトリフォルダー構造を整理する(apis,store,pages,utilsなど)
-  <details><summary>フォルダー構造</summary>
-
-  ```
-  src/
-  ├── apis/       # Supabase, Geminiとの通信ロジック
-  ├── components/ # Effects, Experience, MyStars, UI などの部品
-  ├── store/      # Zustand（星のデータやユーザー情報の管理）
-  ├── pages/      # メイン画面以外のページ
-  ├── utils/      # 感情スコア計算、request、日付フォーマットなどの関数
-  ├── supabase/   # supabase関連（EdgeFunction、GEMINIへのプロンプトをここに書く）
-  └── App.jsx     # 全体の統合
-  ```
-  </details>
+- [x] ディレクトリフォルダー構造を整理する
 - [x] 生成された星をクリックして、詳細情報が表示できるように
 - [x] 星のデータをsupabaseに保存し、userStarsステートを更新する
 - [x] GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
@@ -67,6 +54,21 @@ step4:見て終わったら、その流れ星は加速して画面から消え�
 
 - **Antigravity**: 高度なエージェント AI によるコーディング支援
 - **Skills**: R3F (React Three Fiber) に特化した専門知識モジュール（Geometry, Postprocessing, Shaders など）を活用し、ベストプラクティスに沿った実装を行っています。
+
+# ディレクトリ構造
+
+保守性を向上させるため、`/src/components` ディレクトリは以下のように構成されています：
+
+- **`src/components/canvas/`**: R3F Canvas 内でレンダリングされる 3D コンポーネント群
+  - **`stars/`**: 星に関するコンポーネント (`UserStar`, `ShootingStar`, `FutureStar` など)
+  - **`environment/`**: Skybox や背景要素 (`SkyBox`, `SkyBoxUpGrade` など)
+  - **`effects/`**: ポストプロセスや視覚効果 (`Effects`, `GlitchCanvas` など)
+  - `Experience.jsx`: 3D シーンのメインエントリーポイント
+
+- **`src/components/ui/`**: 画面上にオーバーレイ表示される 2D UI コンポーネント群
+  - **`modals/`**: モーダルダイアログ (`LoginModal`, `StarDetailModal`, `ThemeSelectionModal` など)
+  - **`screens/`**: 全画面 UI (`LoginSuccessScreen` など)
+  - `UI.jsx`: UI のメインエントリーポイント
 
 # 環境初期化
 

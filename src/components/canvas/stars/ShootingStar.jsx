@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import { useRef, useState, useMemo } from 'react'
 import { useFrame, useThree, extend } from '@react-three/fiber'
 import { Billboard, shaderMaterial } from '@react-three/drei'
-import { useFutureMessageStore } from '../store/useFutureMessageStore'
-import { useStarStore } from '../store/useStarStore'
+import { useFutureMessageStore } from '../../../store/useFutureMessageStore'
+import { useStarStore } from '../../../store/useStarStore'
 
 // ══════════════════════════════════════════════════════
 // NagareboshiMaterial: 流星描画用カスタムシェーダー

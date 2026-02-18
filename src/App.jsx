@@ -1,14 +1,14 @@
 import { Canvas } from "@react-three/fiber";
 import { useState, useEffect } from "react";
-import { Experience } from "./components/Experience";
-import { Effects } from "./components/Effects";
-import { UI } from "./components/UI";
+import { Experience } from "./components/canvas/Experience";
+import { Effects } from "./components/canvas/effects/Effects";
+import { UI } from "./components/ui/UI";
 import { Leva, useControls } from "leva";
 import { useStarStore } from './store/useStarStore';
-import { LoginModal } from './components/LoginModal';
-import { LoginSuccessScreen } from './components/LoginSuccessScreen';
-import { RegisterModal } from './components/RegisterModal';
-import { RegisterSuccessScreen } from './components/RegisterSuccessScreen';
+import { LoginModal } from './components/ui/modals/LoginModal';
+import { LoginSuccessScreen } from './components/ui/screens/LoginSuccessScreen';
+import { RegisterModal } from './components/ui/modals/RegisterModal';
+import { RegisterSuccessScreen } from './components/ui/screens/RegisterSuccessScreen';
 
 import { supabase } from './supabaseClient';
 

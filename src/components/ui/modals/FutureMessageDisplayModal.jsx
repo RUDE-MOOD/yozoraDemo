@@ -1,4 +1,4 @@
-import { useFutureMessageStore } from '../store/useFutureMessageStore';
+import { useFutureMessageStore } from '../../../store/useFutureMessageStore';
 
 export const FutureMessageDisplayModal = () => {
     const {

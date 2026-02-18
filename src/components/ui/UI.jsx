@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { StarDetailModal } from "./StarDetailModal";
-import { supabase } from "../supabaseClient";
-import { ThemeSelectionModal } from "./ThemeSelectionModal";
-import { getFallbackAnalysis } from "../utils/fallbackAnalysis";
-import { FutureMessageInputModal } from "./FutureMessageInputModal";
-import { FutureMessageDisplayModal } from "./FutureMessageDisplayModal";
-import { useFutureMessageStore } from "../store/useFutureMessageStore";
-import { useStarStore } from "../store/useStarStore";
+import { StarDetailModal } from "./modals/StarDetailModal";
+import { supabase } from "../../supabaseClient";
+import { ThemeSelectionModal } from "./modals/ThemeSelectionModal";
+import { getFallbackAnalysis } from "../../utils/fallbackAnalysis";
+import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
+import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
+import { useFutureMessageStore } from "../../store/useFutureMessageStore";
+import { useStarStore } from "../../store/useStarStore";
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
@@ -528,9 +528,8 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${
-                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                  }`}
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                    }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div key={q.id} className="space-y-2">
@@ -592,9 +591,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
-                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                  }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                    }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">

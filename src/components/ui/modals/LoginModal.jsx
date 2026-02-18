@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import loginIllustration from '../assets/newUserWelcome.png'
+import loginIllustration from '../../../assets/newUserWelcome.png'
 
 // メールアドレスの正規表現
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

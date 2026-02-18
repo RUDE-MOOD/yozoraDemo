@@ -1,17 +1,17 @@
 import { CameraControls, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { SkyBox } from "./SkyBox";
-import { SkyBoxUpGrade } from "./skyBoxUpGrade";
-import { SkyBoxMixed } from "./skyBoxMixed";
-import { DistantStars } from "./DistantStars";
-import { MyStars } from "./MyStars";
-import { UserAddedStars } from "./UserAddedStars";
+import { SkyBox } from "./environment/SkyBox";
+import { SkyBoxUpGrade } from "./environment/skyBoxUpGrade";
+import { SkyBoxMixed } from "./environment/skyBoxMixed";
+import { DistantStars } from "./stars/DistantStars";
+import { MyStars } from "./stars/MyStars";
+import { UserAddedStars } from "./stars/UserAddedStars";
 import { Suspense, useRef, useEffect, useMemo } from "react";
-import { useThemeStore } from "../store/useThemeStore";
-import { FutureStar } from "./FutureStar";
-import { ShootingStar } from "./ShootingStar";
-import { useFutureMessageStore } from "../store/useFutureMessageStore";
+import { useThemeStore } from "../../store/useThemeStore";
+import { FutureStar } from "./stars/FutureStar";
+import { ShootingStar } from "./stars/ShootingStar";
+import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 
 const FutureStarWrapper = () => {
   const {
