@@ -12,7 +12,7 @@ const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
  * セッションにUIDがない場合に全画面表示される。
  * 純黒背景（透明度なし）で、左に装飾画像、右にログインフォーム。
  */
-export function LoginModal({ onLogin, onRegister, onSkip }) {
+export function LoginModal({ onLogin, onRegister }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -88,39 +88,7 @@ export function LoginModal({ onLogin, onRegister, onSkip }) {
                 fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
             }}
         >
-            {/* ── スキップボタン（認証未実装のため） ── */}
-            {onSkip && (
-                <button
-                    type="button"
-                    onClick={onSkip}
-                    style={{
-                        position: 'absolute',
-                        top: '32px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        padding: '8px 24px',
-                        backgroundColor: 'transparent',
-                        color: 'rgba(255, 255, 255, 0.35)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        letterSpacing: '0.05em',
-                        transition: 'all 0.2s ease',
-                        zIndex: 1,
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = 'rgba(255, 255, 255, 0.7)'
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = 'rgba(255, 255, 255, 0.35)'
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)'
-                    }}
-                >
-                    認証未実装のためスキップ →
-                </button>
-            )}
+
 
             <div
                 style={{
