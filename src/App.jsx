@@ -58,6 +58,10 @@ function App() {
           onRegister={() => {
             setPhase('register');
           }}
+          onSkip={() => {
+            setShowApp(true);
+            setPhase('app');
+          }}
         />
       )}
 
