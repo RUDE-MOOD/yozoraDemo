@@ -69,7 +69,7 @@ export const Effects = () => {
       <ToneMapping
         blendFunction={BlendFunction.NORMAL}
         adaptive={true}
-        resolution={256}
+        resolution={128}
         middleGrey={toneMappingProps.middleGrey}
         maxLuminance={toneMappingProps.maxLuminance}
         averageLuminance={toneMappingProps.averageLuminance}

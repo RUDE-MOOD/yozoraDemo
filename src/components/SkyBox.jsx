@@ -87,9 +87,9 @@ const FluidMaterial = shaderMaterial(
         float a = 0.5;
         vec2 shift = vec2(100.0);
         // Rotate to reduce axial bias
-        mat2 rot = mat2(cos(0.5), sin(0.5),
-                        -sin(0.5), cos(00.5));
-        for (int i = 0; i < 5; ++i) {
+        mat2 rot = mat2(0.8776, 0.4794,
+                        -0.4794, 0.8776);
+        for (int i = 0; i < 3; ++i) {
             v += a * noise(st);
             st = rot * st * 2.0 + shift;
             a *= 0.5;
@@ -152,8 +152,8 @@ const FogMaterial = shaderMaterial(
     float fbm(vec2 p) {
         float v = 0.0;
         float a = 0.5;
-        mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
-        for (int i=0; i<4; i++) {
+        mat2 rot = mat2(0.8776, 0.4794, -0.4794, 0.8776);
+        for (int i=0; i<3; i++) {
             v += a * noise(p);
             p = rot * p * 2.0;
             a *= 0.5;

@@ -210,7 +210,7 @@ export function ShootingStar({ onOpenDisplayModal }) {
             }
 
             // 5秒後に消える
-            if (exitTimer.current > 5.0) {
+            if (exitTimer.current > 2.0) {
                 setPhase('gone')
                 hideShootingStar()
             }

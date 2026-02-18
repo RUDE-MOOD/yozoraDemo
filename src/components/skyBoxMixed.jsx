@@ -7,21 +7,21 @@ import { DistantStars } from './DistantStars'
 
 // SkyBoxUpGradeと同じネビュラシェーダー（透明度制御用にopacity uniformを追加）
 const NebulaFilterMaterial = shaderMaterial(
-    {
-        time: 0,
-        resolution: new THREE.Vector2(1920, 1080),
-        opacity: 0.35,  // フィルターとしての透明度
-    },
-    // Vertex Shader
-    `
+  {
+    time: 0,
+    resolution: new THREE.Vector2(1920, 1080),
+    opacity: 0.35,  // フィルターとしての透明度
+  },
+  // Vertex Shader
+  `
     varying vec2 vUv;
     void main() {
       vUv = uv;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-    // Fragment Shader — ネビュラ + opacity制御
-    `
+  // Fragment Shader — ネビュラ + opacity制御
+  `
     precision highp float;
 
     uniform float time;
@@ -29,7 +29,7 @@ const NebulaFilterMaterial = shaderMaterial(
     uniform float opacity;
     varying vec2 vUv;
 
-    #define NUM_OCTAVES 6
+    #define NUM_OCTAVES 4
 
     float random(vec2 pos) {
       return fract(sin(dot(pos.xy, vec2(13.9898, 78.233))) * 43758.5453123);
@@ -50,7 +50,7 @@ const NebulaFilterMaterial = shaderMaterial(
       float v = 0.0;
       float a = 0.5;
       vec2 shift = vec2(100.0);
-      mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+      mat2 rot = mat2(0.8776, 0.4794, -0.4794, 0.8776);
       for (int i = 0; i < NUM_OCTAVES; i++) {
         float dir = mod(float(i), 2.0) > 0.5 ? 1.0 : -1.0;
         v += a * noise(pos - 0.05 * dir * time);
@@ -68,12 +68,11 @@ const NebulaFilterMaterial = shaderMaterial(
       float t = 0.0, d;
       float time2 = 1.0;
 
-      vec2 q = vec2(0.0);
-      q.x = fbm(p + 0.00 * time2);
-      q.y = fbm(p + vec2(1.0));
-      vec2 r = vec2(0.0);
-      r.x = fbm(p + 1.0 * q + vec2(1.7, 1.2) + 0.15 * time2);
-      r.y = fbm(p + 1.0 * q + vec2(8.3, 2.8) + 0.126 * time2);
+      // 最適化: fbm呼び出しを5→3に削減（q.yとr.yを近似）
+      float qx = fbm(p + 0.00 * time2);
+      vec2 q = vec2(qx, qx * 0.8 + 0.1);
+      float rx = fbm(p + q + vec2(1.7, 1.2) + 0.15 * time2);
+      vec2 r = vec2(rx, rx * 0.9 + 0.05);
       float f = fbm(p + r);
 
       vec3 color = mix(
@@ -106,40 +105,40 @@ const NebulaFilterMaterial = shaderMaterial(
 extend({ NebulaFilterMaterial })
 
 export function SkyBoxMixed() {
-    const filterRef = useRef()
-    const { size } = useThree()
+  const filterRef = useRef()
+  const { size } = useThree()
 
-    useFrame(({ clock }) => {
-        if (filterRef.current) {
-            filterRef.current.time = clock.elapsedTime
-            filterRef.current.resolution.set(
-                size.width * window.devicePixelRatio,
-                size.height * window.devicePixelRatio
-            )
-        }
-    })
+  useFrame(({ clock }) => {
+    if (filterRef.current) {
+      filterRef.current.time = clock.elapsedTime
+      filterRef.current.resolution.set(
+        size.width * window.devicePixelRatio,
+        size.height * window.devicePixelRatio
+      )
+    }
+  })
 
-    return (
-        <group name="SkyBoxMixed">
-            {/* ベース: 従来のSkyBox（Layer1~4） */}
-            <SkyBox />
+  return (
+    <group name="SkyBoxMixed">
+      {/* ベース: 従来のSkyBox（Layer1~4） */}
+      <SkyBox />
 
-            {/* フィルター: ネビュラシェーダーを半透明で上に重ねる */}
-            {/* z=-15: SkyBoxのFog(z=-20)より手前に配置 */}
-            <mesh position={[0, 0.04, -15]}>
-                <planeGeometry args={[1000, 500]} />
-                <nebulaFilterMaterial
-                    ref={filterRef}
-                    key={NebulaFilterMaterial.key}
-                    opacity={0.35}
-                    transparent
-                    depthWrite={false}
-                    blending={THREE.AdditiveBlending}
-                />
-            </mesh>
+      {/* フィルター: ネビュラシェーダーを半透明で上に重ねる */}
+      {/* z=-15: SkyBoxのFog(z=-20)より手前に配置 */}
+      <mesh position={[0, 0.04, -15]}>
+        <planeGeometry args={[1000, 500]} />
+        <nebulaFilterMaterial
+          ref={filterRef}
+          key={NebulaFilterMaterial.key}
+          opacity={0.35}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
 
-            {/* 遠景の星 */}
-            <DistantStars position={[0, 0, -5]} size={2.5} />
-        </group>
-    )
+      {/* 遠景の星 */}
+      <DistantStars position={[0, 0, -5]} size={2.5} />
+    </group>
+  )
 }

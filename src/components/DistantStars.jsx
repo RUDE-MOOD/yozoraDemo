@@ -60,7 +60,7 @@ const StarsMaterial = shaderMaterial(
 
         float alpha = circle * h; 
 
-        if (alpha < 0.01) discard;
+        if (alpha < 0.02) discard;
 
         gl_FragColor = vec4(color, alpha);
     }

@@ -33,7 +33,7 @@ function App() {
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         style={{ width: '100%', height: '100%' }}
-        dpr={[1, 2]} // Optimize for mobile (clamp at 2x)
+        dpr={[1, 1.5]} // 最適化: DPR上限を1.5に（高DPI端末でピクセル数削減）
       >
         <color attach="background" args={['#101020']} />
         <Experience userStars={stars} onStarClick={starClickHandler} focusTarget={focusTarget} />
