@@ -80,9 +80,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [passwordConfirm, setPasswordConfirm] = useState('')
-    const [birthYear, setBirthYear] = useState('2026')
-    const [birthMonth, setBirthMonth] = useState('01')
-    const [birthDay, setBirthDay] = useState('01')
+    const [birthYear, setBirthYear] = useState('')
+    const [birthMonth, setBirthMonth] = useState('')
+    const [birthDay, setBirthDay] = useState('')
     const [agreeTerms, setAgreeTerms] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -135,6 +135,20 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
             valid = false
         }
 
+        // 誕生日バリデーション
+        if (!birthYear || !birthMonth || !birthDay) {
+            newErrors.birthday = '誕生日を選択してください'
+            valid = false
+        } else {
+            const y = parseInt(birthYear); const m = parseInt(birthMonth); const d = parseInt(birthDay)
+            const selected = new Date(y, m - 1, d)
+            const today = new Date(); today.setHours(0, 0, 0, 0)
+            if (selected > today) {
+                newErrors.birthday = '未来の日付は選択できません'
+                valid = false
+            }
+        }
+
         setErrors(newErrors)
         setGeneralError('')
         return valid
@@ -151,7 +165,7 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                 userName: userName.trim(),
                 email: email.trim(),
                 password,
-                birthday: `${birthYear}-${birthMonth}-${birthDay}`,
+                birthday: `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`,
             })
         } catch (err) {
             setGeneralError(err.message || '登録に失敗しました')
@@ -285,54 +299,78 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                         <label style={labelStyle}>誕生日</label>
                         <div style={{ display: 'flex', gap: '10px' }}>
                             {/* 年 */}
-                            <input
-                                type="text"
+                            <select
                                 value={birthYear}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/\D/g, '').slice(0, 4)
-                                    setBirthYear(v)
-                                }}
-                                maxLength={4}
+                                onChange={(e) => { setBirthYear(e.target.value); setBirthDay(''); clearFieldError('birthday') }}
                                 style={{
-                                    ...inputStyle(false),
-                                    width: '100px',
+                                    ...inputStyle(errors.birthday),
+                                    width: '110px',
                                     textAlign: 'center',
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    WebkitAppearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    paddingRight: '28px',
                                 }}
-                                placeholder="2026"
-                            />
+                            >
+                                <option value="">年</option>
+                                {Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => new Date().getFullYear() - i).map(y => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
                             {/* 月 */}
-                            <input
-                                type="text"
+                            <select
                                 value={birthMonth}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/\D/g, '').slice(0, 2)
-                                    setBirthMonth(v)
-                                }}
-                                maxLength={2}
+                                onChange={(e) => { setBirthMonth(e.target.value); setBirthDay(''); clearFieldError('birthday') }}
                                 style={{
-                                    ...inputStyle(false),
-                                    width: '70px',
+                                    ...inputStyle(errors.birthday),
+                                    width: '80px',
                                     textAlign: 'center',
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    WebkitAppearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 10px center',
+                                    paddingRight: '24px',
                                 }}
-                                placeholder="01"
-                            />
+                            >
+                                <option value="">月</option>
+                                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                                    <option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+                                ))}
+                            </select>
                             {/* 日 */}
-                            <input
-                                type="text"
+                            <select
                                 value={birthDay}
-                                onChange={(e) => {
-                                    const v = e.target.value.replace(/\D/g, '').slice(0, 2)
-                                    setBirthDay(v)
-                                }}
-                                maxLength={2}
+                                onChange={(e) => { setBirthDay(e.target.value); clearFieldError('birthday') }}
                                 style={{
-                                    ...inputStyle(false),
-                                    width: '70px',
+                                    ...inputStyle(errors.birthday),
+                                    width: '80px',
                                     textAlign: 'center',
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    WebkitAppearance: 'none',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 10px center',
+                                    paddingRight: '24px',
                                 }}
-                                placeholder="01"
-                            />
+                            >
+                                <option value="">日</option>
+                                {(() => {
+                                    const y = parseInt(birthYear) || 2000
+                                    const m = parseInt(birthMonth) || 1
+                                    const days = new Date(y, m, 0).getDate()
+                                    return Array.from({ length: days }, (_, i) => i + 1).map(d => (
+                                        <option key={d} value={d}>{String(d).padStart(2, '0')}</option>
+                                    ))
+                                })()}
+                            </select>
                         </div>
+                        {errors.birthday && <div style={fieldErrorStyle}>{errors.birthday}</div>}
                     </form>
                 </div>
 
