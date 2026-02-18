@@ -400,7 +400,7 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "flex-end",
+              justifyContent: "center",
               gap: "8px",
             }}
           >
