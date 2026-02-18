@@ -29,7 +29,7 @@ function App() {
 
   return (
     <>
-      <Leva />
+      <Leva hidden />
       <Canvas
         camera={{ position: [0, 0, 10], fov: 50 }}
         style={{ width: '100%', height: '100%' }}
