@@ -1,4 +1,4 @@
-import { useThemeStore } from "../store/useThemeStore";
+import { useThemeStore } from "../../../store/useThemeStore";
 
 export const ThemeSelectionModal = ({ isOpen, onClose }) => {
   const { currentThemeName, setTheme, skyboxType, setSkyboxType } =
@@ -113,18 +113,18 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                     style={
                       skybox.id === "classic"
                         ? {
-                            background:
-                              "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
-                          }
+                          background:
+                            "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
+                        }
                         : skybox.id === "mixed"
                           ? {
-                              background:
-                                "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
-                            }
+                            background:
+                              "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
+                          }
                           : {
-                              background:
-                                "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
-                            }
+                            background:
+                              "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
+                          }
                     }
                   />
                 </div>

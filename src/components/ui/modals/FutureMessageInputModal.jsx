@@ -23,7 +23,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Canvas, useFrame, extend } from '@react-three/fiber';
 import { Billboard, shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
-import { useFutureMessageStore } from '../store/useFutureMessageStore';
+import { useFutureMessageStore } from '../../../store/useFutureMessageStore';
 
 // --- 光球シェーダー（FutureStar.jsxと同一のオーブ型シェーダー） ---
 const FuturePreviewMaterial = shaderMaterial(

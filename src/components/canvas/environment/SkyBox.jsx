@@ -2,10 +2,10 @@ import * as THREE from 'three'
 import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { DistantStars } from './DistantStars'
+import { DistantStars } from '../stars/DistantStars'
 
 // テーマ変更用
-import { useThemeStore } from '../store/useThemeStore'
+import { useThemeStore } from '../../../store/useThemeStore'
 
 // --- Layer 1: Background Shader (Vertical Gradient) ---
 const BackgroundMaterial = shaderMaterial(

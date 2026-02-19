@@ -21,20 +21,7 @@
 - [x] meshを作って一つの星を打ち上げる
 - [x] dreiライブラリのTextを作って星の情報を画面上に表示する
 - [x] UIを追加して、入力欄を追加
-- [x] ディレクトリフォルダー構造を整理する(apis,store,pages,utilsなど)
-  <details><summary>フォルダー構造</summary>
-
-  ```
-  src/
-  ├── apis/       # Supabase, Geminiとの通信ロジック
-  ├── components/ # Effects, Experience, MyStars, UI などの部品
-  ├── store/      # Zustand（星のデータやユーザー情報の管理）
-  ├── pages/      # メイン画面以外のページ
-  ├── utils/      # 感情スコア計算、request、日付フォーマットなどの関数
-  ├── supabase/   # supabase関連（EdgeFunction、GEMINIへのプロンプトをここに書く）
-  └── App.jsx     # 全体の統合
-  ```
-  </details>
+- [x] ディレクトリフォルダー構造を整理する
 - [x] 生成された星をクリックして、詳細情報が表示できるように
 - [x] 星のデータをsupabaseに保存し、userStarsステートを更新する
 - [x] GEMINIのAPIを導入し、ユーザーが書いた日記の感情を分析できるように
@@ -59,6 +46,7 @@ step4:見て終わったら、その流れ星は加速して画面から消え�
 - [x] 流れ星の見た目を調整
 - [ ] 新規登録ユーザーのウエルカム画面にシェーダーを使う[https://www.shadertoy.com/view/XtK3W3](https://www.shadertoy.com/view/XtK3W3) 
 - [x] スライダーで星の色を決める
+- [ ] reactアニメショーンライブラリを活用する[リンク](https://reactbits.dev/animations/splash-cursor)
 
 ## Development Tools
 
@@ -66,6 +54,21 @@ step4:見て終わったら、その流れ星は加速して画面から消え�
 
 - **Antigravity**: 高度なエージェント AI によるコーディング支援
 - **Skills**: R3F (React Three Fiber) に特化した専門知識モジュール（Geometry, Postprocessing, Shaders など）を活用し、ベストプラクティスに沿った実装を行っています。
+
+# ディレクトリ構造
+
+保守性を向上させるため、`/src/components` ディレクトリは以下のように構成されています：
+
+- **`src/components/canvas/`**: R3F Canvas 内でレンダリングされる 3D コンポーネント群
+  - **`stars/`**: 星に関するコンポーネント (`UserStar`, `ShootingStar`, `FutureStar` など)
+  - **`environment/`**: Skybox や背景要素 (`SkyBox`, `SkyBoxUpGrade` など)
+  - **`effects/`**: ポストプロセスや視覚効果 (`Effects`, `GlitchCanvas` など)
+  - `Experience.jsx`: 3D シーンのメインエントリーポイント
+
+- **`src/components/ui/`**: 画面上にオーバーレイ表示される 2D UI コンポーネント群
+  - **`modals/`**: モーダルダイアログ (`LoginModal`, `StarDetailModal`, `ThemeSelectionModal` など)
+  - **`screens/`**: 全画面 UI (`LoginSuccessScreen` など)
+  - `UI.jsx`: UI のメインエントリーポイント
 
 # 環境初期化
 
@@ -220,30 +223,74 @@ SkyBoxの代替として切り替え可能なシェーダー背景。GLSL Sandbo
 
 .env example に参照
 
+# 認証とユーザー管理
+
+Supabase Auth を使用したメールアドレス/パスワード認証を実装。
+
+## 認証フロー (App.jsx)
+
+アプリケーションの状態（`phase`ステート）により、以下のフローで画面が遷移します。
+
+| Phase | 説明 |
+|---|---|
+| `loading` | **初期状態**。Supabaseのセッション存在確認中。画面には何も表示されない（一瞬のチラつき防止）。 |
+| `login` | セッションなし。ログインモーダルを表示。ここから「新規登録」へ遷移可能。 |
+| `register` | ログイン画面から遷移。ユーザー情報（Email, Pass, 名前, 生年月日）を入力。 |
+| `registerSuccess` | 登録成功後。グリッチエフェクト演出を経て、自動的に `app` へ遷移。 |
+| `success` | ログイン成功後。グリッチエフェクト演出を経て、自動的に `app` へ遷移。 |
+| `app` | **メイン画面**。3D空間とUIが表示される。自動ログイン時はいきなりここから開始。 |
+
+## データ所有権 (RLS)
+
+PostgreSQLの **RLS (Row Level Security)** を有効化し、以下のポリシーを適用済み。
+フロントエンドでフィルタリングするのではなく、**データベースレベルで** セキュリティを担保しています。
+
+- **Select**: 自分の `user_id` が付いたデータのみ取得可能
+- **Insert**: 自分の `user_id` を持つデータのみ作成可能（`default: auth.uid()` で自動付与）
+- **Delete/Update**: 自分のデータのみ操作可能
+
 # データベース構造
+
+## ユーザープロフィール (t_account)
+
+Supabase Authの `auth.users` テーブルと連動し、アプリケーション固有のユーザー情報を管理するテーブル。
+
+| コラム | データ型 | 説明 |
+|---|---|---|
+| user_id🔑 | uuid | `auth.users.id` への外部キー (OnetoOne) |
+| user_name | varchar(15) | ユーザー名（3-15文字） |
+| birthday | date | 生年月日 |
+| registration_date | timestamptz | 登録日時 |
+| is_frozen | boolean | アカウント凍結フラグ（将来用） |
 
 ## 星データテーブル (t_stars)
 
-| コラム        | データ型(supabase の選択肢で設置する) | ディフォルト値 | 説明                                                                                       |
-| ------------- | ------------------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| id🔑          | uuid                                  | NULL           | UUID で生成されたユニークな ID                                                             |
-| position      | jsonb                                 | NULL           | 位置                                                                                       |
-| color         | jsonb                                 | NULL           | 色                                                                                         |
-| scale         | Float4                                | NULL           | 大きさ                                                                                     |
-| random        | Float4                                | NULL           | 星の瞬きアニメーションの位相をずらすための値（各星が異なるタイミングで瞬くようにするため） |
-| created_at    | timestamptz                           | NULL           | ISO フォーマットの生成日時（データベース保存用）                                           |
-| display_date  | text                                  | NULL           | YY/MM/DD HH:mm フォーマットの生成日時（画面表示用）                                        |
-| analysis_data | jsonb                                 | NULL           | Gemini API からの分析結果（感情、褒め言葉、今日のいいこと goodThings など）                |
+RLSにより、ユーザーは自分の星しか見えません。
+
+| コラム | データ型 | ディフォルト値 | 説明 |
+|---|---|---|---|
+| id🔑 | uuid | NULL | UUID |
+| user_id | uuid | `auth.uid()` | **[NEW]** 所有者のユーザーID。自動入力。 |
+| position | jsonb | NULL | 位置 `[x, y, z]` |
+| color | jsonb | NULL | 色 `{r, g, b}` |
+| scale | Float4 | NULL | 大きさ |
+| random | Float4 | NULL | 瞬き位相 |
+| created_at | timestamptz | NULL | 生成日時 |
+| display_date | text | NULL | 表示用日時文字 |
+| analysis_data | jsonb | NULL | Gemini API 分析結果 |
 
 ## 未来メッセージテーブル (t_future_messages)
 
-| コラム        | データ型 | ディフォルト値     | 説明                           |
-| ------------- | -------- | ------------------ | ------------------------------ |
-| id🔑          | uuid     | uuid_generate_v4() | UUID で生成されたユニークな ID |
-| message       | text     | NULL               | 未来の自分へのメッセージ本文   |
-| created_at    | timestamptz | now()           | メッセージの作成日時           |
-| display_date  | text     | NULL               | 表示用の日付文字列             |
-| is_read       | bool     | false              | 既読フラグ（流れ星で閲覧済みか）|
+RLSにより、自分宛てのメッセージのみ管理されます。
+
+| コラム | データ型 | ディフォルト値 | 説明 |
+|---|---|---|---|
+| id🔑 | uuid | uuid_generate_v4() | UUID |
+| user_id | uuid | `auth.uid()` | **[NEW]** 所有者のユーザーID。自動入力。 |
+| message | text | NULL | メッセージ本文 |
+| created_at | timestamptz | now() | 作成日時 |
+| display_date | text | NULL | 表示用日時 |
+| is_read | bool | false | 既読フラグ |
 
 # Gemini API の使用 (テスト用の TEST-API を実行する時に、学校のネットワークから弾かれる可能性もある、テザリングを使うのは推薦)
 

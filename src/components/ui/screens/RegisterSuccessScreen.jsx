@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import loginIllustration from '../assets/newUserWelcome.png'
-import { GlitchCanvas } from './GlitchCanvas'
+import loginIllustration from '../../../assets/newUserWelcome.png'
+import { GlitchCanvas } from '../../canvas/effects/GlitchCanvas'
 
 // ══════════════════════════════════════════════════════
 //  RegisterSuccessScreen

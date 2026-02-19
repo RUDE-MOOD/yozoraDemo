@@ -2,14 +2,15 @@ import * as THREE from 'three'
 import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
-import { DistantStars } from './DistantStars'
+import { SkyBox } from './SkyBox'
+import { DistantStars } from '../stars/DistantStars'
 
-// FBM Nebula Shader — faithful port from GLSL Sandbox
-// Uses virtual resolution to replicate gl_FragCoord coordinate space exactly
-const NebulaMaterial = shaderMaterial(
+// SkyBoxUpGradeと同じネビュラシェーダー（透明度制御用にopacity uniformを追加）
+const NebulaFilterMaterial = shaderMaterial(
   {
     time: 0,
     resolution: new THREE.Vector2(1920, 1080),
+    opacity: 0.35,  // フィルターとしての透明度
   },
   // Vertex Shader
   `
@@ -19,12 +20,13 @@ const NebulaMaterial = shaderMaterial(
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
-  // Fragment Shader — kept as close to the original as possible
+  // Fragment Shader — ネビュラ + opacity制御
   `
     precision highp float;
 
     uniform float time;
     uniform vec2 resolution;
+    uniform float opacity;
     varying vec2 vUv;
 
     #define NUM_OCTAVES 4
@@ -59,9 +61,7 @@ const NebulaMaterial = shaderMaterial(
     }
 
     void main(void) {
-      // Reconstruct gl_FragCoord equivalent from vUv
       vec2 fragCoord = vUv * resolution;
-
       vec2 p = (fragCoord.xy * 3.0 - resolution.xy) / min(resolution.x, resolution.y);
       p -= vec2(12.0, 0.0);
 
@@ -75,7 +75,6 @@ const NebulaMaterial = shaderMaterial(
       vec2 r = vec2(rx, rx * 0.9 + 0.05);
       float f = fbm(p + r);
 
-      // DS: hornidev
       vec3 color = mix(
         vec3(1.0, 1.0, 2.0),
         vec3(1.0, 1.0, 1.0),
@@ -96,25 +95,23 @@ const NebulaMaterial = shaderMaterial(
 
       color = (f * f * f * 1.0 + 0.5 * 1.7 * 0.0 + 0.9 * f) * color;
 
-      vec2 uv = fragCoord.xy / resolution.xy;
-      float alpha = 50.0 - max(pow(100.0 * distance(uv.x, -1.0), 0.0), pow(2.0 * distance(uv.y, 0.5), 5.0));
-      gl_FragColor = vec4(color * 100.0, color.r);
-      gl_FragColor = vec4(color, alpha * color.r);
+      // opacity uniformでフィルターの強さを制御
+      float alpha = opacity * color.r;
+      gl_FragColor = vec4(color, alpha);
     }
   `
 )
 
-extend({ NebulaMaterial })
+extend({ NebulaFilterMaterial })
 
-export function SkyBoxUpGrade() {
-  const materialRef = useRef()
+export function SkyBoxMixed() {
+  const filterRef = useRef()
   const { size } = useThree()
 
   useFrame(({ clock }) => {
-    if (materialRef.current) {
-      materialRef.current.time = clock.elapsedTime
-      // Pass actual canvas pixel resolution to match original coordinate space
-      materialRef.current.resolution.set(
+    if (filterRef.current) {
+      filterRef.current.time = clock.elapsedTime
+      filterRef.current.resolution.set(
         size.width * window.devicePixelRatio,
         size.height * window.devicePixelRatio
       )
@@ -122,16 +119,25 @@ export function SkyBoxUpGrade() {
   })
 
   return (
-    <group name="SkyBoxUpGrade">
-      <mesh position={[0, 0, -50]}>
+    <group name="SkyBoxMixed">
+      {/* ベース: 従来のSkyBox（Layer1~4） */}
+      <SkyBox />
+
+      {/* フィルター: ネビュラシェーダーを半透明で上に重ねる */}
+      {/* z=-15: SkyBoxのFog(z=-20)より手前に配置 */}
+      <mesh position={[0, 0.04, -15]}>
         <planeGeometry args={[1000, 500]} />
-        <nebulaMaterial
-          ref={materialRef}
-          key={NebulaMaterial.key}
+        <nebulaFilterMaterial
+          ref={filterRef}
+          key={NebulaFilterMaterial.key}
+          opacity={0.35}
+          transparent
           depthWrite={false}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
-      {/* 遠景の星 — z=-5でカメラに近い → 星が大きく見える */}
+
+      {/* 遠景の星 */}
       <DistantStars position={[0, 0, -5]} size={2.5} />
     </group>
   )
