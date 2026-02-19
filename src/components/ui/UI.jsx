@@ -1,54 +1,54 @@
-import { useState, useEffect } from 'react';
-import { StarDetailModal } from './StarDetailModal';
-import { supabase } from '../supabaseClient';
-import { ThemeSelectionModal } from './ThemeSelectionModal';
-import { getFallbackAnalysis } from '../utils/fallbackAnalysis';
-import { FutureMessageInputModal } from './FutureMessageInputModal';
-import { FutureMessageDisplayModal } from './FutureMessageDisplayModal';
-import { useFutureMessageStore } from '../store/useFutureMessageStore';
-import { useStarStore } from '../store/useStarStore';
+import { useState, useEffect } from "react";
+import { StarDetailModal } from "./modals/StarDetailModal";
+import { supabase } from "../../supabaseClient";
+import { ThemeSelectionModal } from "./modals/ThemeSelectionModal";
+import { getFallbackAnalysis } from "../../utils/fallbackAnalysis";
+import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
+import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
+import { useFutureMessageStore } from "../../store/useFutureMessageStore";
+import { useStarStore } from "../../store/useStarStore";
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
   {
-    id: 'emotional',      // 情緒的安定性
-    question: '今の気持ちは心地いい？',
-    leftLabel: 'つらい・どんより',
-    rightLabel: '心地いい・穏やか',
+    id: "emotional", // 情緒的安定性
+    question: "今の気持ちは心地いい？",
+    leftLabel: "つらい・どんより",
+    rightLabel: "心地いい・穏やか",
   },
   {
-    id: 'motivation',     // 動因の充足
-    question: '今日は「自分らしく」過ごせた？',
-    leftLabel: '無気力・不完全燃焼',
-    rightLabel: 'やりきった・満足',
+    id: "motivation", // 動因の充足
+    question: "今日は「自分らしく」過ごせた？",
+    leftLabel: "無気力・不完全燃焼",
+    rightLabel: "やりきった・満足",
   },
   {
-    id: 'social',         // 社会的適応
-    question: '今日の「心の満たされ方」は？',
-    leftLabel: '孤独・物足りない',
-    rightLabel: '充足感・満タン',
+    id: "social", // 社会的適応
+    question: "今日の「心の満たされ方」は？",
+    leftLabel: "孤独・物足りない",
+    rightLabel: "充足感・満タン",
   },
   {
-    id: 'physical',       // 生体的メカニズム
-    question: '今の「体」の状態は？',
-    leftLabel: 'ずっしり重たい',
-    rightLabel: 'すっきり軽やか',
+    id: "physical", // 生体的メカニズム
+    question: "今の「体」の状態は？",
+    leftLabel: "ずっしり重たい",
+    rightLabel: "すっきり軽やか",
   },
   {
-    id: 'fulfillment',    // 刺激の受容
-    question: '今日の「充実感」はどうだった？',
-    leftLabel: '退屈・マンネリ',
-    rightLabel: '新鮮・充実していた',
+    id: "fulfillment", // 刺激の受容
+    question: "今日の「充実感」はどうだった？",
+    leftLabel: "退屈・マンネリ",
+    rightLabel: "新鮮・充実していた",
   },
 ];
 
 // 初期スライダー値
 const INITIAL_MOOD_VALUES = {
-  emotional: 50,    // 情緒的安定性
-  motivation: 50,   // 動因の充足
-  social: 50,       // 社会的適応
-  physical: 50,     // 生体的メカニズム
-  fulfillment: 50,  // 刺激の受容
+  emotional: 50, // 情緒的安定性
+  motivation: 50, // 動因の充足
+  social: 50, // 社会的適応
+  physical: 50, // 生体的メカニズム
+  fulfillment: 50, // 刺激の受容
 };
 
 export const UI = ({ onSend, onStarClick }) => {
@@ -69,9 +69,9 @@ export const UI = ({ onSend, onStarClick }) => {
   // 送信時、重複送信を防ぐためのフラグ
   const [isSending, setIsSending] = useState(false);
   // 今日のいいこと
-  const [goodThing1, setGoodThing1] = useState('');
-  const [goodThing2, setGoodThing2] = useState('');
-  const [goodThing3, setGoodThing3] = useState('');
+  const [goodThing1, setGoodThing1] = useState("");
+  const [goodThing2, setGoodThing2] = useState("");
+  const [goodThing3, setGoodThing3] = useState("");
   // スマホ用: 0=スライダー, 1=テキスト入力
   const [mobileDiaryStep, setMobileDiaryStep] = useState(0);
 
@@ -82,7 +82,7 @@ export const UI = ({ onSend, onStarClick }) => {
     triggerShootingStarCheck,
     debug_setFutureStarVisible,
     debug_setShootingStarVisible,
-    debug_loadMockMessage
+    debug_loadMockMessage,
   } = useFutureMessageStore();
 
   const { setFocusTarget } = useStarStore();
@@ -98,8 +98,9 @@ export const UI = ({ onSend, onStarClick }) => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
   // フルスクリーン切り替え
@@ -113,15 +114,15 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
-    setMoodValues(prev => ({ ...prev, [id]: value }));
+    setMoodValues((prev) => ({ ...prev, [id]: value }));
   };
 
   // 今日の日付をフォーマット
   const getFormattedDate = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
     return `${year}/${month}/${day}`;
   };
 
@@ -133,7 +134,7 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // 星の詳細を表示する関数
   const showStarDetails = (starData) => {
-    console.log('showStarDetails called with:', starData);
+    console.log("showStarDetails called with:", starData);
     setSelectedStarData(starData);
     setStarOpen(true);
   };
@@ -141,7 +142,7 @@ export const UI = ({ onSend, onStarClick }) => {
   // 親コンポーネントにコールバックを渡す
   useEffect(() => {
     if (onStarClick) {
-      console.log('Setting star click handler');
+      console.log("Setting star click handler");
       onStarClick(showStarDetails);
     }
   }, []); // 依存配列を空にして、マウント時のみ実行
@@ -159,9 +160,12 @@ export const UI = ({ onSend, onStarClick }) => {
       // 1. Gemini APIを呼び出す (Supabase Edge Function)
       // スライダー値と今日のいいことから星からの手紙を生成
       try {
-        const { data, error } = await supabase.functions.invoke('analyze-diary', {
-          body: { moodValues, goodThings }
-        });
+        const { data, error } = await supabase.functions.invoke(
+          "analyze-diary",
+          {
+            body: { moodValues, goodThings },
+          },
+        );
         if (error) {
           console.error("Gemini API Error:", error);
         } else if (data && data.success) {
@@ -189,9 +193,9 @@ export const UI = ({ onSend, onStarClick }) => {
 
       // 3. フォームをリセットして閉じる
       setMoodValues(INITIAL_MOOD_VALUES);
-      setGoodThing1('');
-      setGoodThing2('');
-      setGoodThing3('');
+      setGoodThing1("");
+      setGoodThing2("");
+      setGoodThing3("");
       setMobileDiaryStep(0);
       setDiaryOpen(false);
 
@@ -204,14 +208,17 @@ export const UI = ({ onSend, onStarClick }) => {
     } finally {
       setIsSending(false);
     }
-  };//handleSend
+  }; //handleSend
 
   return (
     <>
       {/* --- ロケットメニュー (Rocket Menu) - 右下 --- */}
       <div className="fixed bottom-6 right-6 z-[1000]">
         <button
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => {
+            setMenuOpen(false);
+            setDiaryOpen(true);
+          }}
           className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
           {/* ロケットアイコン (Rocket Icon) */}
@@ -236,7 +243,7 @@ export const UI = ({ onSend, onStarClick }) => {
           </svg>
         </button>
 
-        {menuOpen && (
+        {/* {menuOpen && (
           <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
             <button
               onClick={() => {
@@ -244,12 +251,12 @@ export const UI = ({ onSend, onStarClick }) => {
                 setDiaryOpen(true);
               }}
               className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
             >
               日記を書く
             </button>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* --- ユーザーメニュー (User Menu) --- */}
@@ -284,17 +291,39 @@ export const UI = ({ onSend, onStarClick }) => {
         <button
           onClick={toggleFullscreen}
           className="hidden md:flex w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
-          aria-label={isFullscreen ? '全画面を終了' : '全画面表示'}
+          aria-label={isFullscreen ? "全画面を終了" : "全画面表示"}
         >
           {isFullscreen ? (
             /* 全画面終了アイコン (ArrowsPointingInward) */
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+              />
             </svg>
           ) : (
             /* 全画面アイコン (ArrowsPointingOutward) */
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+              />
             </svg>
           )}
         </button>
@@ -309,7 +338,7 @@ export const UI = ({ onSend, onStarClick }) => {
                   setFocusTarget(futureStarPosition);
                 }}
                 className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-                style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+                style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
               >
                 未来への手紙
               </button>
@@ -319,8 +348,8 @@ export const UI = ({ onSend, onStarClick }) => {
                 setUserMenuOpen(false);
                 setThemeModalOpen(true);
               }}
-              className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? ' border-t border-white/5' : ''}`}
-              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? " border-t border-white/5" : ""}`}
+              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
             >
               テーマ
             </button>
@@ -330,7 +359,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 // TODO: 設定機能
               }}
               className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
             >
               ログ
             </button>
@@ -340,7 +369,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 // TODO: ログアウト機能
               }}
               className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
             >
               設定
             </button>
@@ -350,7 +379,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 setDebugOpen(true);
               }}
               className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: '1rem', paddingRight: '1.25rem' }}
+              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
             >
               デバッグ
             </button>
@@ -360,9 +389,17 @@ export const UI = ({ onSend, onStarClick }) => {
 
       {/* --- Debug Panel --- */}
       {debugOpen && (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDebugOpen(false)}>
-          <div className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">デバッグツール</h3>
+        <div
+          className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setDebugOpen(false)}
+        >
+          <div
+            className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">
+              デバッグツール
+            </h3>
 
             <div className="space-y-2">
               <p className="text-xs text-white/50">未来への手紙（入力）</p>
@@ -372,21 +409,30 @@ export const UI = ({ onSend, onStarClick }) => {
                     debug_setFutureStarVisible(true);
                   }
                   setTimeout(() => {
-                    const pos = useFutureMessageStore.getState().futureStarPosition;
+                    const pos =
+                      useFutureMessageStore.getState().futureStarPosition;
                     if (pos) setFocusTarget(pos);
                   }, 100);
                   setDebugOpen(false);
                 }}
                 className="w-full py-2 bg-blue-500/20 text-blue-200 rounded hover:bg-blue-500/40 text-sm"
               >
-                {isFutureStarVisible ? '未来星にフォーカス' : '未来星を強制表示＆フォーカス'}
+                {isFutureStarVisible
+                  ? "未来星にフォーカス"
+                  : "未来星を強制表示＆フォーカス"}
               </button>
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs text-white/50">流れ星（過去のメッセージ取得）</p>
+              <p className="text-xs text-white/50">
+                流れ星（過去のメッセージ取得）
+              </p>
               <button
-                onClick={() => { debug_loadMockMessage(); debug_setShootingStarVisible(true); setDebugOpen(false); }}
+                onClick={() => {
+                  debug_loadMockMessage();
+                  debug_setShootingStarVisible(true);
+                  setDebugOpen(false);
+                }}
                 className="w-full py-2 bg-pink-500/20 text-pink-200 rounded hover:bg-pink-500/40 text-sm"
               >
                 流れ星を強制表示（モック）
@@ -415,9 +461,8 @@ export const UI = ({ onSend, onStarClick }) => {
           {/* モーダルコンテンツ */}
           <div
             className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-black/40 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0"
-            style={{ padding: '24px' }}
+            style={{ padding: "24px" }}
           >
-
             {/* ヘッダー: スマホは戻る矢印+日付+X、PCは日付+X */}
             <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
               {/* 左: スマホstep1は戻る矢印 / それ以外はスペース */}
@@ -429,8 +474,19 @@ export const UI = ({ onSend, onStarClick }) => {
                     className="flex md:hidden items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
                     aria-label="戻る"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 19l-7-7 7-7"
+                      />
                     </svg>
                   </button>
                 )}
@@ -446,11 +502,22 @@ export const UI = ({ onSend, onStarClick }) => {
                 <button
                   type="button"
                   onClick={closeDiaryModal}
-                  className={`items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors ${mobileDiaryStep === 0 ? 'flex' : 'hidden md:flex'}`}
+                  className={`items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors ${mobileDiaryStep === 0 ? "flex" : "hidden md:flex"}`}
                   aria-label="閉じる"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -461,7 +528,7 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? 'hidden md:block' : 'block'
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
                     }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
@@ -481,10 +548,12 @@ export const UI = ({ onSend, onStarClick }) => {
                           min="0"
                           max="100"
                           value={moodValues[q.id]}
-                          onChange={(e) => handleSliderChange(q.id, parseInt(e.target.value))}
+                          onChange={(e) =>
+                            handleSliderChange(q.id, parseInt(e.target.value))
+                          }
                           className="mood-slider w-full appearance-none cursor-pointer"
                           style={{
-                            background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`
+                            background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`,
                           }}
                         />
                       </div>
@@ -502,8 +571,19 @@ export const UI = ({ onSend, onStarClick }) => {
                       className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300"
                       aria-label="次へ"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -511,12 +591,13 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? 'hidden md:flex' : 'flex'
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
                     }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
-                      今日のいいこと1 <span className="text-white/50">(必須)</span>
+                      今日のいいこと1{" "}
+                      <span className="text-white/50">(必須)</span>
                     </label>
                     <textarea
                       value={goodThing1}
@@ -524,12 +605,13 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: '80px' }}
+                      style={{ height: "80px" }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
-                      今日のいいこと2 <span className="text-white/50">(任意)</span>
+                      今日のいいこと2{" "}
+                      <span className="text-white/50">(任意)</span>
                     </label>
                     <textarea
                       value={goodThing2}
@@ -537,12 +619,13 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: '80px' }}
+                      style={{ height: "80px" }}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
-                      今日のいいこと3 <span className="text-white/50">(任意)</span>
+                      今日のいいこと3{" "}
+                      <span className="text-white/50">(任意)</span>
                     </label>
                     <textarea
                       value={goodThing3}
@@ -550,7 +633,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: '80px' }}
+                      style={{ height: "80px" }}
                     />
                   </div>
 
@@ -563,14 +646,30 @@ export const UI = ({ onSend, onStarClick }) => {
                     >
                       {isSending ? (
                         <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin w-4 h-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           送信中...
                         </span>
                       ) : (
-                        '打ち上げ'
+                        "打ち上げ"
                       )}
                     </button>
                   </div>

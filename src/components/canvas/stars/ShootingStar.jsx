@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { useRef, useState, useMemo } from 'react'
 import { useFrame, useThree, extend } from '@react-three/fiber'
 import { Billboard, shaderMaterial } from '@react-three/drei'
-import { useFutureMessageStore } from '../store/useFutureMessageStore'
+import { useFutureMessageStore } from '../../../store/useFutureMessageStore'
+import { useStarStore } from '../../../store/useStarStore'
 
 // ══════════════════════════════════════════════════════
 // NagareboshiMaterial: 流星描画用カスタムシェーダー
@@ -159,6 +160,9 @@ export function ShootingStar({ onOpenDisplayModal }) {
 
     const { isShootingStarLeaving, hideShootingStar } = useFutureMessageStore()
 
+    // 退場完了後、最新の星にカメラを戻すために使用
+    const { stars, setFocusTarget } = useStarStore()
+
     // 退場タイマー
     const exitTimer = useRef(0)
 
@@ -211,6 +215,11 @@ export function ShootingStar({ onOpenDisplayModal }) {
 
             // 5秒後に消える
             if (exitTimer.current > 2.0) {
+                // 退場完了：最新の星の位置にカメラを戻す（打ち上げ後と同じzoom）
+                if (stars.length > 0) {
+                    const lastStar = stars[stars.length - 1]
+                    setFocusTarget(lastStar.position)
+                }
                 setPhase('gone')
                 hideShootingStar()
             }

@@ -28,7 +28,7 @@ import { Canvas, useFrame, extend } from '@react-three/fiber';
 import { Billboard, shaderMaterial } from '@react-three/drei';
 import { useRef } from 'react';
 import * as THREE from 'three';
-import { getFallbackAnalysis } from '../utils/fallbackAnalysis';
+import { getFallbackAnalysis } from '../../../utils/fallbackAnalysis';
 
 // --- SingleStarMaterial（UserStar.jsxと同一のシェーダー） ---
 const PreviewStarMaterial = shaderMaterial(

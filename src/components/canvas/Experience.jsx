@@ -1,17 +1,17 @@
 import { CameraControls, useScroll } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import * as THREE from 'three';
-import { SkyBox } from "./SkyBox";
-import { SkyBoxUpGrade } from "./skyBoxUpGrade";
-import { SkyBoxMixed } from "./skyBoxMixed";
-import { DistantStars } from "./DistantStars";
-import { MyStars } from "./MyStars";
-import { UserAddedStars } from "./UserAddedStars";
+import * as THREE from "three";
+import { SkyBox } from "./environment/SkyBox";
+import { SkyBoxUpGrade } from "./environment/skyBoxUpGrade";
+import { SkyBoxMixed } from "./environment/skyBoxMixed";
+import { DistantStars } from "./stars/DistantStars";
+import { MyStars } from "./stars/MyStars";
+import { UserAddedStars } from "./stars/UserAddedStars";
 import { Suspense, useRef, useEffect, useMemo } from "react";
-import { useThemeStore } from '../store/useThemeStore';
-import { FutureStar } from "./FutureStar";
-import { ShootingStar } from "./ShootingStar";
-import { useFutureMessageStore } from "../store/useFutureMessageStore";
+import { useThemeStore } from "../../store/useThemeStore";
+import { FutureStar } from "./stars/FutureStar";
+import { ShootingStar } from "./stars/ShootingStar";
+import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 
 const FutureStarWrapper = () => {
   const {
@@ -21,7 +21,7 @@ const FutureStarWrapper = () => {
     setFutureStarPosition,
     isShootingStarVisible,
     futureMessages,
-    openMessageDisplay
+    openMessageDisplay,
   } = useFutureMessageStore();
 
   useEffect(() => {
@@ -35,11 +35,14 @@ const FutureStarWrapper = () => {
   }, []);
 
   // FutureStarの位置をランダムに生成（表示されるたびに新しい位置）
-  const futureStarPos = useMemo(() => [
-    Math.random() * 600 - 300,  // x: -300 ~ 300
-    Math.random() * 300 - 150,  // y: -150 ~ 150
-    -10                          // z: 固定
-  ], [isFutureStarVisible]);
+  const futureStarPos = useMemo(
+    () => [
+      Math.random() * 600 - 300, // x: -300 ~ 300
+      Math.random() * 300 - 150, // y: -150 ~ 150
+      -10, // z: 固定
+    ],
+    [isFutureStarVisible],
+  );
 
   // ランダム位置をストアに保存（UI側でカメラ移動に使用）
   useEffect(() => {
@@ -72,12 +75,11 @@ const FutureStarWrapper = () => {
   );
 };
 
-
 // 最上階レイヤーのボーダー（見られる制限のサイズ）
 const FrameLimiter = () => {
   useFrame(({ camera }) => {
     // Hard limits for position (panning)
-    // Background is 1000x500. 
+    // Background is 1000x500.
     // Skybox valid area is roughly -500..500.
     // We clamp slightly wider than star generation (-320..320) to allow centering stars at the edge.
     // Max visible width at max zoom (Z=100) is approx 250 units.
@@ -86,7 +88,7 @@ const FrameLimiter = () => {
     camera.position.y = THREE.MathUtils.clamp(camera.position.y, -160, 160);
   });
   return null;
-}
+};
 
 export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   const cameraControlsRef = useRef();
@@ -104,12 +106,18 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   return (
     <>
       <Suspense fallback={null}>
-        {skyboxType === 'upgrade' ? <SkyBoxUpGrade /> : skyboxType === 'mixed' ? <SkyBoxMixed /> : <SkyBox />}
+        {skyboxType === "upgrade" ? (
+          <SkyBoxUpGrade />
+        ) : skyboxType === "mixed" ? (
+          <SkyBoxMixed />
+        ) : (
+          <SkyBox />
+        )}
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <FutureStarWrapper />
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />
-        <fog attach="fog" args={['#101020', 10, 150]} />
+        <fog attach="fog" args={["#101020", 10, 150]} />
       </Suspense>
 
       <FrameLimiter />
@@ -117,28 +125,28 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
       <CameraControls
         ref={cameraControlsRef}
         makeDefault
-        minZoom={0.5}        // 最小ズーム倍率 (これ以上縮小できない)
-        maxZoom={2}          // 最大ズーム倍率 (これ以上拡大できない)
-        minDistance={10}     // カメラの最小距離 (被写体に近づける限界)
-        maxDistance={100}    // カメラの最大距離 (被写体から離れられる限界 - これで黒い背景が見えるのを防ぐ)
-        dollySpeed={-2}      // ズーム速度 (-2 にするとピンチ操作の方向が反転します)
+        minZoom={0.5} // 最小ズーム倍率 (これ以上縮小できない)
+        maxZoom={2} // 最大ズーム倍率 (これ以上拡大できない)
+        minDistance={10} // カメラの最小距離 (被写体に近づける限界)
+        maxDistance={100} // カメラの最大距離 (被写体から離れられる限界 - これで黒い背景が見えるのを防ぐ)
+        dollySpeed={2} // ズーム速度 (-2 にするとピンチ操作の方向が反転します)
+        //! できれば上のdollySpeedはPCとモバイルに分けて、PCだと2、モバイルだと-2にする。-2のままにしたらPCのスクロールが反転になっちゃう
         azimuthRotateSpeed={0} // 水平方向の回転速度 (0 = 回転無効)
-        polarRotateSpeed={0}   // 垂直方向の回転速度 (0 = 回転無効)
-        truckSpeed={5}         // 平行移動(ドラッグ)の速度
+        polarRotateSpeed={0} // 垂直方向の回転速度 (0 = 回転無効)
+        truckSpeed={5} // 平行移動(ドラッグ)の速度
         mouseButtons={{
-          left: 2,   // 左クリック: 2 = TRUCK (平行移動)
+          left: 2, // 左クリック: 2 = TRUCK (平行移動)
           middle: 0, // ミドルクリック: 0 = 無効
-          right: 0,  // 右クリック: 0 = 無効
-          wheel: 16  // ホイールスクロール: 16 = ZOOM (ズーム)
+          right: 0, // 右クリック: 0 = 無効
+          wheel: 16, // ホイールスクロール: 16 = ZOOM (ズーム)
         }}
         touches={{
-          one: 2,    // 1本指タッチ: 2 = TRUCK (平行移動)
-          two: 16,   // 2本指タッチ: 16 = ZOOM (ピンチズーム)
-          three: 0   // 3本指タッチ: 0 = 無効
+          one: 2, // 1本指タッチ: 2 = TRUCK (平行移動)
+          two: 16, // 2本指タッチ: 16 = ZOOM (ピンチズーム)
+          three: 0, // 3本指タッチ: 0 = 無効
         }}
         imgui={false} // デバッグUIの表示 (false = 非表示)
       />
-
     </>
   );
 };

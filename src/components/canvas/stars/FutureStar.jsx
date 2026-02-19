@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { shaderMaterial, Billboard, Text } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { useFutureMessageStore } from '../store/useFutureMessageStore'
+import { useFutureMessageStore } from '../../../store/useFutureMessageStore'
 
 // FutureStarMaterial: A distinct, pulsing shader for the Future Star
 const FutureStarMaterial = shaderMaterial(
