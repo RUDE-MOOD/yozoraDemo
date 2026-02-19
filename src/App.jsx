@@ -9,6 +9,7 @@ import { LoginModal } from './components/ui/modals/LoginModal';
 import { LoginSuccessScreen } from './components/ui/screens/LoginSuccessScreen';
 import { RegisterModal } from './components/ui/modals/RegisterModal';
 import { RegisterSuccessScreen } from './components/ui/screens/RegisterSuccessScreen';
+import { ForgotPasswordModal } from './components/ui/modals/ForgotPasswordModal';
 
 import { supabase } from './supabaseClient';
 
@@ -97,6 +98,38 @@ function App() {
           }}
           onRegister={() => {
             setPhase('register');
+          }}
+          onForgotPassword={() => {
+            setPhase('forgotPassword');
+          }}
+        />
+      )}
+
+      {phase === 'forgotPassword' && (
+        <ForgotPasswordModal
+          onBackToLogin={() => setPhase('login')}
+          onSubmitEmail={async (email) => {
+            const { error } = await supabase.auth.signInWithOtp({
+              email,
+              options: { shouldCreateUser: false },
+            });
+            if (error) throw error;
+          }}
+          onSubmitCode={async (email, code) => {
+            const { error } = await supabase.auth.verifyOtp({
+              email,
+              token: code,
+              type: 'email',
+            });
+            if (error) throw error;
+          }}
+          onSubmitNewPassword={async (email, code, password) => {
+            const { error } = await supabase.auth.updateUser({
+              password: password
+            });
+            if (error) throw error;
+            setShowApp(true);
+            setPhase('app');
           }}
         />
       )}
