@@ -56,8 +56,19 @@ export const UI = ({ onSend, onStarClick }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   // ユーザーメニューの開閉状態
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  // 設定サブメニューの開閉状態
+  const [showSettingsSubmenu, setShowSettingsSubmenu] = useState(false);
   // 日記モーダルの開閉状態
   const [diaryOpen, setDiaryOpen] = useState(false);
+
+  // ユーザーメニューが閉じたときにサブメニュー状態をリセット
+  useEffect(() => {
+    if (!userMenuOpen) {
+      // 少し遅延させて、アニメーション中にコンテンツが変わるのを防ぐ（任意）
+      const timer = setTimeout(() => setShowSettingsSubmenu(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [userMenuOpen]);
   // テーマ選択モーダルの開閉状態
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   // スライダーの値（0-100）
@@ -330,59 +341,89 @@ export const UI = ({ onSend, onStarClick }) => {
 
         {userMenuOpen && (
           <div className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-0 md:right-auto w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left">
-            {/* 未来への手紙メニュー項目（FutureStarが表示中のみ） */}
-            {isFutureStarVisible && futureStarPosition && (
-              <button
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  setFocusTarget(futureStarPosition);
-                }}
-                className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-                style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-              >
-                未来への手紙
-              </button>
+            {!showSettingsSubmenu ? (
+              /* --- Main Menu --- */
+              <>
+                {isFutureStarVisible && futureStarPosition && (
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      setFocusTarget(futureStarPosition);
+                    }}
+                    className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+                    style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  >
+                    未来への手紙
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setThemeModalOpen(true);
+                  }}
+                  className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? " border-t border-white/5" : ""}`}
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  テーマ
+                </button>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    // TODO: ログ機能
+                  }}
+                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  ログ
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSettingsSubmenu(true);
+                  }}
+                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  設定
+                </button>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setDebugOpen(true);
+                  }}
+                  className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  デバッグ
+                </button>
+              </>
+            ) : (
+              /* --- Settings Submenu --- */
+              <div className="py-2">
+                <div className="flex items-center px-4 py-2 mb-2 border-b border-white/10">
+                  <button
+                    onClick={() => setShowSettingsSubmenu(false)}
+                    className="mr-2 text-white/50 hover:text-white transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                  </button>
+                  <span className="text-white font-sans text-sm underline underline-offset-4 decoration-white/30">アカウント設定</span>
+                </div>
+
+                {/* Logout */}
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    setUserMenuOpen(false);
+                    setShowSettingsSubmenu(false);
+                  }}
+                  className="w-full text-left px-6 py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5 mt-2"
+                >
+                  ログアウト
+                </button>
+              </div>
             )}
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                setThemeModalOpen(true);
-              }}
-              className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? " border-t border-white/5" : ""}`}
-              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-            >
-              テーマ
-            </button>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                // TODO: 設定機能
-              }}
-              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-            >
-              ログ
-            </button>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                // TODO: ログアウト機能
-              }}
-              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-            >
-              設定
-            </button>
-            <button
-              onClick={() => {
-                setUserMenuOpen(false);
-                setDebugOpen(true);
-              }}
-              className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-            >
-              デバッグ
-            </button>
           </div>
         )}
       </div>
