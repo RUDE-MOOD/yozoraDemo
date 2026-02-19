@@ -34,7 +34,7 @@
 
 <h2>システム構成</h2>
   <img width="1300" height="240" alt="システム構成図v2" src="https://github.com/user-attachments/assets/0c90333f-af0d-46ca-ab30-82425a0f3116" />
-
+  <h3><b>詳細はGUIDANCE.mdを参照してください</b></h3>
 
   <h4>フロントエンド：</h4>
   <ul>
