@@ -12,7 +12,7 @@ const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
  * セッションにUIDがない場合に全画面表示される。
  * 純黒背景（透明度なし）で、左に装飾画像、右にログインフォーム。
  */
-export function LoginModal({ onLogin, onRegister }) {
+export function LoginModal({ onLogin, onRegister, onForgotPassword }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -234,9 +234,7 @@ export function LoginModal({ onLogin, onRegister }) {
                                     padding: 0,
                                     letterSpacing: "0.03em",
                                 }}
-                                onClick={() => {
-                                    /* TODO: パスワードリセット */
-                                }}
+                                onClick={onForgotPassword}
                             >
                                 パスワードを忘れた場合
                             </button>
