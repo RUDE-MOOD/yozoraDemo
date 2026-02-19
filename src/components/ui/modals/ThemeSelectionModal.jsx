@@ -32,7 +32,10 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
       <div className="relative w-full max-w-lg mx-4 bg-[#1a1a3a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col">
         {/* Header */}
         <div className="relative flex items-center justify-center py-4 border-b border-white/10">
-          <h2 className="text-white/90 font-sans text-lg tracking-widest font-light">
+          <h2
+            className="text-white/90 font-sans text-lg tracking-widest font-heavy"
+            style={{ margin: "5px" }}
+          >
             テーマ変更
           </h2>
           <button
@@ -58,7 +61,10 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
 
         {/* Body - Theme Thumbnails */}
         <div className="px-8 pt-6 pb-2">
-          <p className="text-white/50 text-xs tracking-widest text-center mb-4">
+          <p
+            className="text-white/50 text-xs tracking-widest text-center mb-4"
+            style={{ margin: "10px" }}
+          >
             背景色
           </p>
           <div
@@ -94,10 +100,16 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
 
         {/* Skybox Selection */}
         <div className="px-8 pt-4 pb-6">
-          <p className="text-white/50 text-xs tracking-widest text-center mb-4">
+          <p
+            className="text-white/50 text-xs tracking-widest text-center mb-4"
+            style={{ margin: "30px 0 10px 0" }}
+          >
             背景タイプ
           </p>
-          <div className="flex justify-center gap-x-10">
+          <div
+            className="flex justify-center gap-x-10"
+            style={{ marginBottom: "20px" }}
+          >
             {skyboxes.map((skybox) => (
               <div
                 key={skybox.id}
@@ -113,18 +125,18 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                     style={
                       skybox.id === "classic"
                         ? {
-                          background:
-                            "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
-                        }
+                            background:
+                              "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
+                          }
                         : skybox.id === "mixed"
                           ? {
-                            background:
-                              "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
-                          }
+                              background:
+                                "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
+                            }
                           : {
-                            background:
-                              "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
-                          }
+                              background:
+                                "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
+                            }
                     }
                   />
                 </div>
@@ -146,14 +158,14 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/10 bg-black/20">
+        {/* <div className="p-4 border-t border-white/10 bg-black/20">
           <button
             onClick={onClose}
             className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white rounded-xl transition-all duration-200 tracking-widest text-sm"
           >
             閉じる
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
