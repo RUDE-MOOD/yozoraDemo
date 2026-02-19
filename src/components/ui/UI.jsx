@@ -461,7 +461,7 @@ export const UI = ({ onSend, onStarClick }) => {
           {/* モーダルコンテンツ */}
           <div
             className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-black/40 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0"
-            style={{ padding: "24px" }}
+            style={{ padding: "24px 36px" }}
           >
             {/* ヘッダー: スマホは戻る矢印+日付+X、PCは日付+X */}
             <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
@@ -493,7 +493,10 @@ export const UI = ({ onSend, onStarClick }) => {
               </div>
 
               {/* 中央: 日付 */}
-              <h2 className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              <h2
+                className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                style={{ fontSize: "28px", marginBottom: "15px" }}
+              >
                 {getFormattedDate()}
               </h2>
 
@@ -528,21 +531,26 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                    }`}
+                  className={`flex-1 space-y-6 min-w-0 ${
+                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                  }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
-                    <div key={q.id} className="space-y-2">
+                    <div
+                      key={q.id}
+                      className="space-y-2"
+                      style={{ margin: "12px 0" }}
+                    >
                       <p className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left">
                         {q.question}
                       </p>
                       <div className="relative px-3">
                         {/* 左端ドット */}
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/80 z-[1]" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
                         {/* 右端ドット */}
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white/80 z-[1]" />
+                        <div className="absolute right-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
                         {/* 中央インジケーター（50%） */}
-                        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
+                        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/3 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
                         <input
                           type="range"
                           min="0"
@@ -591,8 +599,9 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                    }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
+                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                  }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
@@ -605,7 +614,11 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: "80px" }}
+                      style={{
+                        height: "80px",
+                        margin: "10px 0",
+                        padding: "10px",
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -619,7 +632,11 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: "80px" }}
+                      style={{
+                        height: "80px",
+                        margin: "10px 0",
+                        padding: "10px",
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -633,7 +650,11 @@ export const UI = ({ onSend, onStarClick }) => {
                       maxLength={300}
                       placeholder=""
                       className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{ height: "80px" }}
+                      style={{
+                        height: "80px",
+                        margin: "10px 0",
+                        padding: "10px",
+                      }}
                     />
                   </div>
 
@@ -643,6 +664,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       onClick={handleSend}
                       disabled={isSending || !goodThing1.trim()}
                       className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white/70 text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                      style={{ padding: "8px", fontWeight: "bold" }}
                     >
                       {isSending ? (
                         <span className="flex items-center justify-center gap-2">
@@ -666,7 +688,7 @@ export const UI = ({ onSend, onStarClick }) => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                           </svg>
-                          送信中...
+                          打ち上げる準備中...
                         </span>
                       ) : (
                         "打ち上げ"
