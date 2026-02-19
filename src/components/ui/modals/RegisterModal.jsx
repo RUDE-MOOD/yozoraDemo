@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import loginIllustration from "../../../assets/newUserWelcome.png";
 
 // メールアドレスの正規表現
@@ -72,8 +72,8 @@ const TERMS_OF_SERVICE = `
 
 /**
  * 新規登録モーダル
- * ログインモーダルから「新規登録」ボタンで遷移。
- * 左にフォーム、右に利用規約テキスト。背景にイラスト。
+ * PC: 左にフォーム、右に利用規約テキスト。背景にイラスト。
+ * モバイル: タブ切替 + ステップ式 (Step0=フォーム, Step1=利用規約)
  */
 export function RegisterModal({ onRegister, onBackToLogin }) {
   const [userName, setUserName] = useState("");
@@ -86,18 +86,28 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // モバイル用ステップ (0=フォーム, 1=利用規約)
+  const [mobileStep, setMobileStep] = useState(0);
+
+  // レスポンシブ判定
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   // フィールドごとのエラー
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState("");
 
-  const setFieldError = (field, msg) => {
-    setErrors((prev) => ({ ...prev, [field]: msg }));
-  };
   const clearFieldError = (field) => {
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const validate = () => {
+  // Step0（フォーム）のバリデーション
+  const validateForm = () => {
     const newErrors = {};
     let valid = true;
 
@@ -105,7 +115,6 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
       newErrors.userName = "ユーザー名を入力してください";
       valid = false;
     }
-
     if (!email.trim()) {
       newErrors.email = "メールアドレスを入力してください";
       valid = false;
@@ -113,7 +122,6 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
       newErrors.email = "正しいメールアドレスの形式で入力してください";
       valid = false;
     }
-
     if (!password) {
       newErrors.password = "パスワードを入力してください";
       valid = false;
@@ -121,7 +129,6 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
       newErrors.password = "8文字以上、英字と数字を含めてください";
       valid = false;
     }
-
     if (!passwordConfirm) {
       newErrors.passwordConfirm = "確認用パスワードを入力してください";
       valid = false;
@@ -129,13 +136,6 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
       newErrors.passwordConfirm = "パスワードが一致しません";
       valid = false;
     }
-
-    if (!agreeTerms) {
-      newErrors.terms = "利用規約に同意してください";
-      valid = false;
-    }
-
-    // 誕生日バリデーション
     if (!birthYear || !birthMonth || !birthDay) {
       newErrors.birthday = "誕生日を選択してください";
       valid = false;
@@ -157,9 +157,29 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
     return valid;
   };
 
+  // フル（PC用）のバリデーション — フォーム + 利用規約同意
+  const validateAll = () => {
+    const formValid = validateForm();
+    if (!agreeTerms) {
+      setErrors((prev) => ({ ...prev, terms: "利用規約に同意してください" }));
+      return false;
+    }
+    return formValid;
+  };
+
   const handleRegister = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+    if (e) e.preventDefault();
+
+    // PC: フルバリデーション / モバイル: Step1で呼ばれる（agreeTermsは既にtrue）
+    if (!isMobile) {
+      if (!validateAll()) return;
+    } else {
+      // モバイルの場合: Step1から呼ばれる時点でフォームは既にバリデーション済み
+      if (!validateForm()) {
+        setMobileStep(0);
+        return;
+      }
+    }
 
     setIsLoading(true);
     setGeneralError("");
@@ -172,22 +192,37 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
       });
     } catch (err) {
       setGeneralError(err.message || "登録に失敗しました");
+      // モバイルでエラー時はStep0に戻す
+      if (isMobile) setMobileStep(0);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // モバイル: Step0 → Step1 遷移（フォームバリデーション通過時のみ）
+  const handleMobileNext = () => {
+    if (validateForm()) {
+      setMobileStep(1);
+    }
+  };
+
+  // モバイル: Step1で「同意する」→ 登録実行
+  const handleMobileAgreeAndRegister = () => {
+    setAgreeTerms(true);
+    handleRegister();
   };
 
   // 共通スタイル
   const labelStyle = {
     display: "block",
     color: "#ffffff",
-    fontSize: "13px",
-    marginBottom: "6px",
+    fontSize: "12px",
+    marginBottom: "4px",
     letterSpacing: "0.05em",
   };
   const inputStyle = (hasError) => ({
     width: "100%",
-    padding: "10px 14px",
+    padding: "8px 14px",
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     border: hasError ? "2px solid #ff6b6b" : "2px solid transparent",
     borderRadius: "24px",
@@ -203,6 +238,415 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
     paddingLeft: "14px",
   };
 
+  // ──────────────────────────────────────────
+  //  モバイル用レイアウト
+  // ──────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          backgroundColor: "#1a1a1a",
+          display: "flex",
+          flexDirection: "column",
+          fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
+          overflowY: "auto",
+        }}
+      >
+        {/* ── タブ切替 (新規登録 / ログイン) ── */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "28px 24px 24px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              borderRadius: "28px",
+              overflow: "hidden",
+              border: "1.5px solid rgba(255,255,255,0.3)",
+            }}
+          >
+            {/* 新規登録（アクティブ → 黒背景） */}
+            <button
+              type="button"
+              style={{
+                padding: "12px 28px",
+                fontSize: "15px",
+                fontWeight: "bold",
+                border: "none",
+                cursor: "pointer",
+                letterSpacing: "0.08em",
+                backgroundColor: "#1a1a1a",
+                color: "#ffffff",
+                borderRadius: "28px 0 0 28px",
+              }}
+            >
+              新規登録
+            </button>
+            {/* ログイン（非アクティブ → 白背景） */}
+            <button
+              type="button"
+              onClick={onBackToLogin}
+              style={{
+                padding: "12px 28px",
+                fontSize: "15px",
+                fontWeight: "bold",
+                border: "none",
+                cursor: "pointer",
+                letterSpacing: "0.08em",
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                borderRadius: "0 28px 28px 0",
+              }}
+            >
+              ログイン
+            </button>
+          </div>
+        </div>
+
+        {/* ── Step 0: フォーム入力 ── */}
+        {mobileStep === 0 && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              padding: "32px 28px 16px",
+              gap: "0",
+              animation: "mobileAuthFadeIn 0.25s ease",
+            }}
+          >
+            {/* ユーザーネーム */}
+            <label style={labelStyle}>ユーザーネーム</label>
+            <input
+              type="text"
+              value={userName}
+              onChange={(e) => {
+                setUserName(e.target.value);
+                clearFieldError("userName");
+              }}
+              style={inputStyle(errors.userName)}
+            />
+            {errors.userName && (
+              <div style={fieldErrorStyle}>{errors.userName}</div>
+            )}
+            <div style={{ marginBottom: errors.userName ? "6px" : "12px" }} />
+
+            {/* メールアドレス */}
+            <label style={labelStyle}>メールアドレス</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearFieldError("email");
+              }}
+              style={inputStyle(errors.email)}
+            />
+            {errors.email && <div style={fieldErrorStyle}>{errors.email}</div>}
+            <div style={{ marginBottom: errors.email ? "6px" : "12px" }} />
+
+            {/* パスワード */}
+            <label style={labelStyle}>
+              パスワード{" "}
+              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px" }}>
+                英数字・大文字・小文字が必須
+              </span>
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                clearFieldError("password");
+              }}
+              style={inputStyle(errors.password)}
+            />
+            {errors.password && (
+              <div style={fieldErrorStyle}>{errors.password}</div>
+            )}
+            <div style={{ marginBottom: errors.password ? "6px" : "12px" }} />
+
+            {/* パスワード再入力 */}
+            <label style={labelStyle}>パスワード再入力</label>
+            <input
+              type="password"
+              value={passwordConfirm}
+              onChange={(e) => {
+                setPasswordConfirm(e.target.value);
+                clearFieldError("passwordConfirm");
+              }}
+              style={inputStyle(errors.passwordConfirm)}
+            />
+            {errors.passwordConfirm && (
+              <div style={fieldErrorStyle}>{errors.passwordConfirm}</div>
+            )}
+            <div
+              style={{
+                marginBottom: errors.passwordConfirm ? "6px" : "12px",
+              }}
+            />
+
+            {/* 誕生日 */}
+            <label style={labelStyle}>誕生日</label>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              {/* 年 */}
+              <select
+                value={birthYear}
+                onChange={(e) => {
+                  setBirthYear(e.target.value);
+                  setBirthDay("");
+                  clearFieldError("birthday");
+                }}
+                style={{
+                  ...inputStyle(errors.birthday),
+                  width: "100px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  appearance: "none",
+                  WebkitAppearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 10px center",
+                  paddingRight: "24px",
+                }}
+              >
+                <option value="">年</option>
+                {Array.from(
+                  { length: new Date().getFullYear() - 1900 + 1 },
+                  (_, i) => new Date().getFullYear() - i,
+                ).map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+                年
+              </span>
+
+              {/* 月 */}
+              <select
+                value={birthMonth}
+                onChange={(e) => {
+                  setBirthMonth(e.target.value);
+                  setBirthDay("");
+                  clearFieldError("birthday");
+                }}
+                style={{
+                  ...inputStyle(errors.birthday),
+                  width: "70px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  appearance: "none",
+                  WebkitAppearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 8px center",
+                  paddingRight: "20px",
+                }}
+              >
+                <option value="">月</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                  <option key={m} value={m}>
+                    {String(m).padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+                月
+              </span>
+
+              {/* 日 */}
+              <select
+                value={birthDay}
+                onChange={(e) => {
+                  setBirthDay(e.target.value);
+                  clearFieldError("birthday");
+                }}
+                style={{
+                  ...inputStyle(errors.birthday),
+                  width: "70px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  appearance: "none",
+                  WebkitAppearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 8px center",
+                  paddingRight: "20px",
+                }}
+              >
+                <option value="">日</option>
+                {(() => {
+                  const y = parseInt(birthYear) || 2000;
+                  const m2 = parseInt(birthMonth) || 1;
+                  const days = new Date(y, m2, 0).getDate();
+                  return Array.from({ length: days }, (_, i) => i + 1).map(
+                    (d) => (
+                      <option key={d} value={d}>
+                        {String(d).padStart(2, "0")}
+                      </option>
+                    ),
+                  );
+                })()}
+              </select>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+                日
+              </span>
+            </div>
+            {errors.birthday && (
+              <div style={fieldErrorStyle}>{errors.birthday}</div>
+            )}
+
+            {/* 全体エラー */}
+            {generalError && (
+              <div
+                style={{
+                  color: "#ff6b6b",
+                  fontSize: "12px",
+                  textAlign: "center",
+                  padding: "8px 12px",
+                  marginTop: "12px",
+                  backgroundColor: "rgba(255, 107, 107, 0.1)",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255, 107, 107, 0.3)",
+                }}
+              >
+                {generalError}
+              </div>
+            )}
+
+            {/* アカウント作成ボタン */}
+            <div style={{ paddingTop: "16px" }}>
+              <button
+                type="button"
+                onClick={handleMobileNext}
+                style={{
+                  width: "100%",
+                  padding: "12px 24px",
+                  backgroundColor: "#ffffff",
+                  color: "#000000",
+                  border: "1.5px solid rgba(255,255,255,0.7)",
+                  borderRadius: "24px",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  letterSpacing: "0.08em",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                アカウント作成
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* フェードインアニメーション */}
+        <style>{`
+          @keyframes mobileAuthFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+
+        {/* ── Step 1: 利用規約 ── */}
+        {mobileStep === 1 && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              padding: "24px 24px 32px",
+            }}
+          >
+            {/* 利用規約ボックス */}
+            <div
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(255, 255, 255, 0.92)",
+                borderRadius: "16px",
+                padding: "20px",
+                overflowY: "auto",
+                fontSize: "12px",
+                lineHeight: "1.8",
+                color: "#333",
+                maxHeight: "55vh",
+              }}
+              className="scrollbar-hidden"
+            >
+              <div
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  marginBottom: "12px",
+                  color: "#1a1a1a",
+                }}
+              >
+                利用規約：
+              </div>
+              <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+                {TERMS_OF_SERVICE}
+              </div>
+            </div>
+
+            {/* 同意するボタン */}
+            <div style={{ marginTop: "20px" }}>
+              <button
+                type="button"
+                onClick={handleMobileAgreeAndRegister}
+                disabled={isLoading}
+                style={{
+                  width: "100%",
+                  padding: "12px 24px",
+                  backgroundColor: isLoading ? "rgba(255,255,255,0.5)" : "#ffffff",
+                  color: "#000000",
+                  border: "1.5px solid rgba(255,255,255,0.7)",
+                  borderRadius: "24px",
+                  fontSize: "14px",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  letterSpacing: "0.08em",
+                  transition: "all 0.2s ease",
+                  opacity: isLoading ? 0.6 : 1,
+                }}
+              >
+                {isLoading ? "登録中..." : "同意する"}
+              </button>
+            </div>
+
+            {/* アカウント作成ボタン */}
+            <div style={{ marginTop: "16px" }}>
+              <button
+                type="button"
+                onClick={() => setMobileStep(0)}
+                style={{
+                  width: "100%",
+                  padding: "12px 24px",
+                  backgroundColor: "transparent",
+                  color: "rgba(255,255,255,0.5)",
+                  border: "1.5px solid rgba(255,255,255,0.2)",
+                  borderRadius: "28px",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                ← 戻る
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ──────────────────────────────────────────
+  //  PC用レイアウト（既存のまま）
+  // ──────────────────────────────────────────
   return (
     <div
       style={{

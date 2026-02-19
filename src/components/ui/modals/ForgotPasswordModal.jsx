@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import loginIllustration from '../../../assets/newUserWelcome.png'
 
 // メールアドレスの正規表現
@@ -28,6 +28,15 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
     const [codeError, setCodeError] = useState('')
     const [passwordError, setPasswordError] = useState('')
     const [confirmPasswordError, setConfirmPasswordError] = useState('')
+
+    // レスポンシブ判定
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768)
+        check()
+        window.addEventListener('resize', check)
+        return () => window.removeEventListener('resize', check)
+    }, [])
 
     // --- Step 1 Handlers ---
     const handleStep1Submit = async (e) => {
@@ -106,7 +115,6 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
         setIsLoading(true)
         try {
             await onSubmitNewPassword(email.trim(), verificationCode.trim(), newPassword)
-            // Success - could auto login or return to login
             onBackToLogin()
         } catch (err) {
             setGeneralError(err.message || 'パスワードの再設定に失敗しました')
@@ -119,8 +127,8 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
     const labelStyle = {
         display: 'block',
         color: '#ffffff',
-        fontSize: '14px',
-        marginBottom: '8px',
+        fontSize: '13px',
+        marginBottom: '6px',
         letterSpacing: '0.05em',
     }
     const inputStyle = (hasError) => ({
@@ -141,6 +149,254 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
         paddingLeft: '16px',
     }
 
+    // エラー表示（共通）
+    const errorBlock = generalError && (
+        <div
+            style={{
+                marginTop: '16px',
+                color: '#ff6b6b',
+                fontSize: '12px',
+                textAlign: 'center',
+                padding: '8px 12px',
+                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 107, 107, 0.3)',
+            }}
+        >
+            {generalError}
+        </div>
+    )
+
+    // ──────────────────────────────────────────
+    //  モバイル用レイアウト
+    // ──────────────────────────────────────────
+    if (isMobile) {
+        return (
+            <div
+                style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 9999,
+                    backgroundColor: '#1a1a1a',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
+                }}
+            >
+                {/* コンテンツエリア */}
+                <div
+                    style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        padding: '40px 32px',
+                        animation: 'forgotPwFadeIn 0.25s ease',
+                    }}
+                >
+                    {/* Step 1: メールアドレス入力 */}
+                    {step === 1 && (
+                        <form onSubmit={handleStep1Submit}>
+                            <p style={{
+                                color: 'rgba(255,255,255,0.8)',
+                                fontSize: '14px',
+                                lineHeight: '1.7',
+                                marginBottom: '32px',
+                                textAlign: 'center',
+                            }}>
+                                入力されたメールアドレスに<br />ワンタイムコードを送信します
+                            </p>
+
+                            <label style={labelStyle}>メールアドレス</label>
+                            <input
+                                type="text"
+                                value={email}
+                                onChange={(e) => { setEmail(e.target.value); setEmailError('') }}
+                                style={inputStyle(emailError)}
+                            />
+                            {emailError && <div style={fieldErrorStyle}>{emailError}</div>}
+
+                            {errorBlock}
+
+                            <div style={{ paddingTop: '32px' }}>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 24px',
+                                        backgroundColor: '#ffffff',
+                                        color: '#000000',
+                                        border: '1.5px solid rgba(255,255,255,0.7)',
+                                        borderRadius: '24px',
+                                        fontSize: '14px',
+                                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                                        letterSpacing: '0.08em',
+                                        transition: 'all 0.2s ease',
+                                        opacity: isLoading ? 0.6 : 1,
+                                    }}
+                                >
+                                    {isLoading ? '送信中...' : 'コードを送信'}
+                                </button>
+                            </div>
+
+                            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                                <button
+                                    type="button"
+                                    onClick={onBackToLogin}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'rgba(255,255,255,0.4)',
+                                        fontSize: '12px',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                    }}
+                                >
+                                    ← ログインに戻る
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* Step 2: ワンタイムコード入力 */}
+                    {step === 2 && (
+                        <form onSubmit={handleStep2Submit}>
+                            <p style={{
+                                color: 'rgba(255,255,255,0.8)',
+                                fontSize: '14px',
+                                lineHeight: '1.7',
+                                marginBottom: '32px',
+                                textAlign: 'center',
+                            }}>
+                                送信されたワンタイムコードを<br />入力してください
+                            </p>
+
+                            <label style={labelStyle}>ワンタイムコード</label>
+                            <input
+                                type="text"
+                                value={verificationCode}
+                                onChange={(e) => { setVerificationCode(e.target.value); setCodeError('') }}
+                                style={inputStyle(codeError)}
+                            />
+                            {codeError && <div style={fieldErrorStyle}>{codeError}</div>}
+
+                            {errorBlock}
+
+                            <div style={{ paddingTop: '32px' }}>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 24px',
+                                        backgroundColor: '#ffffff',
+                                        color: '#000000',
+                                        border: '1.5px solid rgba(255,255,255,0.7)',
+                                        borderRadius: '24px',
+                                        fontSize: '14px',
+                                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                                        letterSpacing: '0.08em',
+                                        transition: 'all 0.2s ease',
+                                        opacity: isLoading ? 0.6 : 1,
+                                    }}
+                                >
+                                    {isLoading ? '確認中...' : '送信する'}
+                                </button>
+                            </div>
+
+                            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(1)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'rgba(255,255,255,0.4)',
+                                        fontSize: '12px',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                    }}
+                                >
+                                    ← 戻る
+                                </button>
+                            </div>
+                        </form>
+                    )}
+
+                    {/* Step 3: 新しいパスワード設定 */}
+                    {step === 3 && (
+                        <form onSubmit={handleStep3Submit}>
+                            <p style={{
+                                color: 'rgba(255,255,255,0.8)',
+                                fontSize: '14px',
+                                lineHeight: '1.7',
+                                marginBottom: '32px',
+                                textAlign: 'center',
+                            }}>
+                                新しいパスワードを入力してください
+                            </p>
+
+                            <label style={labelStyle}>新しいパスワード</label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => { setNewPassword(e.target.value); setPasswordError('') }}
+                                style={inputStyle(passwordError)}
+                            />
+                            {passwordError && <div style={fieldErrorStyle}>{passwordError}</div>}
+                            <div style={{ marginBottom: '20px' }} />
+
+                            <label style={labelStyle}>新しいパスワード（確認）</label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => { setConfirmPassword(e.target.value); setConfirmPasswordError('') }}
+                                style={inputStyle(confirmPasswordError)}
+                            />
+                            {confirmPasswordError && <div style={fieldErrorStyle}>{confirmPasswordError}</div>}
+
+                            {errorBlock}
+
+                            <div style={{ paddingTop: '32px' }}>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 24px',
+                                        backgroundColor: '#ffffff',
+                                        color: '#000000',
+                                        border: '1.5px solid rgba(255,255,255,0.7)',
+                                        borderRadius: '24px',
+                                        fontSize: '14px',
+                                        cursor: isLoading ? 'not-allowed' : 'pointer',
+                                        letterSpacing: '0.08em',
+                                        transition: 'all 0.2s ease',
+                                        opacity: isLoading ? 0.6 : 1,
+                                    }}
+                                >
+                                    {isLoading ? '設定中...' : 'ログインする'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
+
+                {/* フェードインアニメーション */}
+                <style>{`
+                    @keyframes forgotPwFadeIn {
+                        from { opacity: 0; transform: translateY(8px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}</style>
+            </div>
+        )
+    }
+
+    // ──────────────────────────────────────────
+    //  PC用レイアウト（既存のまま）
+    // ──────────────────────────────────────────
     return (
         <div
             style={{
@@ -208,7 +464,7 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
                         justifyContent: 'center',
                         padding: '20px 30px',
                         maxWidth: '380px',
-                        minHeight: '380px', // 高さが変わらないようにある程度確保
+                        minHeight: '380px',
                     }}
                 >
                     {/* タイトルと説明 */}
@@ -239,7 +495,7 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
                     {/* Step 1: メール入力 */}
                     {step === 1 && (
                         <form onSubmit={handleStep1Submit}>
-                            <label style={labelStyle}>メールアドレス</label>
+                            <label style={{ ...labelStyle, fontSize: '14px', marginBottom: '8px' }}>メールアドレス</label>
                             <input
                                 type="text"
                                 value={email}
@@ -290,7 +546,7 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
                     {/* Step 2: コード入力 */}
                     {step === 2 && (
                         <form onSubmit={handleStep2Submit}>
-                            <label style={labelStyle}>認証コード</label>
+                            <label style={{ ...labelStyle, fontSize: '14px', marginBottom: '8px' }}>認証コード</label>
                             <input
                                 type="text"
                                 value={verificationCode}
@@ -341,7 +597,7 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
                     {/* Step 3: 新パスワード入力 */}
                     {step === 3 && (
                         <form onSubmit={handleStep3Submit}>
-                            <label style={labelStyle}>新しいパスワード</label>
+                            <label style={{ ...labelStyle, fontSize: '14px', marginBottom: '8px' }}>新しいパスワード</label>
                             <input
                                 type="password"
                                 value={newPassword}
@@ -351,7 +607,7 @@ export function ForgotPasswordModal({ onBackToLogin, onSubmitEmail, onSubmitCode
                             {passwordError && <div style={fieldErrorStyle}>{passwordError}</div>}
                             <div style={{ marginBottom: '16px' }} />
 
-                            <label style={labelStyle}>新しいパスワード（確認）</label>
+                            <label style={{ ...labelStyle, fontSize: '14px', marginBottom: '8px' }}>新しいパスワード（確認）</label>
                             <input
                                 type="password"
                                 value={confirmPassword}

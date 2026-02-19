@@ -46,30 +46,33 @@ export function RegisterSuccessScreen({ onStartApp, onGlitchDone }) {
                     fontFamily: "'Noto Sans JP', 'Hiragino Sans', sans-serif",
                     opacity: contentOpacity,
                     transition: 'opacity 0.4s ease',
+                    padding: '20px',
                 }}>
                     <div style={{
-                        position: 'absolute', width: 600, height: 600, borderRadius: '50%',
+                        position: 'absolute', width: '80vw', maxWidth: 600, height: '80vw', maxHeight: 600, borderRadius: '50%',
                         background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, transparent 70%)',
                         pointerEvents: 'none',
                     }} />
 
                     <div style={{
-                        color: '#fff', fontSize: 28, fontWeight: 300,
+                        color: '#fff', fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 300,
                         letterSpacing: '0.15em', marginBottom: 24, zIndex: 3,
                         textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.2)',
+                        textAlign: 'center',
                     }}>
                         登録できました！
                     </div>
 
                     <img src={loginIllustration} alt="" style={{
-                        width: 300, height: 'auto', zIndex: 3,
+                        width: 'clamp(200px, 60vw, 300px)', height: 'auto', zIndex: 3,
                         filter: 'drop-shadow(0 0 40px rgba(255,255,255,0.15))',
                     }} />
 
                     <div style={{
-                        color: '#fff', fontSize: 22, fontWeight: 300,
+                        color: '#fff', fontSize: 'clamp(18px, 5vw, 22px)', fontWeight: 300,
                         letterSpacing: '0.12em', marginTop: 28, zIndex: 3,
                         textShadow: '0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(255,255,255,0.2)',
+                        textAlign: 'center',
                     }}>
                         あなただけの空へようこそ！
                     </div>
