@@ -271,7 +271,7 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
               border: "1.5px solid rgba(255,255,255,0.3)",
             }}
           >
-            {/* 新規登録（アクティブ → 黒背景） */}
+            {/* 新規登録（アクティブ → 白背景） */}
             <button
               type="button"
               style={{
@@ -281,14 +281,14 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                 border: "none",
                 cursor: "pointer",
                 letterSpacing: "0.08em",
-                backgroundColor: "#1a1a1a",
-                color: "#ffffff",
-                borderRadius: "28px 0 0 28px",
+                backgroundColor: "#ffffff",
+                color: "#202020",
+                borderRadius: "28px 28px 28px 28px",
               }}
             >
               新規登録
             </button>
-            {/* ログイン（非アクティブ → 白背景） */}
+            {/* ログイン（非アクティブ → 黒背景） */}
             <button
               type="button"
               onClick={onBackToLogin}
@@ -299,8 +299,8 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                 border: "none",
                 cursor: "pointer",
                 letterSpacing: "0.08em",
-                backgroundColor: "#ffffff",
-                color: "#000000",
+                backgroundColor: "#202020",
+                color: "#ffffff",
                 borderRadius: "0 28px 28px 0",
               }}
             >
@@ -316,11 +316,24 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              padding: "32px 28px 16px",
+              padding: "0px 32px 28px 32px",
               gap: "0",
               animation: "mobileAuthFadeIn 0.25s ease",
             }}
           >
+            <img
+              src={loginIllustration}
+              alt="Yozora"
+              style={{
+                maxWidth: "220px",
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 0 30px rgba(255, 255, 255, 0.08))",
+                margin: "0 auto",
+                paddingBottom: "30px",
+              }}
+            />
             {/* ユーザーネーム */}
             <label style={labelStyle}>ユーザーネーム</label>
             <input
@@ -354,7 +367,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
             {/* パスワード */}
             <label style={labelStyle}>
               パスワード{" "}
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px" }}>
+              <span
+                style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px" }}
+              >
                 英数字・大文字・小文字が必須
               </span>
             </label>
@@ -426,7 +441,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                   </option>
                 ))}
               </select>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+              <span
+                style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}
+              >
                 年
               </span>
 
@@ -458,7 +475,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                   </option>
                 ))}
               </select>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+              <span
+                style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}
+              >
                 月
               </span>
 
@@ -496,7 +515,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                   );
                 })()}
               </select>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
+              <span
+                style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}
+              >
                 日
               </span>
             </div>
@@ -603,7 +624,9 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                 style={{
                   width: "100%",
                   padding: "12px 24px",
-                  backgroundColor: isLoading ? "rgba(255,255,255,0.5)" : "#ffffff",
+                  backgroundColor: isLoading
+                    ? "rgba(255,255,255,0.5)"
+                    : "#ffffff",
                   color: "#000000",
                   border: "1.5px solid rgba(255,255,255,0.7)",
                   borderRadius: "24px",
