@@ -23,8 +23,8 @@ export function ProfileModal({ isOpen, onClose }) {
     const [nameSaving, setNameSaving] = useState(false);
     const nameInputRef = useRef(null);
 
-    // --- メール変更 (OTPフロー) ---
-    // 0=表示のみ, 1=新メール入力, 2=OTP入力
+    // --- メール変更 ---
+    // 0=表示のみ, 1=新メール入力, 2=確認コード入力
     const [emailStep, setEmailStep] = useState(0);
     const [newEmail, setNewEmail] = useState("");
     const [emailOtp, setEmailOtp] = useState("");
@@ -55,6 +55,8 @@ export function ProfileModal({ isOpen, onClose }) {
         if (!isOpen) {
             setIsEditingName(false);
             setEmailStep(0);
+            setNewEmail("");
+            setEmailOtp("");
             setEmailError("");
             setIsEditingPassword(false);
             setPasswordError("");
@@ -114,41 +116,37 @@ export function ProfileModal({ isOpen, onClose }) {
         }
     };
 
-    // --- メール変更: OTP送信 ---
-    const handleSendEmailOtp = async () => {
+    // --- メール変更: Step1 - updateUserで確認コードメールを送信 ---
+    const handleChangeEmail = async () => {
         if (!newEmail.trim()) return;
         setEmailSaving(true);
         setEmailError("");
         try {
-            const { error } = await supabase.auth.signInWithOtp({
+            const { error } = await supabase.auth.updateUser({
                 email: newEmail.trim(),
-                options: { shouldCreateUser: false },
             });
             if (error) throw error;
-            setEmailStep(2);
+            setEmailStep(2); // 確認コード入力画面へ
         } catch (err) {
-            setEmailError(err.message || "OTP送信に失敗しました");
+            setEmailError(err.message || "メール変更に失敗しました");
         } finally {
             setEmailSaving(false);
         }
     };
 
-    // --- メール変更: OTP検証 & 更新 ---
+    // --- メール変更: Step2 - 確認コードを検証 ---
     const handleVerifyEmailOtp = async () => {
         if (!emailOtp.trim()) return;
         setEmailSaving(true);
         setEmailError("");
         try {
-            const { error: verifyError } = await supabase.auth.verifyOtp({
+            const { error } = await supabase.auth.verifyOtp({
                 email: newEmail.trim(),
                 token: emailOtp.trim(),
-                type: "email",
+                type: "email_change",
             });
-            if (verifyError) throw verifyError;
-            const { error: updateError } = await supabase.auth.updateUser({
-                email: newEmail.trim(),
-            });
-            if (updateError) throw updateError;
+            if (error) throw error;
+            // 成功！リセット
             setEmailStep(0);
             setNewEmail("");
             setEmailOtp("");
@@ -354,9 +352,15 @@ export function ProfileModal({ isOpen, onClose }) {
                                         <button
                                             onClick={handleSaveName}
                                             disabled={nameSaving}
-                                            className="px-3 py-1.5 bg-white/15 text-white/90 text-xs rounded-full hover:bg-white/25 transition-colors disabled:opacity-50"
+                                            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition-colors disabled:opacity-50 flex-shrink-0"
                                         >
-                                            {nameSaving ? "..." : "保存"}
+                                            {nameSaving ? (
+                                                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 text-white/80">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                </svg>
+                                            )}
                                         </button>
                                     </div>
                                 ) : (
@@ -431,15 +435,16 @@ export function ProfileModal({ isOpen, onClose }) {
                                         )}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={handleSendEmailOtp}
+                                                onClick={handleChangeEmail}
                                                 disabled={emailSaving}
                                                 className="flex-1 py-2 bg-white/10 text-white/90 text-xs rounded-full hover:bg-white/20 border border-white/10 transition-colors disabled:opacity-50"
                                             >
-                                                {emailSaving ? "送信中..." : "確認コードを送信"}
+                                                {emailSaving ? "送信中..." : "確認メールを送信"}
                                             </button>
                                             <button
                                                 onClick={() => {
                                                     setEmailStep(0);
+                                                    setNewEmail("");
                                                     setEmailError("");
                                                 }}
                                                 className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors"
@@ -451,15 +456,15 @@ export function ProfileModal({ isOpen, onClose }) {
                                 )}
                                 {emailStep === 2 && (
                                     <div className="space-y-2">
-                                        <p className="text-white/50 text-xs px-2">
+                                        <p className="text-white/60 text-xs px-2">
                                             {newEmail} に確認コードを送信しました
                                         </p>
                                         <input
                                             type="text"
-                                            placeholder="確認コード (6桁)"
+                                            placeholder="確認コード (8桁)"
                                             value={emailOtp}
                                             onChange={(e) => setEmailOtp(e.target.value)}
-                                            maxLength={6}
+                                            maxLength={8}
                                             className="w-full px-4 py-2.5 bg-white/8 border border-white/10 rounded-full text-white/90 text-sm focus:outline-none focus:ring-1 focus:ring-white/30 placeholder-white/30"
                                             style={{ letterSpacing: "0.3em", textAlign: "center" }}
                                         />
@@ -477,6 +482,8 @@ export function ProfileModal({ isOpen, onClose }) {
                                             <button
                                                 onClick={() => {
                                                     setEmailStep(0);
+                                                    setNewEmail("");
+                                                    setEmailOtp("");
                                                     setEmailError("");
                                                 }}
                                                 className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors"
