@@ -270,7 +270,11 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                 </p>
                 <div className="space-y-2.5">
                   {goodThingsList.map((thing, index) => (
-                    <div key={index} className="flex items-start gap-3 px-2">
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 px-2"
+                      style={{ justifyContent: "center", paddingRight: "15px" }}
+                    >
                       <span className="text-white/60 text-sm mt-0.5 flex-shrink-0">
                         •
                       </span>
