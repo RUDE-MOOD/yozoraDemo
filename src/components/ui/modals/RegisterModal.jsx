@@ -658,7 +658,7 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
                   letterSpacing: "0.08em",
                 }}
               >
-                ← 戻る
+                戻る
               </button>
             </div>
           </div>
