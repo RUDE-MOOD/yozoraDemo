@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 // ══════════════════════════════════════════════════════
 //  WebGL グリッチシェーダー (videoglitch.js ベース)
@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react'
 const VERT = `
 attribute vec2 a_position;
 void main() { gl_Position = vec4(a_position, 0.0, 1.0); }
-`
+`;
 
 const FRAG = `
 precision mediump float;
@@ -70,12 +70,12 @@ void main() {
   alpha += bar;
 
   vec3 dark  = vec3(0.08, 0.08, 0.10);
-  vec3 light = vec3(0.6, 0.8, 0.9);
+  vec3 light = vec3(0.9, 0.9, 0.9);
   vec3 color = mix(dark, light, clamp(interf + flash + bar, 0.0, 1.0));
 
   gl_FragColor = vec4(color, clamp(alpha, 0.0, 1.0));
 }
-`
+`;
 
 /**
  * GlitchCanvas — フルスクリーン WebGL グリッチオーバーレイ
@@ -83,60 +83,91 @@ void main() {
  * @param {number} duration  減衰にかかる秒数（intensity 1→0）
  */
 export function GlitchCanvas({ duration = 2.5 }) {
-    const ref = useRef(null)
-    const raf = useRef(null)
-    const t0 = useRef(0)
+  const ref = useRef(null);
+  const raf = useRef(null);
+  const t0 = useRef(0);
 
-    useEffect(() => {
-        const c = ref.current
-        if (!c) return
-        const gl = c.getContext('webgl', { premultipliedAlpha: false })
-        if (!gl) return
+  useEffect(() => {
+    const c = ref.current;
+    if (!c) return;
+    const gl = c.getContext("webgl", { premultipliedAlpha: false });
+    if (!gl) return;
 
-        gl.enable(gl.BLEND)
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, VERT); gl.compileShader(vs)
-        const fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, FRAG); gl.compileShader(fs)
-        if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
-            console.error('Glitch shader:', gl.getShaderInfoLog(fs))
-        const pg = gl.createProgram(); gl.attachShader(pg, vs); gl.attachShader(pg, fs); gl.linkProgram(pg); gl.useProgram(pg)
+    const vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, VERT);
+    gl.compileShader(vs);
+    const fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, FRAG);
+    gl.compileShader(fs);
+    if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
+      console.error("Glitch shader:", gl.getShaderInfoLog(fs));
+    const pg = gl.createProgram();
+    gl.attachShader(pg, vs);
+    gl.attachShader(pg, fs);
+    gl.linkProgram(pg);
+    gl.useProgram(pg);
 
-        const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf)
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW)
-        const aP = gl.getAttribLocation(pg, 'a_position'); gl.enableVertexAttribArray(aP)
-        gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0)
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
+    const aP = gl.getAttribLocation(pg, "a_position");
+    gl.enableVertexAttribArray(aP);
+    gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
 
-        const uR = gl.getUniformLocation(pg, 'u_resolution')
-        const uT = gl.getUniformLocation(pg, 'u_time')
-        const uI = gl.getUniformLocation(pg, 'u_intensity')
+    const uR = gl.getUniformLocation(pg, "u_resolution");
+    const uT = gl.getUniformLocation(pg, "u_time");
+    const uI = gl.getUniformLocation(pg, "u_intensity");
 
-        const resize = () => { c.width = innerWidth; c.height = innerHeight; gl.viewport(0, 0, c.width, c.height) }
-        resize(); addEventListener('resize', resize)
+    const resize = () => {
+      c.width = innerWidth;
+      c.height = innerHeight;
+      gl.viewport(0, 0, c.width, c.height);
+    };
+    resize();
+    addEventListener("resize", resize);
 
-        t0.current = performance.now()
+    t0.current = performance.now();
 
-        const loop = () => {
-            const elapsed = (performance.now() - t0.current) / 1000
-            const p = Math.min(elapsed / duration, 1.0)
-            const intensity = 1.0 - p * p * (3.0 - 2.0 * p)
+    const loop = () => {
+      const elapsed = (performance.now() - t0.current) / 1000;
+      const p = Math.min(elapsed / duration, 1.0);
+      const intensity = 1.0 - p * p * (3.0 - 2.0 * p);
 
-            gl.clearColor(0, 0, 0, 0)
-            gl.clear(gl.COLOR_BUFFER_BIT)
-            gl.uniform2f(uR, c.width, c.height)
-            gl.uniform1f(uT, elapsed)
-            gl.uniform1f(uI, intensity)
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(uR, c.width, c.height);
+      gl.uniform1f(uT, elapsed);
+      gl.uniform1f(uI, intensity);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-            if (intensity > 0.005) raf.current = requestAnimationFrame(loop)
-        }
-        loop()
+      if (intensity > 0.005) raf.current = requestAnimationFrame(loop);
+    };
+    loop();
 
-        return () => { removeEventListener('resize', resize); cancelAnimationFrame(raf.current) }
-    }, [duration])
+    return () => {
+      removeEventListener("resize", resize);
+      cancelAnimationFrame(raf.current);
+    };
+  }, [duration]);
 
-    return <canvas ref={ref} style={{
-        position: 'fixed', inset: 0, width: '100%', height: '100%',
-        zIndex: 10001, pointerEvents: 'none',
-    }} />
+  return (
+    <canvas
+      ref={ref}
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 10001,
+        pointerEvents: "none",
+      }}
+    />
+  );
 }
