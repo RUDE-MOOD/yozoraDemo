@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { StarDetailModal } from "./modals/StarDetailModal";
 import { supabase } from "../../supabaseClient";
 import { ThemeSelectionModal } from "./modals/ThemeSelectionModal";
+import { ProfileModal } from "./modals/ProfileModal";
 import { getFallbackAnalysis } from "../../utils/fallbackAnalysis";
 import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
 import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
@@ -71,6 +72,8 @@ export const UI = ({ onSend, onStarClick }) => {
   }, [userMenuOpen]);
   // テーマ選択モーダルの開閉状態
   const [themeModalOpen, setThemeModalOpen] = useState(false);
+  // プロフィールモーダルの開閉状態
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   // スライダーの値（0-100）
   const [moodValues, setMoodValues] = useState(INITIAL_MOOD_VALUES);
   // 星の詳細確認モーダルの開閉状態
@@ -344,13 +347,23 @@ export const UI = ({ onSend, onStarClick }) => {
             {!showSettingsSubmenu ? (
               /* --- Main Menu --- */
               <>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setProfileModalOpen(true);
+                  }}
+                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  プロフィール
+                </button>
                 {isFutureStarVisible && futureStarPosition && (
                   <button
                     onClick={() => {
                       setUserMenuOpen(false);
                       setFocusTarget(futureStarPosition);
                     }}
-                    className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+                    className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                     style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
                   >
                     未来への手紙
@@ -361,7 +374,7 @@ export const UI = ({ onSend, onStarClick }) => {
                     setUserMenuOpen(false);
                     setThemeModalOpen(true);
                   }}
-                  className={`w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs${isFutureStarVisible ? " border-t border-white/5" : ""}`}
+                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
                 >
                   テーマ
@@ -572,9 +585,8 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${
-                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                  }`}
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                    }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div
@@ -640,9 +652,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
-                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                  }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                    }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
@@ -742,6 +753,12 @@ export const UI = ({ onSend, onStarClick }) => {
           </div>
         </div>
       )}
+
+      {/* --- プロフィールモーダル (Profile Modal) --- */}
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+      />
 
       {/* --- テーマ選択モーダル (Theme Selection Modal) --- */}
       <ThemeSelectionModal

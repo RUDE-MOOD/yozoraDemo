@@ -177,6 +177,19 @@ function App() {
               throw new Error('プロフィールの作成に失敗しました: ' + dbError.message);
             }
 
+            // 3. デフォルトタグを作成（#休日, #誕生日, #アニバーサリー）
+            const { error: tagError } = await supabase
+              .from('t_tag')
+              .insert([
+                { creator_id: authData.user.id, tag_name: '休日' },
+                { creator_id: authData.user.id, tag_name: '誕生日' },
+                { creator_id: authData.user.id, tag_name: 'アニバーサリー' },
+              ]);
+            if (tagError) {
+              console.error('Default tags creation failed:', tagError);
+              // タグ作成失敗は致命的ではないのでログのみ
+            }
+
             console.log('Register success:', authData);
             setPhase('registerSuccess');
           }}
