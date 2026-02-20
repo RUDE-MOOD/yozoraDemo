@@ -51,10 +51,13 @@ const INITIAL_MOOD_VALUES = {
   physical: 50, // 生体的メカニズム
   fulfillment: 50, // 刺激の受容
 };
+import { LogViewsModal } from "./modals/LogViewsModal";
 
 export const UI = ({ onSend, onStarClick }) => {
   // メニューの開閉状態
   const [menuOpen, setMenuOpen] = useState(false);
+  // ログモーダルの開閉状態
+  const [logModalOpen, setLogModalOpen] = useState(false);
   // ユーザーメニューの開閉状態
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   // 設定サブメニューの開閉状態
@@ -382,7 +385,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 <button
                   onClick={() => {
                     setUserMenuOpen(false);
-                    // TODO: ログ機能
+                    setLogModalOpen(true);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
@@ -752,6 +755,11 @@ export const UI = ({ onSend, onStarClick }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* --- ログ一覧モーダル --- */}
+      {logModalOpen && (
+        <LogViewsModal onClose={() => setLogModalOpen(false)} />
       )}
 
       {/* --- プロフィールモーダル (Profile Modal) --- */}
