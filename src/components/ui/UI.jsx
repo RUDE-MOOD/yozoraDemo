@@ -237,6 +237,7 @@ export const UI = ({ onSend, onStarClick }) => {
             setDiaryOpen(true);
             setUserMenuOpen(false);
             setProfileModalOpen(false);
+            setStarOpen(false);
           }}
           className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
@@ -775,9 +776,7 @@ export const UI = ({ onSend, onStarClick }) => {
       )}
 
       {/* --- ログ一覧モーダル --- */}
-      {logModalOpen && (
-        <LogViewsModal onClose={() => setLogModalOpen(false)} />
-      )}
+      {logModalOpen && <LogViewsModal onClose={() => setLogModalOpen(false)} />}
 
       {/* --- プロフィールモーダル (Profile Modal) --- */}
       <ProfileModal
