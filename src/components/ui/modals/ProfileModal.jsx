@@ -293,7 +293,8 @@ export function ProfileModal({ isOpen, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 md:justify-start md:pl-8"
-      onClick={onClose}
+      style={{ maxWidth: "40vw", width: "100%" }}
+      //   onClick={onClose}
     >
       {/* バックドロップ — StarDetailModalと同じ */}
       {/* <div className="absolute inset-0 bg-black/20 transition-opacity duration-300" /> */}
