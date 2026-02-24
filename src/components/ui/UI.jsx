@@ -3,6 +3,7 @@ import { StarDetailModal } from "./modals/StarDetailModal";
 import { supabase } from "../../supabaseClient";
 import { ThemeSelectionModal } from "./modals/ThemeSelectionModal";
 import { ProfileModal } from "./modals/ProfileModal";
+import { ConstellationModal } from "./modals/ConstellationModal";
 import { getFallbackAnalysis } from "../../utils/fallbackAnalysis";
 import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
 import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
@@ -74,6 +75,8 @@ export const UI = ({ onSend, onStarClick }) => {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   // プロフィールモーダルの開閉状態
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  // 星座モーダルの開閉状態
+  const [constellationModalOpen, setConstellationModalOpen] = useState(false);
   // スライダーの値（0-100）
   const [moodValues, setMoodValues] = useState(INITIAL_MOOD_VALUES);
   // 星の詳細確認モーダルの開閉状態
@@ -357,6 +360,16 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
                 >
                   プロフィール
+                </button>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setConstellationModalOpen(true);
+                  }}
+                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                >
+                  マイセイザ
                 </button>
                 {isFutureStarVisible && futureStarPosition && (
                   <button
@@ -772,6 +785,12 @@ export const UI = ({ onSend, onStarClick }) => {
       <ProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
+      />
+
+      {/* --- 星座モーダル (Constellation Modal) --- */}
+      <ConstellationModal
+        isOpen={constellationModalOpen}
+        onClose={() => setConstellationModalOpen(false)}
       />
 
       {/* --- テーマ選択モーダル (Theme Selection Modal) --- */}
