@@ -1,22 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { StarDetailModal } from "./modals/StarDetailModal";
 import { supabase } from "../../supabaseClient";
 import { ThemeSelectionModal } from "./modals/ThemeSelectionModal";
 import { ProfileModal } from "./modals/ProfileModal";
-import { ConstellationModal } from "./modals/ConstellationModal";
 import { getFallbackAnalysis } from "../../utils/fallbackAnalysis";
 import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
 import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
 import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 import { useStarStore } from "../../store/useStarStore";
-import {
-  getAppNow,
-  isCooldownActive,
-  getCooldownProgress,
-  getCooldownTimeString,
-  getDebugDayOffset,
-  setDebugDayOffset,
-} from "../../utils/appTime";
 
 // スライダー質問の定義（5つ）
 const MOOD_QUESTIONS = [
@@ -83,8 +74,6 @@ export const UI = ({ onSend, onStarClick }) => {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   // プロフィールモーダルの開閉状態
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  // 星座モーダルの開閉状態
-  const [constellationModalOpen, setConstellationModalOpen] = useState(false);
   // スライダーの値（0-100）
   const [moodValues, setMoodValues] = useState(INITIAL_MOOD_VALUES);
   // 星の詳細確認モーダルの開閉状態
@@ -110,31 +99,10 @@ export const UI = ({ onSend, onStarClick }) => {
     debug_loadMockMessage,
   } = useFutureMessageStore();
 
-  const { setFocusTarget, stars } = useStarStore();
+  const { setFocusTarget } = useStarStore();
 
-  // 開発者モードパネルの開閉状態
+  // Debug Modals
   const [debugOpen, setDebugOpen] = useState(false);
-
-  // --- 冷却タイマー ---
-  const [cooldown, setCooldown] = useState(false);
-  const [cooldownProgress, setCooldownProgress] = useState(1);
-  const [cooldownTime, setCooldownTime] = useState("");
-  const [debugOffset, setDebugOffset] = useState(getDebugDayOffset());
-
-  // 冷却状態を1秒ごとに更新
-  useEffect(() => {
-    const updateCooldown = () => {
-      const active = isCooldownActive(stars);
-      setCooldown(active);
-      if (active) {
-        setCooldownProgress(getCooldownProgress(stars));
-        setCooldownTime(getCooldownTimeString());
-      }
-    };
-    updateCooldown();
-    const interval = setInterval(updateCooldown, 1000);
-    return () => clearInterval(interval);
-  }, [stars, debugOffset]);
 
   // フルスクリーン状態（PC用）
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -165,7 +133,7 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // 今日の日付をフォーマット
   const getFormattedDate = () => {
-    const now = getAppNow();
+    const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const day = String(now.getDate()).padStart(2, "0");
@@ -258,78 +226,38 @@ export const UI = ({ onSend, onStarClick }) => {
 
   return (
     <>
-      {/* --- ロケットボタン（冷却リング付き）- 右下 --- */}
+      {/* --- ロケットメニュー (Rocket Menu) - 右下 --- */}
       <div className="fixed bottom-6 right-6 z-[1000]">
-        <div className="relative">
-          {/* 冷却リング（SVG円弧） */}
-          {cooldown && (
-            <svg
-              className="absolute -inset-1.5 w-[52px] h-[52px] -rotate-90"
-              viewBox="0 0 52 52"
-            >
-              {/* 背景リング */}
-              <circle
-                cx="26" cy="26" r="23"
-                fill="none"
-                stroke="rgba(255,255,255,0.08)"
-                strokeWidth="2"
-              />
-              {/* 進捗リング */}
-              <circle
-                cx="26" cy="26" r="23"
-                fill="none"
-                stroke="rgba(147,197,253,0.6)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 23}`}
-                strokeDashoffset={`${2 * Math.PI * 23 * (1 - cooldownProgress)}`}
-                style={{ transition: "stroke-dashoffset 1s linear" }}
-              />
-            </svg>
-          )}
-          <button
-            onClick={() => {
-              if (cooldown) return; // 冷却中はクリック不可
-              setMenuOpen(false);
-              setDiaryOpen(true);
-              setUserMenuOpen(false);
-            }}
-            className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-white/20"
-              }`}
-            title={cooldown ? `冷却中: ${cooldownTime}` : "日記を書く"}
+        <button
+          onClick={() => {
+            setMenuOpen(false);
+            setDiaryOpen(true);
+            setUserMenuOpen(false);
+            setProfileModalOpen(false);
+          }}
+          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
+        >
+          {/* ロケットアイコン (Rocket Icon) */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
           >
-            {/* ロケットアイコン (Rocket Icon) */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.5904 14.3696C15.6948 14.8128 15.75 15.275 15.75 15.75C15.75 19.0637 13.0637 21.75 9.75 21.75V16.9503M15.5904 14.3696C19.3244 11.6411 21.75 7.22874 21.75 2.25C16.7715 2.25021 12.3595 4.67586 9.63122 8.40975M15.5904 14.3696C13.8819 15.6181 11.8994 16.514 9.75 16.9503M9.63122 8.40975C9.18777 8.30528 8.72534 8.25 8.25 8.25C4.93629 8.25 2.25 10.9363 2.25 14.25H7.05072M9.63122 8.40975C8.38285 10.1183 7.48701 12.1007 7.05072 14.25M9.75 16.9503C9.64659 16.9713 9.54279 16.9912 9.43862 17.0101C8.53171 16.291 7.70991 15.4692 6.99079 14.5623C7.00969 14.4578 7.02967 14.3537 7.05072 14.25M4.81191 16.6408C3.71213 17.4612 3 18.7724 3 20.25C3 20.4869 3.0183 20.7195 3.05356 20.9464C3.28054 20.9817 3.51313 21 3.75 21C5.22758 21 6.53883 20.2879 7.35925 19.1881"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 9C16.5 9.82843 15.8284 10.5 15 10.5C14.1716 10.5 13.5 9.82843 13.5 9C13.5 8.17157 14.1716 7.5 15 7.5C15.8284 7.5 16.5 8.17157 16.5 9Z"
-              />
-            </svg>
-          </button>
-          {/* 冷却中の残り時間テキスト */}
-          {cooldown && (
-            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <span className="text-[9px] text-white/40 font-mono tracking-wider">
-                {cooldownTime}
-              </span>
-            </div>
-          )}
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.5904 14.3696C15.6948 14.8128 15.75 15.275 15.75 15.75C15.75 19.0637 13.0637 21.75 9.75 21.75V16.9503M15.5904 14.3696C19.3244 11.6411 21.75 7.22874 21.75 2.25C16.7715 2.25021 12.3595 4.67586 9.63122 8.40975M15.5904 14.3696C13.8819 15.6181 11.8994 16.514 9.75 16.9503M9.63122 8.40975C9.18777 8.30528 8.72534 8.25 8.25 8.25C4.93629 8.25 2.25 10.9363 2.25 14.25H7.05072M9.63122 8.40975C8.38285 10.1183 7.48701 12.1007 7.05072 14.25M9.75 16.9503C9.64659 16.9713 9.54279 16.9912 9.43862 17.0101C8.53171 16.291 7.70991 15.4692 6.99079 14.5623C7.00969 14.4578 7.02967 14.3537 7.05072 14.25M4.81191 16.6408C3.71213 17.4612 3 18.7724 3 20.25C3 20.4869 3.0183 20.7195 3.05356 20.9464C3.28054 20.9817 3.51313 21 3.75 21C5.22758 21 6.53883 20.2879 7.35925 19.1881"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.5 9C16.5 9.82843 15.8284 10.5 15 10.5C14.1716 10.5 13.5 9.82843 13.5 9C13.5 8.17157 14.1716 7.5 15 7.5C15.8284 7.5 16.5 8.17157 16.5 9Z"
+            />
+          </svg>
+        </button>
 
         {/* {menuOpen && (
           <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
@@ -431,16 +359,6 @@ export const UI = ({ onSend, onStarClick }) => {
                 >
                   プロフィール
                 </button>
-                <button
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    setConstellationModalOpen(true);
-                  }}
-                  className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-                >
-                  マイセイザ
-                </button>
                 {isFutureStarVisible && futureStarPosition && (
                   <button
                     onClick={() => {
@@ -490,7 +408,7 @@ export const UI = ({ onSend, onStarClick }) => {
                   className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
                 >
-                  開発者モード
+                  デバッグ
                 </button>
               </>
             ) : (
@@ -538,7 +456,7 @@ export const UI = ({ onSend, onStarClick }) => {
         )}
       </div>
 
-      {/* --- 開発者モードパネル (Developer Mode Panel) --- */}
+      {/* --- Debug Panel --- */}
       {debugOpen && (
         <div
           className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -549,51 +467,9 @@ export const UI = ({ onSend, onStarClick }) => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">
-              開発者モード
+              デバッグツール
             </h3>
 
-            {/* 現在のアプリ時間 */}
-            <div className="text-center py-2 bg-white/5 rounded-lg">
-              <p className="text-[10px] text-white/40 mb-1">アプリ時間</p>
-              <p className="text-white/90 font-mono text-sm">
-                {getAppNow().toLocaleString("ja-JP")}
-              </p>
-              {debugOffset > 0 && (
-                <p className="text-yellow-300/70 text-[10px] mt-1">
-                  +{debugOffset}日 スキップ中
-                </p>
-              )}
-            </div>
-
-            {/* タイムスキップ */}
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">タイムスキップ</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    const newOffset = debugOffset + 1;
-                    setDebugDayOffset(newOffset);
-                    setDebugOffset(newOffset);
-                  }}
-                  className="flex-1 py-2 bg-yellow-500/20 text-yellow-200 rounded hover:bg-yellow-500/40 text-sm"
-                >
-                  翌日にスキップ
-                </button>
-                <button
-                  onClick={() => {
-                    setDebugDayOffset(0);
-                    setDebugOffset(0);
-                  }}
-                  className="flex-1 py-2 bg-white/10 text-white/70 rounded hover:bg-white/20 text-sm"
-                  disabled={debugOffset === 0}
-                  style={{ opacity: debugOffset === 0 ? 0.3 : 1 }}
-                >
-                  実時間にリセット
-                </button>
-              </div>
-            </div>
-
-            {/* 未来への手紙 */}
             <div className="space-y-2">
               <p className="text-xs text-white/50">未来への手紙（入力）</p>
               <button
@@ -616,7 +492,6 @@ export const UI = ({ onSend, onStarClick }) => {
               </button>
             </div>
 
-            {/* 流れ星 */}
             <div className="space-y-2">
               <p className="text-xs text-white/50">
                 流れ星（過去のメッセージ取得）
@@ -725,8 +600,9 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                    }`}
+                  className={`flex-1 space-y-6 min-w-0 ${
+                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                  }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div
@@ -792,8 +668,9 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                    }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
+                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                  }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
@@ -898,12 +775,6 @@ export const UI = ({ onSend, onStarClick }) => {
       <ProfileModal
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
-      />
-
-      {/* --- 星座モーダル (Constellation Modal) --- */}
-      <ConstellationModal
-        isOpen={constellationModalOpen}
-        onClose={() => setConstellationModalOpen(false)}
       />
 
       {/* --- テーマ選択モーダル (Theme Selection Modal) --- */}

@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { getAppNow } from "./appTime";
 
 /**
  * ムードデータから星を生成する
@@ -14,7 +13,7 @@ import { getAppNow } from "./appTime";
  */
 export const starDataMaker = ({ moodValues }) => {
 
-    const now = getAppNow();
+    const now = new Date();
     // 日付のフォーマット: YY/MM/DD HH:mm (例: 26/1/26 16:25)
     const year = now.getFullYear().toString().slice(-2);
     const month = now.getMonth() + 1;

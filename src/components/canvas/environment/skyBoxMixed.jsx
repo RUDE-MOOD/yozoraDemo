@@ -4,7 +4,6 @@ import { extend, useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import { SkyBox } from './SkyBox'
 import { DistantStars } from '../stars/DistantStars'
-import { DistantNagareboshi } from '../stars/DistantNagareboshi'
 
 // SkyBoxUpGradeと同じネビュラシェーダー（透明度制御用にopacity uniformを追加）
 const NebulaFilterMaterial = shaderMaterial(
@@ -140,7 +139,6 @@ export function SkyBoxMixed() {
 
       {/* 遠景の星 */}
       <DistantStars position={[0, 0, -5]} size={2.5} />
-      <DistantNagareboshi />
     </group>
   )
 }

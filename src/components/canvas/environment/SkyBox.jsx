@@ -3,7 +3,6 @@ import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import { DistantStars } from '../stars/DistantStars'
-import { DistantNagareboshi } from '../stars/DistantNagareboshi'
 
 // テーマ変更用
 import { useThemeStore } from '../../../store/useThemeStore'
@@ -224,7 +223,6 @@ export function SkyBox() {
 
       {/* 3. Distant Stars - 独立コンポーネント */}
       <DistantStars />
-      <DistantNagareboshi />
 
       {/* 4. Fog Layer - Volume illusion */}
       {/* 

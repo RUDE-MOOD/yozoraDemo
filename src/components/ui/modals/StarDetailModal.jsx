@@ -139,13 +139,6 @@ function formatDateOnly(displayDate) {
   return parts;
 }
 
-// --- 時間フォーマット ---
-function formatTime(displayDate) {
-  if (!displayDate) return "";
-  const parts = displayDate.split(" ");
-  return parts[1] || "";
-}
-
 // --- メインコンポーネント ---
 export const StarDetailModal = ({ isOpen, onClose, starData }) => {
   if (!isOpen || !starData) return null;
@@ -247,86 +240,45 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
               </div>
             </div>
 
-            {/* 日付＋時間＋感情 */}
+            {/* 日付 */}
             <div className="text-center mb-6" style={{ padding: "5px" }}>
-              <p className="text-white/95 text-xl font-bold font-sans tracking-wide">
+              <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1">
+                日付
+              </p>
+              <p className="text-white/95 text-lg font-sans tracking-wide">
                 {formatDateOnly(starData.display_date)}
               </p>
-              <div className="flex items-center justify-center gap-3 mt-1">
-                {formatTime(starData.display_date) && (
-                  <span className="text-white/50 text-sm font-sans">
-                    {formatTime(starData.display_date)}
-                  </span>
-                )}
-                {hasAnalysis && displayAnalysis.emotion && (
-                  <span className="text-white/95 text-2xl font-bold font-sans tracking-wide">
-                    {displayAnalysis.emotion}
-                  </span>
-                )}
-              </div>
             </div>
 
-            {/* 5軸ムードバー */}
-            {starData.mood_values && (() => {
-              const axes = [
-                { key: "emotional", icon: "🫧", label: "気分" },
-                { key: "motivation", icon: "✦", label: "自分らしさ" },
-                { key: "social", icon: "♡", label: "心の充足" },
-                { key: "physical", icon: "☁", label: "フィジカル" },
-                { key: "fulfillment", icon: "✧", label: "充実感" },
-              ];
-              return (
-                <div className="mb-6 space-y-2" style={{ padding: "0 2px" }}>
-                  {axes.map(({ key, icon }) => {
-                    const val = starData.mood_values[key] ?? 0;
-                    const filled = Math.round(val / 10); // 0-100 → 0-10
-                    return (
-                      <div key={key} className="flex items-center gap-2">
-                        <span className="text-white/70 text-sm w-5 text-center flex-shrink-0" style={{ fontSize: "14px" }}>
-                          {icon}
-                        </span>
-                        <div className="flex gap-[3px] flex-1">
-                          {Array.from({ length: 10 }).map((_, i) => (
-                            <div
-                              key={i}
-                              className={`h-3 flex-1 rounded-[2px] ${i < filled
-                                ? "bg-white/70"
-                                : "bg-white/10 border border-white/15"
-                                }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
+            {/* 感情 */}
+            {hasAnalysis && displayAnalysis.emotion && (
+              <div className="text-center mb-6" style={{ padding: "5px" }}>
+                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1">
+                  感情
+                </p>
+                <p className="text-white/95 text-lg font-sans tracking-wide">
+                  {displayAnalysis.emotion}
+                </p>
+              </div>
+            )}
 
-            {/* 3 Good Things — 縦書きラベル + リスト */}
+            {/* 3 Good Things */}
             {goodThingsList.length > 0 && (
-              <div className="mb-4 flex" style={{ padding: "5px 0", minHeight: "80px" }}>
-                {/* 縦書きラベル */}
-                <div className="flex-shrink-0 flex items-center justify-center" style={{ width: "32px" }}>
-                  <span
-                    className="text-white/50 text-sm font-bold tracking-[0.12em] font-sans whitespace-nowrap"
-                    style={{
-                      writingMode: "vertical-rl",
-                      textOrientation: "mixed",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    3 Good Things
-                  </span>
-                </div>
-                {/* 区切り線 */}
-                <div className="w-px bg-white/15 mx-2 self-stretch" />
-                {/* リスト */}
-                <div className="flex-1 flex flex-col justify-center space-y-3 pl-1">
+              <div className="mb-4" style={{ padding: "5px" }}>
+                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center">
+                  3 Good Things
+                </p>
+                <div className="space-y-2.5">
                   {goodThingsList.map((thing, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <span className="text-white/40 text-xs mt-0.5 flex-shrink-0">•</span>
-                      <p className="text-white/80 text-sm leading-relaxed font-sans break-words min-w-0">
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 px-2"
+                      style={{ justifyContent: "center", paddingRight: "15px" }}
+                    >
+                      <span className="text-white/60 text-sm mt-0.5 flex-shrink-0">
+                        •
+                      </span>
+                      <p className="text-white/90 text-sm leading-relaxed font-sans break-words min-w-0">
                         {thing}
                       </p>
                     </div>
