@@ -5,8 +5,8 @@ import { getFallbackAnalysis } from "../../../utils/fallbackAnalysis";
 export const LogViewsModal = ({ onClose, onLogClick }) => {
     const { stars } = useStarStore();
 
-    // 現在表示中の年月（初期値は現在日時）
-    const [currentDate, setCurrentDate] = useState(new Date());
+    // 現在表示中の年月（初期値は2025年12月）
+    const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 1));
 
     // 表示用データを作成
     const calendarData = useMemo(() => {
