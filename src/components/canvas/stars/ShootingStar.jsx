@@ -213,15 +213,17 @@ export function ShootingStar({ onOpenDisplayModal }) {
                 )
             }
 
-            // 5秒後に消える
+            // 2秒後に消える
             if (exitTimer.current > 2.0) {
-                // 退場完了：最新の星の位置にカメラを戻す（打ち上げ後と同じzoom）
-                if (stars.length > 0) {
-                    const lastStar = stars[stars.length - 1]
-                    setFocusTarget(lastStar.position)
-                }
+                // 退場完了：1秒待ってから最新の星にカメラを戻す
                 setPhase('gone')
                 hideShootingStar()
+                if (stars.length > 0) {
+                    const lastStar = stars[stars.length - 1]
+                    setTimeout(() => {
+                        setFocusTarget(lastStar.position)
+                    }, 1000)
+                }
             }
         }
 
@@ -277,8 +279,9 @@ export function ShootingStar({ onOpenDisplayModal }) {
         // 明るさ: idle中は少し暗く、退場中は最後の2秒でフェードアウト
         if (phase === 'idle') {
             materialRef.current.brightness = 0.7
-        } else if (phase === 'exiting' && exitTimer.current > 3.0) {
-            const fadeProg = Math.min((exitTimer.current - 3.0) / 2.0, 1.0)
+        } else if (phase === 'exiting' && exitTimer.current > 1.5) {
+            // 退場の最後0.5秒でフェードアウト（1.5s→2.0s で brightness 1→0）
+            const fadeProg = Math.min((exitTimer.current - 1.5) / 0.5, 1.0)
             materialRef.current.brightness = 1.0 - fadeProg
         } else {
             materialRef.current.brightness = 1.0
