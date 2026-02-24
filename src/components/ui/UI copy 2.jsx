@@ -11,6 +11,9 @@ import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 import { useStarStore } from "../../store/useStarStore";
 import {
   getAppNow,
+  isCooldownActive,
+  getCooldownProgress,
+  getCooldownTimeString,
   getDebugDayOffset,
   setDebugDayOffset,
 } from "../../utils/appTime";
@@ -115,7 +118,25 @@ export const UI = ({ onSend, onStarClick }) => {
   const [debugOpen, setDebugOpen] = useState(false);
 
   // --- 冷却タイマー ---
+  const [cooldown, setCooldown] = useState(false);
+  const [cooldownProgress, setCooldownProgress] = useState(1);
+  const [cooldownTime, setCooldownTime] = useState("");
   const [debugOffset, setDebugOffset] = useState(getDebugDayOffset());
+
+  // 冷却状態を1秒ごとに更新
+  useEffect(() => {
+    const updateCooldown = () => {
+      const active = isCooldownActive(stars);
+      setCooldown(active);
+      if (active) {
+        setCooldownProgress(getCooldownProgress(stars));
+        setCooldownTime(getCooldownTimeString());
+      }
+    };
+    updateCooldown();
+    const interval = setInterval(updateCooldown, 1000);
+    return () => clearInterval(interval);
+  }, [stars]);
 
   // フルスクリーン状態（PC用）
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -242,37 +263,69 @@ export const UI = ({ onSend, onStarClick }) => {
     <>
       {/* --- ロケットボタン（冷却リング付き）- 右下 --- */}
       <div className="fixed bottom-6 right-6 z-[1000]">
-        <button
-          onClick={() => {
-            setMenuOpen(false);
-            setDiaryOpen(true);
-            setUserMenuOpen(false);
-            setProfileModalOpen(false);
-            setStarOpen(false);
-          }}
-          className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
-        >
-          {/* ロケットアイコン (Rocket Icon) */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+        <div className="relative">
+          {/* 冷却リング（SVG円弧） */}
+          {cooldown && (
+            <svg
+              className="absolute -inset-1.5 w-[52px] h-[52px] -rotate-90"
+              viewBox="0 0 52 52"
+            >
+              {/* 背景リング */}
+              <circle
+                cx="26" cy="26" r="23"
+                fill="none"
+                stroke="rgba(255,255,255,0.08)"
+                strokeWidth="2"
+              />
+              {/* 進捗リング */}
+              <circle
+                cx="26" cy="26" r="23"
+                fill="none"
+                stroke="rgba(147,197,253,0.6)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 23}`}
+                strokeDashoffset={`${2 * Math.PI * 23 * (1 - cooldownProgress)}`}
+                style={{ transition: "stroke-dashoffset 1s linear" }}
+              />
+            </svg>
+          )}
+          <button
+            onClick={() => {
+              if (cooldown) return;
+              setDiaryOpen(true);
+              setUserMenuOpen(false);
+              setProfileModalOpen(false);
+              setStarOpen(false);
+            }}
+            className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:bg-white/20"
+              }`}
+            title={cooldown ? `冷却中: ${cooldownTime}` : "日記を書く"}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.5904 14.3696C15.6948 14.8128 15.75 15.275 15.75 15.75C15.75 19.0637 13.0637 21.75 9.75 21.75V16.9503M15.5904 14.3696C19.3244 11.6411 21.75 7.22874 21.75 2.25C16.7715 2.25021 12.3595 4.67586 9.63122 8.40975M15.5904 14.3696C13.8819 15.6181 11.8994 16.514 9.75 16.9503M9.63122 8.40975C9.18777 8.30528 8.72534 8.25 8.25 8.25C4.93629 8.25 2.25 10.9363 2.25 14.25H7.05072M9.63122 8.40975C8.38285 10.1183 7.48701 12.1007 7.05072 14.25M9.75 16.9503C9.64659 16.9713 9.54279 16.9912 9.43862 17.0101C8.53171 16.291 7.70991 15.4692 6.99079 14.5623C7.00969 14.4578 7.02967 14.3537 7.05072 14.25M4.81191 16.6408C3.71213 17.4612 3 18.7724 3 20.25C3 20.4869 3.0183 20.7195 3.05356 20.9464C3.28054 20.9817 3.51313 21 3.75 21C5.22758 21 6.53883 20.2879 7.35925 19.1881"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16.5 9C16.5 9.82843 15.8284 10.5 15 10.5C14.1716 10.5 13.5 9.82843 13.5 9C13.5 8.17157 14.1716 7.5 15 7.5C15.8284 7.5 16.5 8.17157 16.5 9Z"
-            />
-          </svg>
-        </button>
+            {/* ロケットアイコン (Rocket Icon) */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.5904 14.3696C15.6948 14.8128 15.75 15.275 15.75 15.75C15.75 19.0637 13.0637 21.75 9.75 21.75V16.9503M15.5904 14.3696C19.3244 11.6411 21.75 7.22874 21.75 2.25C16.7715 2.25021 12.3595 4.67586 9.63122 8.40975M15.5904 14.3696C13.8819 15.6181 11.8994 16.514 9.75 16.9503M9.63122 8.40975C9.18777 8.30528 8.72534 8.25 8.25 8.25C4.93629 8.25 2.25 10.9363 2.25 14.25H7.05072M9.63122 8.40975C8.38285 10.1183 7.48701 12.1007 7.05072 14.25M9.75 16.9503C9.64659 16.9713 9.54279 16.9912 9.43862 17.0101C8.53171 16.291 7.70991 15.4692 6.99079 14.5623C7.00969 14.4578 7.02967 14.3537 7.05072 14.25M4.81191 16.6408C3.71213 17.4612 3 18.7724 3 20.25C3 20.4869 3.0183 20.7195 3.05356 20.9464C3.28054 20.9817 3.51313 21 3.75 21C5.22758 21 6.53883 20.2879 7.35925 19.1881"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 9C16.5 9.82843 15.8284 10.5 15 10.5C14.1716 10.5 13.5 9.82843 13.5 9C13.5 8.17157 14.1716 7.5 15 7.5C15.8284 7.5 16.5 8.17157 16.5 9Z"
+              />
+            </svg>
+          </button>
+        </div>
 
         {/* {menuOpen && (
           <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
