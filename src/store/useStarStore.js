@@ -81,4 +81,35 @@ export const useStarStore = create((set) => ({
     // フォーカスを設定する関数（毎回新しい配列参照を生成してuseEffectを確実に発火させる）
     setFocusTarget: (target) => set({ focusTarget: [...target] }),
 
+    // --- Supabase Realtime: 他デバイスからの星追加をリアルタイム同期 ---
+    subscribeToStars: () => {
+        const channel = supabase
+            .channel('stars-realtime')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 't_stars' },
+                (payload) => {
+                    const newRow = payload.new;
+                    // 既にローカルに存在する場合はスキップ（自分が追加した星の重複防止）
+                    const currentStars = useStarStore.getState().stars;
+                    if (currentStars.some((s) => s.id === newRow.id)) return;
+
+                    const starForShow = {
+                        ...newRow,
+                        color: new Color(newRow.color.r, newRow.color.g, newRow.color.b),
+                        mood_values: newRow.analysis_data?.moodValues ?? null,
+                    };
+
+                    set((state) => ({
+                        stars: [...state.stars, starForShow],
+                    }));
+                }
+            )
+            .subscribe();
+
+        // クリーンアップ用にunsubscribe関数を返す
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    },
 }));

@@ -17,7 +17,7 @@ import { useUserStore } from './store/useUserStore';
 
 function App() {
   // Zustand storeから星のデータと追加関数を取得
-  const { stars, addStar, fetchStars, focusTarget } = useStarStore();
+  const { stars, addStar, fetchStars, subscribeToStars, focusTarget } = useStarStore();
   // ユーザー情報ストア
   const { setUser, setSession } = useUserStore();
 
@@ -27,6 +27,9 @@ function App() {
   // 起動時にsupabaseから星のデータを読み込む
   useEffect(() => {
     fetchStars();
+    // 他デバイスからの星追加をリアルタイム同期
+    const unsubscribe = subscribeToStars();
+    return () => unsubscribe();
   }, []);
 
   const [starClickHandler, setStarClickHandler] = useState(() => null);
