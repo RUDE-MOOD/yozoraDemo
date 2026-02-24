@@ -112,4 +112,7 @@ export const useStarStore = create((set) => ({
             supabase.removeChannel(channel);
         };
     },
+
+    // ログアウト時に星をクリアする関数
+    clearStars: () => set({ stars: [], focusTarget: null }),
 }));

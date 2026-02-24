@@ -19,18 +19,23 @@ function App() {
   // Zustand storeから星のデータと追加関数を取得
   const { stars, addStar, fetchStars, subscribeToStars, focusTarget } = useStarStore();
   // ユーザー情報ストア
-  const { setUser, setSession } = useUserStore();
+  const { setUser, setSession, user } = useUserStore();
 
   // Dummy control to ensure Leva panel appears
   useControls({ debugPanel: true });
 
-  // 起動時にsupabaseから星のデータを読み込む
+  // ユーザーがログイン（IDが変わった時）に星データを取得
   useEffect(() => {
-    fetchStars();
-    // 他デバイスからの星追加をリアルタイム同期
+    if (user?.id) {
+      fetchStars();
+    }
+  }, [user?.id, fetchStars]);
+
+  // 他デバイスからの星追加をリアルタイム同期 (マウント時に1度だけ登録)
+  useEffect(() => {
     const unsubscribe = subscribeToStars();
     return () => unsubscribe();
-  }, []);
+  }, [subscribeToStars]);
 
   const [starClickHandler, setStarClickHandler] = useState(() => null);
 

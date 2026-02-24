@@ -9,6 +9,7 @@ import { FutureMessageInputModal } from "./modals/FutureMessageInputModal";
 import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
 import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 import { useStarStore } from "../../store/useStarStore";
+import { useUserStore } from "../../store/useUserStore";
 import {
   getAppNow,
   isCooldownActive,
@@ -521,6 +522,12 @@ export const UI = ({ onSend, onStarClick }) => {
                 <button
                   onClick={async () => {
                     await supabase.auth.signOut();
+
+                    // ストアの状態をクリアする（別のアカウントでログインした時に前のアカウントのデータが見えないようにする）
+                    useUserStore.getState().clearUser();
+                    useStarStore.getState().clearStars();
+                    useFutureMessageStore.getState().clearFutureMessages();
+
                     setUserMenuOpen(false);
                     setShowSettingsSubmenu(false);
                   }}

@@ -198,5 +198,18 @@ export const useFutureMessageStore = create((set, get) => ({
             display_date: "2025/12/31 23:59",
             is_read: false
         }]
-    })
+    }),
+
+    // ログアウト時に全ての状態をクリアする関数
+    clearFutureMessages: () => set({
+        futureMessages: [],
+        isFutureStarVisible: false,
+        isShootingStarVisible: false,
+        futureStarPosition: null,
+        loading: false,
+        isInputModalOpen: false,
+        isDisplayModalOpen: false,
+        currentMessage: null,
+        isShootingStarLeaving: false,
+    }),
 }));
