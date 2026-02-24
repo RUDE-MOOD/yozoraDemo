@@ -3,6 +3,7 @@ import { shaderMaterial } from '@react-three/drei'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import { DistantStars } from '../stars/DistantStars'
+import { DistantNagareboshi } from '../stars/DistantNagareboshi'
 
 // FBM Nebula Shader — faithful port from GLSL Sandbox
 // Uses virtual resolution to replicate gl_FragCoord coordinate space exactly
@@ -133,6 +134,7 @@ export function SkyBoxUpGrade() {
       </mesh>
       {/* 遠景の星 — z=-5でカメラに近い → 星が大きく見える */}
       <DistantStars position={[0, 0, -5]} size={2.5} />
+      <DistantNagareboshi />
     </group>
   )
 }
