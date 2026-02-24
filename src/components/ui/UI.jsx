@@ -893,7 +893,17 @@ export const UI = ({ onSend, onStarClick }) => {
       }
 
       {/* --- ログ一覧モーダル --- */}
-      {logModalOpen && <LogViewsModal onClose={() => setLogModalOpen(false)} />}
+      {logModalOpen && (
+        <LogViewsModal
+          onClose={() => setLogModalOpen(false)}
+          onLogClick={(star) => {
+            if (star?.position) {
+              setFocusTarget(star.position);
+            }
+            setLogModalOpen(false);
+          }}
+        />
+      )}
 
       {/* --- プロフィールモーダル (Profile Modal) --- */}
       <ProfileModal
