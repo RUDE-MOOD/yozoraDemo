@@ -5,8 +5,8 @@ import { getFallbackAnalysis } from "../../../utils/fallbackAnalysis";
 export const LogViewsModal = ({ onClose, onLogClick }) => {
     const { stars } = useStarStore();
 
-    // 現在表示中の年月（初期値は2025年12月）
-    const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 1));
+    // 現在表示中の年月（初期値は現在日時）
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     // 表示用データを作成
     const calendarData = useMemo(() => {
@@ -47,8 +47,11 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     const isCurrentMonth =
         currentDate.getFullYear() === now.getFullYear() &&
         currentDate.getMonth() === now.getMonth();
+    const isMinMonth =
+        currentDate.getFullYear() === 2025 && currentDate.getMonth() === 11;
 
     const handlePrevMonth = () => {
+        if (isMinMonth) return;
         setCurrentDate(
             new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
         );
@@ -260,20 +263,24 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                     <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
                         <button
                             onClick={handlePrevMonth}
+                            disabled={isMinMonth}
                             style={{
                                 background: "transparent",
                                 border: "none",
-                                color: "rgba(255,255,255,0.5)",
-                                cursor: "pointer",
+                                color: isMinMonth ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.5)",
+                                cursor: isMinMonth ? "not-allowed" : "pointer",
                                 padding: "4px 8px",
                                 transition: "color 0.2s",
                                 display: "flex",
                                 alignItems: "center",
                             }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                            onMouseLeave={(e) =>
-                                (e.currentTarget.style.color = "rgba(255,255,255,0.5)")
-                            }
+                            onMouseEnter={(e) => {
+                                if (!isMinMonth) e.currentTarget.style.color = "#fff";
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isMinMonth)
+                                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                            }}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -428,12 +435,13 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                     >
                         <button
                             onClick={handlePrevMonth}
+                            disabled={isMinMonth}
                             style={{
                                 background: "transparent",
                                 border: "none",
-                                color: "#fff",
+                                color: isMinMonth ? "rgba(255,255,255,0.15)" : "#fff",
                                 fontSize: "1.3rem",
-                                cursor: "pointer",
+                                cursor: isMinMonth ? "not-allowed" : "pointer",
                                 padding: "4px 8px",
                             }}
                         >
