@@ -120,9 +120,9 @@ export function ProfileModal({ isOpen, onClose }) {
     setEmailSaving(true);
     setEmailError("");
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: newEmail.trim(),
-        options: { shouldCreateUser: false },
+      // メールアドレス変更の際は updateUser を呼び出すことでOTPが送信されます
+      const { error } = await supabase.auth.updateUser({
+        email: newEmail.trim()
       });
       if (error) throw error;
       setEmailStep(2);
@@ -142,13 +142,11 @@ export function ProfileModal({ isOpen, onClose }) {
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email: newEmail.trim(),
         token: emailOtp.trim(),
-        type: "email",
+        type: "email_change",
       });
       if (verifyError) throw verifyError;
-      const { error: updateError } = await supabase.auth.updateUser({
-        email: newEmail.trim(),
-      });
-      if (updateError) throw updateError;
+
+      // verifyOtp(email_change) が成功すれば自動的に更新されます
       setEmailStep(0);
       setNewEmail("");
       setEmailOtp("");
@@ -292,21 +290,18 @@ export function ProfileModal({ isOpen, onClose }) {
   // --- メインレンダリング ---
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:justify-start md:pl-8"
-      style={{ maxWidth: "40vw", width: "100%" }}
-      //   onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:justify-start md:pl-8 pointer-events-none"
+    //   onClick={onClose} // Currently commented out
     >
-      {/* バックドロップ — StarDetailModalと同じ */}
+      {/* バックドロップ — (現在は使用していないようです。必要なら復活) */}
       {/* <div className="absolute inset-0 bg-black/20 transition-opacity duration-300" /> */}
 
       {/* モーダル本体 — StarDetailModalと同じグラスモーフィズム */}
       <div
-        className="relative z-10 w-full max-w-sm bg-black/30 backdrop-blur-xl border border-white/10 rounded-[32px] shadow-2xl shadow-black/40 max-h-[85vh] overflow-y-auto scrollbar-hidden"
+        className="relative z-10 w-full max-w-sm md:max-w-[400px] bg-black/30 backdrop-blur-xl border border-white/10 rounded-[32px] shadow-2xl shadow-black/40 overflow-y-auto scrollbar-hidden pointer-events-auto"
         style={{
           padding: "10px 30px 30px 30px",
-          margin: "0 30px",
-          maxHeight: "90vh",
-          height: "100%",
+          maxHeight: "85vh",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -360,10 +355,9 @@ export function ProfileModal({ isOpen, onClose }) {
                     <button
                       onClick={handleSaveName}
                       disabled={nameSaving}
-                      className="px-3 py-1.5 bg-white/15 text-white/90 text-xs rounded-full hover:bg-white/25 transition-colors disabled:opacity-50"
-                      style={{ width: "15px" }}
+                      className="px-3 py-1.5 bg-white/15 text-white/90 text-[14px] rounded-full hover:bg-white/25 transition-colors disabled:opacity-50 flex items-center justify-center min-w-[36px]"
                     >
-                      {nameSaving ? "..." : "保存"}
+                      {nameSaving ? "..." : "✓"}
                     </button>
                   </div>
                 ) : (
@@ -475,10 +469,10 @@ export function ProfileModal({ isOpen, onClose }) {
                     </p>
                     <input
                       type="text"
-                      placeholder="確認コード (6桁)"
+                      placeholder="確認コード (8桁)"
                       value={emailOtp}
                       onChange={(e) => setEmailOtp(e.target.value)}
-                      maxLength={6}
+                      maxLength={8}
                       className="w-full px-4 py-2.5 bg-white/8 border border-white/10 rounded-full text-white/90 text-sm focus:outline-none focus:ring-1 focus:ring-white/30 placeholder-white/30"
                       style={{ letterSpacing: "0.3em", textAlign: "center" }}
                     />
