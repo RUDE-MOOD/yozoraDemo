@@ -360,6 +360,7 @@ export function ProfileModal({ isOpen, onClose }) {
                       onClick={handleSaveName}
                       disabled={nameSaving}
                       className="px-3 py-1.5 bg-white/15 text-white/90 text-xs rounded-full hover:bg-white/25 transition-colors disabled:opacity-50"
+                      style={{ width: "15px" }}
                     >
                       {nameSaving ? "..." : "保存"}
                     </button>
@@ -378,7 +379,10 @@ export function ProfileModal({ isOpen, onClose }) {
               </div>
 
               {/* --- 統計 --- */}
-              <div className="flex items-center justify-center gap-0 mb-4">
+              <div
+                className="flex items-center justify-center gap-5 mb-4"
+                style={{ margin: "30px 0 5px 0" }}
+              >
                 <div className="text-center px-6">
                   <div className="text-white/95 text-2xl font-bold tabular-nums">
                     {starCount}
@@ -403,20 +407,29 @@ export function ProfileModal({ isOpen, onClose }) {
               </div>
 
               {/* --- 登録日 --- */}
-              <div className="text-center mb-6">
+              <div
+                className="text-center mb-6"
+                style={{ marginBottom: "20px" }}
+              >
                 <span className="text-white/40 text-xs tracking-[0.15em]">
                   {formatDate(profile?.registration_date)}に登録
                 </span>
               </div>
 
               {/* --- メールアドレス --- */}
-              <div className="mb-5" style={{ padding: "5px 0" }}>
+              <div
+                className="mb-5"
+                style={{ padding: "5px 0", margin: "5px 0" }}
+              >
                 <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2">
                   メールアドレス
                 </p>
                 {emailStep === 0 && (
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 px-4 py-2.5 bg-white/8 rounded-full text-white/80 text-sm truncate border border-white/5">
+                    <div
+                      className="flex-1 px-4 py-2.5 bg-white/8 rounded-full text-white/80 text-sm truncate border border-white/5"
+                      style={{ padding: "5px 10px" }}
+                    >
                       {user?.email || "---"}
                     </div>
                     {editIconButton(() => setEmailStep(1))}
@@ -494,13 +507,19 @@ export function ProfileModal({ isOpen, onClose }) {
               </div>
 
               {/* --- パスワード --- */}
-              <div className="mb-6" style={{ padding: "5px 0" }}>
+              <div
+                className="mb-6"
+                style={{ padding: "5px 0", margin: "5px 0" }}
+              >
                 <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2">
                   パスワード
                 </p>
                 {!isEditingPassword ? (
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 px-4 py-2.5 bg-white/8 rounded-full text-white/80 text-sm tracking-widest border border-white/5">
+                    <div
+                      className="flex-1 px-4 py-2.5 bg-white/8 rounded-full text-white/80 text-sm tracking-widest border border-white/5"
+                      style={{ padding: "5px 10px" }}
+                    >
                       ●●●●●●●●
                     </div>
                     {editIconButton(() => setIsEditingPassword(true))}
@@ -543,7 +562,7 @@ export function ProfileModal({ isOpen, onClose }) {
               </div>
 
               {/* --- タグ --- */}
-              <div style={{ padding: "5px 0" }}>
+              <div style={{ padding: "5px 0", margin: "20px 0" }}>
                 <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center">
                   タグ
                 </p>
@@ -563,6 +582,7 @@ export function ProfileModal({ isOpen, onClose }) {
                           onBlur={() => handleUpdateTag(tag.id)}
                           maxLength={16}
                           className="w-28 px-3 py-1.5 bg-white/15 border border-white/30 rounded-full text-white text-xs text-center focus:outline-none focus:ring-1 focus:ring-white/40"
+                          style={{ padding: "4px 7px" }}
                         />
                       ) : (
                         <div className="flex items-center">
@@ -572,6 +592,7 @@ export function ProfileModal({ isOpen, onClose }) {
                               setEditingTagValue(tag.tag_name);
                             }}
                             className="px-4 py-1.5 bg-white/8 hover:bg-white/15 border border-white/10 rounded-full text-white/80 text-xs transition-colors duration-200 cursor-pointer"
+                            style={{ padding: "8px 15px" }}
                           >
                             #{tag.tag_name}
                           </button>
@@ -622,6 +643,7 @@ export function ProfileModal({ isOpen, onClose }) {
                       setNewTagValue("");
                     }}
                     className="w-8 h-8 flex items-center justify-center rounded-full bg-white/8 hover:bg-white/15 border border-white/10 transition-colors duration-200"
+                    style={{ margin: "10px 0" }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
