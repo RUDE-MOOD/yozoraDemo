@@ -328,7 +328,6 @@ export const UI = ({ onSend, onStarClick }) => {
         </div>
 
         {/* {menuOpen && (
-        {/* {menuOpen && (
           <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
             <button
               onClick={() => {
