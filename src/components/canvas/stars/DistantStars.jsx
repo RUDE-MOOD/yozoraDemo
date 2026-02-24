@@ -51,14 +51,16 @@ const StarsMaterial = shaderMaterial(
         // Size variation
         float r = size * 0.01 * h; 
         
-        // Twinkle
-        float twinkle = sin(time * 2.0 + h * 100.0) * 0.5 + 0.5;
-        r *= 0.5 + 0.5 * twinkle;
+        // Twinkle — pow で圧縮して「普段は暗い → 瞬間的に明るくなる」パルス効果
+        float wave = sin(time * 3.5 + h * 100.0) * 0.5 + 0.5;
+        float twinkle = pow(wave, 4.0); // 4乗で大半の時間は低い値、ピーク時だけ1.0に近づく
+        r *= 0.50 + 0.50 * twinkle;
 
         float d = length(gv);
         float circle = smoothstep(r, r - 0.01, d);
 
-        float alpha = circle * h; 
+        // alpha: 普段は控えめ、フラッシュ時にパッと明るく
+        float alpha = circle * h * (0.5 + 0.5 * twinkle);
 
         if (alpha < 0.02) discard;
 
