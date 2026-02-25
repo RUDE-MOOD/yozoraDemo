@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { Billboard, useTexture } from '@react-three/drei';
 import { useStarStore } from '../../store/useStarStore';
 import { CONSTELLATIONS } from '../../data/constellationData';
 import * as THREE from 'three';
@@ -119,6 +120,45 @@ function ShaderGlowingLine({ start, end, color = "#e0e0ff" }) {
     );
 }
 
+// --- 背景テクスチャ用コンポーネント ---
+function ConstellationBackground({ url, position, size, visibleDistance = 150 }) {
+    const texture = useTexture(url);
+    const materialRef = useRef();
+
+    useFrame(({ camera }) => {
+        if (!materialRef.current) return;
+        const dist = camera.position.distanceTo(new THREE.Vector3(...position));
+
+        let opacity = 0.0;
+        if (dist < 80.0) {
+            opacity = 0.3; // 最大透明度
+        } else if (dist < visibleDistance) {
+            opacity = 0.3 * (1.0 - ((dist - 80.0) / (visibleDistance - 80.0)));
+        }
+
+        // Z退避時
+        if (camera.position.z > 80) opacity = 0;
+
+        materialRef.current.opacity = opacity;
+    });
+
+    return (
+        <Billboard position={position} lockX={false} lockY={false} lockZ={false}>
+            <mesh>
+                <planeGeometry args={[size, size]} />
+                <meshBasicMaterial
+                    ref={materialRef}
+                    map={texture}
+                    transparent={true}
+                    opacity={0}
+                    blending={THREE.AdditiveBlending}
+                    depthWrite={false}
+                />
+            </mesh>
+        </Billboard>
+    );
+}
+
 export function ConstellationLines() {
     const stars = useStarStore((state) => state.stars);
 
@@ -144,8 +184,57 @@ export function ConstellationLines() {
                 const cNodes = activeNodes[c.id];
                 if (!cNodes) return null;
 
+                // テスト用テクスチャ表示ロジック
+                // 星座のバウンディングボックスの中心を計算します
+                let centerX = 0, centerY = 0, centerZ = 0;
+                let activeCount = Object.keys(cNodes).length;
+                let bgRender = null;
+
+                const supportedBackgrounds = [
+                    "monoceros", "andromeda", "sagittarius", "delphinus",
+                    "indus", "pisces", "lepus", "bootes", "hydra", "eridanus"
+                ];
+
+                // 画像ごとの位置合わせ用オフセットとサイズ
+                const backgroundConfig = {
+                    "monoceros": { offsetX: 2, offsetY: 5, scale: 1 },
+                    "andromeda": { offsetX: -7, offsetY: -4, scale: 1.4 },
+                    "sagittarius": { offsetX: 0, offsetY: 5, scale: 1.4 },
+                    "delphinus": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "indus": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "pisces": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "lepus": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "bootes": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "eridanus": { offsetX: 0, offsetY: 0, scale: 1.2 }
+                };
+
+                if (supportedBackgrounds.includes(c.id) && activeCount > 0) {
+                    for (let key in cNodes) {
+                        centerX += cNodes[key][0];
+                        centerY += cNodes[key][1];
+                        centerZ += cNodes[key][2];
+                    }
+                    centerX /= activeCount;
+                    centerY /= activeCount;
+                    centerZ /= activeCount;
+
+                    const config = backgroundConfig[c.id] || { offsetX: 0, offsetY: 0, scale: 1.0 };
+                    const finalSize = 70 * config.scale;
+
+                    // 星のZ軸より少し奥に配置
+                    bgRender = (
+                        <ConstellationBackground
+                            url={`/test_${c.id}.png`}
+                            position={[centerX + config.offsetX, centerY + config.offsetY, centerZ - 2]}
+                            size={finalSize} // boxWidth=60に対し少し大きめに設定
+                        />
+                    );
+                }
+
                 return (
                     <group key={`constellation-group-${c.id}`}>
+                        {bgRender}
                         {c.lines.map((lineDef, idx) => {
                             const [indexA, indexB] = lineDef;
                             const posA = cNodes[indexA];
