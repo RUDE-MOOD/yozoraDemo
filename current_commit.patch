@@ -1,0 +1,28 @@
+commit 5b359df5d3a26fcccc856e72f796ba76f543fabb
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Wed Feb 25 15:31:34 2026 +0900
+
+    change:?????????8?????????????????????????????????????????
+
+diff --git a/src/components/canvas/ConstellationLines.jsx b/src/components/canvas/ConstellationLines.jsx
+index 23394d1..4ee7c18 100644
+--- a/src/components/canvas/ConstellationLines.jsx
++++ b/src/components/canvas/ConstellationLines.jsx
+@@ -208,7 +208,7 @@ export function ConstellationLines() {
+                     "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 }
+                 };
+ 
+-                if (supportedBackgrounds.includes(c.id) && activeCount > 0) {
++                if (supportedBackgrounds.includes(c.id) && activeCount >= c.starCount) {
+                     for (let key in cNodes) {
+                         centerX += cNodes[key][0];
+                         centerY += cNodes[key][1];
+@@ -234,7 +234,7 @@ export function ConstellationLines() {
+                 return (
+                     <group key={`constellation-group-${c.id}`}>
+                         {bgRender}
+-                        {c.lines.map((lineDef, idx) => {
++                        {activeCount >= c.starCount * 0.8 && c.lines.map((lineDef, idx) => {
+                             const [indexA, indexB] = lineDef;
+                             const posA = cNodes[indexA];
+                             const posB = cNodes[indexB];

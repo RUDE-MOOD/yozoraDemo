@@ -4,6 +4,9 @@ import { supabase } from '../supabaseClient';
 import { Color } from 'three';
 
 export const useStarStore = create((set, get) => ({
+    // ユーザーの星データ配列
+    stars: [],
+
     // カメラがフォーカスすべきターゲット位置 (null または [x, y, z])
     focusTarget: null,
 

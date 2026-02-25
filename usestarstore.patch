@@ -1,0 +1,200 @@
+﻿commit 4eb4f8a0a337f895f10738c5f4857ad6f084c951
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Wed Feb 25 12:31:49 2026 +0900
+
+    add:鏄熷骇銈掍節銇よ拷鍔犮€侀枊鐧鸿€呫儮銉笺儔銇ф槦搴с伄涓€鏅傝〃绀恒亴銇с亶銈嬨倛銇嗐伀銆佹槦搴son褰㈠紡銇儑銉笺偪銇痙ata銉曘偐銉儉銉煎唴銇甦raftConstellationData銇т繚瀛樸仚銈?
+diff --git a/src/store/useStarStore.js b/src/store/useStarStore.js
+index dd2a2f8..29f9f20 100644
+--- a/src/store/useStarStore.js
++++ b/src/store/useStarStore.js
+@@ -115,6 +115,69 @@ export const useStarStore = create((set, get) => ({
+         };
+     },
+ 
++    // 銉囥儛銉冦偘鐢? 1鍒嗛枔銇犮亼鏄熷骇銈掕〃绀恒仚銈?+    debug_showConstellation: async (constellationId) => {
++        const { CONSTELLATIONS } = await import('../data/constellationData.js');
++        const target = CONSTELLATIONS.find(c => c.id === constellationId);
++        if (!target) return;
++
++        const hashCode = (s) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
++        const boxWidth = 60;
++        const boxHeight = 60;
++        const minX = -320 + boxWidth / 2 + 10;
++        const maxX = 320 - boxWidth / 2 - 10;
++        const minY = -160 + boxHeight / 2 + 10;
++        const maxY = 160 - boxHeight / 2 - 10;
++
++        const hash = Math.abs(hashCode(target.id));
++        const prngX = (hash % 100) / 100;
++        const prngY = ((hash * 13) % 100) / 100;
++        const prngZ = ((hash * 17) % 100) / 100;
++
++        const centerX = minX + prngX * (maxX - minX);
++        const centerY = minY + prngY * (maxY - minY);
++        const baseZ = -10 + prngZ * 15;
++
++        const mockStars = [];
++        for (let i = 0; i < target.starCount; i++) {
++            const nodeNormalized = target.starPositions[i];
++            const localX = (nodeNormalized.x - 0.5) * boxWidth;
++            const localY = (0.5 - nodeNormalized.y) * boxHeight;
++            const position = [
++                centerX + localX,
++                centerY + localY,
++                baseZ
++            ];
++
++            mockStars.push({
++                id: `debug-${target.id}-${i}-${Date.now()}`,
++                position: position,
++                color: new Color(1, 1, 1),
++                scale: 1,
++                random: Math.random(),
++                created_at: new Date().toISOString(),
++                display_date: new Date().toISOString(),
++                analysis_data: {
++                    constellation: {
++                        id: target.id,
++                        nodeIndex: i
++                    }
++                }
++            });
++        }
++
++        set((state) => ({
++            stars: [...state.stars, ...mockStars],
++            focusTarget: [centerX, centerY, baseZ]
++        }));
++
++        setTimeout(() => {
++            set((state) => ({
++                stars: state.stars.filter(s => !s.id.startsWith(`debug-${target.id}`))
++            }));
++        }, 60000);
++    },
++
+     // 銉偘銈偊銉堟檪銇槦銈掋偗銉偄銇欍倠闁㈡暟
+     clearStars: () => set({ stars: [], focusTarget: null }),
+ }));
+\ No newline at end of file
+
+commit 77adebe72b65756805a0582947109c99899539eb
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Wed Feb 25 11:02:34 2026 +0900
+
+    feat:銉炪偆銈汇偆銈讹紙鏄熷骇銇暟銈掑銈勩仚銇伅銇俱仩锛?
+diff --git a/src/store/useStarStore.js b/src/store/useStarStore.js
+index 69dd6e8..dd2a2f8 100644
+--- a/src/store/useStarStore.js
++++ b/src/store/useStarStore.js
+@@ -3,7 +3,7 @@ import { starDataMaker } from '../utils/starDataMaker';
+ import { supabase } from '../supabaseClient';
+ import { Color } from 'three';
+ 
+-export const useStarStore = create((set) => ({
++export const useStarStore = create((set, get) => ({
+     // 銈儭銉┿亴銉曘偐銉笺偒銈广仚銇广亶銈裤兗銈层儍銉堜綅缃?(null 銇俱仧銇?[x, y, z])
+     focusTarget: null,
+ 
+@@ -37,15 +37,17 @@ export const useStarStore = create((set) => ({
+     // analysisResult = null 銇€併偍銉┿兗鍥為伩銇欍倠銇熴倎銇垵鏈熷€?     // goodThings = { goodThing1, goodThing2, goodThing3 } 锛?銇ゃ伄銇勩亜銇撱仺锛?     addStar: async (moodValues, analysisResult = null, goodThings = null) => {
+-        const newStar = starDataMaker({ moodValues });
++        const currentStars = get().stars;
++        const newStar = starDataMaker({ moodValues, existingStars: currentStars });
+ 
+-        // analysis_data: moodValues + Gemini绲愭灉 + goodThings锛坱_stars銇玬ood_values銈儵銉犮亴銇亜銇熴倎銇撱亾銇牸绱嶏級
++        // analysis_data: moodValues + Gemini绲愭灉 + goodThings + constellation
+         const analysisData = {
+             moodValues,
+             ...(analysisResult || {}),
+             ...(goodThings && (goodThings.goodThing1 || goodThings.goodThing2 || goodThings.goodThing3)
+                 ? { goodThings }
+                 : {}),
++            ...(newStar.constellation ? { constellation: newStar.constellation } : {})
+         };
+ 
+         // t_stars銇疅闅涖伄銈儵銉犮伄銇挎尶鍏ワ紙id, position, color, scale, random, created_at, display_date, analysis_data锛?
+commit 1cf25cc384fe28610fe1198554a9bd16f181fa1d
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Tue Feb 24 19:36:47 2026 +0900
+
+    change:鑳屾櫙銇仩銇勬槦銈儖銉°偡銉с兗銉炽€併儹銈般偆銉崇敾闈㈣儗鏅洺銉戙偣 fix:銉偘銈偊銉堛仐銇﹀垾銇偄銈偊銉炽儓銈掔櫥閷层仚銈?
+diff --git a/src/store/useStarStore.js b/src/store/useStarStore.js
+index 4285e67..69dd6e8 100644
+--- a/src/store/useStarStore.js
++++ b/src/store/useStarStore.js
+@@ -112,4 +112,7 @@ export const useStarStore = create((set) => ({
+             supabase.removeChannel(channel);
+         };
+     },
++
++    // 銉偘銈偊銉堟檪銇槦銈掋偗銉偄銇欍倠闁㈡暟
++    clearStars: () => set({ stars: [], focusTarget: null }),
+ }));
+\ No newline at end of file
+
+commit 8356ec40b60c2c4e4313600527d22d1ec134118a
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Tue Feb 24 15:04:57 2026 +0900
+
+    fix:瑜囨暟銇鏈倰鍚屾檪銇埄鐢ㄣ仐銇︺倠鏅傘伀銆佹槦銇敾闈笂銇嚜鍕曠殑銇悓鏈熴仹銇嶃仾銇?
+diff --git a/src/store/useStarStore.js b/src/store/useStarStore.js
+index 4085fcc..4285e67 100644
+--- a/src/store/useStarStore.js
++++ b/src/store/useStarStore.js
+@@ -81,4 +81,35 @@ export const useStarStore = create((set) => ({
+     // 銉曘偐銉笺偒銈广倰瑷畾銇欍倠闁㈡暟锛堟瘞鍥炴柊銇椼亜閰嶅垪鍙傜収銈掔敓鎴愩仐銇seEffect銈掔⒑瀹熴伀鐧虹伀銇曘仜銈嬶級
+     setFocusTarget: (target) => set({ focusTarget: [...target] }),
+ 
++    // --- Supabase Realtime: 浠栥儑銉愩偆銈广亱銈夈伄鏄熻拷鍔犮倰銉偄銉偪銈ゃ儬鍚屾湡 ---
++    subscribeToStars: () => {
++        const channel = supabase
++            .channel('stars-realtime')
++            .on(
++                'postgres_changes',
++                { event: 'INSERT', schema: 'public', table: 't_stars' },
++                (payload) => {
++                    const newRow = payload.new;
++                    // 鏃伀銉兗銈儷銇瓨鍦ㄣ仚銈嬪牬鍚堛伅銈广偔銉冦儣锛堣嚜鍒嗐亴杩藉姞銇椼仧鏄熴伄閲嶈闃叉锛?+                    const currentStars = useStarStore.getState().stars;
++                    if (currentStars.some((s) => s.id === newRow.id)) return;
++
++                    const starForShow = {
++                        ...newRow,
++                        color: new Color(newRow.color.r, newRow.color.g, newRow.color.b),
++                        mood_values: newRow.analysis_data?.moodValues ?? null,
++                    };
++
++                    set((state) => ({
++                        stars: [...state.stars, starForShow],
++                    }));
++                }
++            )
++            .subscribe();
++
++        // 銈儶銉笺兂銈儍銉楃敤銇玼nsubscribe闁㈡暟銈掕繑銇?+        return () => {
++            supabase.removeChannel(channel);
++        };
++    },
+ }));
+\ No newline at end of file
+
+commit 08f19331d306008c24c315c8dd010aacdad114ad
+Author: RUDE-MOOD <chokaho.halstudent@gmail.com>
+Date:   Wed Feb 11 12:33:51 2026 +0900
+
+    fix:娴併倢鏄熴伄閫€鍫存檪銇€熷害銇岄€熴仚銇庡晱椤屻€併偤銉笺儬璺濋洟銇ㄣ儑銉曘偐銉儓閫熷害銈掕鏁淬仚銈嬨亾銇ㄣ仹淇 fix:銉囥儛銉冦偘銉兗銉夈仹future鏄熴伄姝ｇ⒑銇骇妯欍伀銉曘偐銉笺偒銈广仹銇嶃倠銈堛亞銇?
+diff --git a/src/store/useStarStore.js b/src/store/useStarStore.js
+index 0dd65a8..4085fcc 100644
+--- a/src/store/useStarStore.js
++++ b/src/store/useStarStore.js
+@@ -78,7 +78,7 @@ export const useStarStore = create((set) => ({
+     // 銉曘偐銉笺偒銈广倰銉偦銉冦儓銇欍倠闁㈡暟 (蹇呰銇繙銇樸仸)
+     resetFocus: () => set({ focusTarget: null }),
+ 
+-    // 銉曘偐銉笺偒銈广倰瑷畾銇欍倠闁㈡暟
+-    setFocusTarget: (target) => set({ focusTarget: target }),
++    // 銉曘偐銉笺偒銈广倰瑷畾銇欍倠闁㈡暟锛堟瘞鍥炴柊銇椼亜閰嶅垪鍙傜収銈掔敓鎴愩仐銇seEffect銈掔⒑瀹熴伀鐧虹伀銇曘仜銈嬶級
++    setFocusTarget: (target) => set({ focusTarget: [...target] }),
+ 
+ }));
+\ No newline at end of file

@@ -229,6 +229,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
+
         {/* ===== デスクトップ用ヘッダー（横一列） ===== */}
         <div
           className="log-header-desktop"
