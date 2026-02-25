@@ -322,10 +322,7 @@ export function ConstellationModal({ isOpen, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 md:justify-start md:pl-8"
-      style={{
-        maxWidth: "30vw",
-        width: "100%",
-      }}
+      onClick={handleClose}
     >
       {/* バックドロップ */}
       <div className="absolute inset-0 transition-opacity duration-300" />
