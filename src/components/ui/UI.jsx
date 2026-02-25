@@ -507,7 +507,10 @@ export const UI = ({ onSend, onStarClick }) => {
             ) : (
               /* --- Settings Submenu --- */
               <div className="py-2">
-                <div className="flex items-center px-4 py-2 mb-2 border-b border-white/10">
+                <div
+                  className="flex items-center px-4 py-2 mb-2 border-b border-white/10"
+                  style={{ padding: "3px" }}
+                >
                   <button
                     onClick={() => setShowSettingsSubmenu(false)}
                     className="mr-2 text-white/50 hover:text-white transition-colors"
@@ -527,7 +530,10 @@ export const UI = ({ onSend, onStarClick }) => {
                       />
                     </svg>
                   </button>
-                  <span className="text-white font-sans text-sm underline underline-offset-4 decoration-white/30">
+                  <span
+                    className="text-white font-sans"
+                    style={{ fontSize: "12px" }}
+                  >
                     アカウント設定
                   </span>
                 </div>
@@ -545,7 +551,8 @@ export const UI = ({ onSend, onStarClick }) => {
                     setUserMenuOpen(false);
                     setShowSettingsSubmenu(false);
                   }}
-                  className="w-full text-left px-6 py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5 mt-2"
+                  className="w-full text-left px-6 py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
+                  style={{ padding: "0 15px", fontSize: "12px" }}
                 >
                   ログアウト
                 </button>
