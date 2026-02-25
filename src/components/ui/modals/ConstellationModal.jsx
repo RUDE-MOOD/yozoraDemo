@@ -16,11 +16,13 @@
 
 import { useState } from "react";
 import { CONSTELLATIONS } from "../../../data/constellationData";
+import { useStarStore } from "../../../store/useStarStore";
 
 // --- 星座図を描画するSVGコンポーネント ---
 function ConstellationDiagram({ constellation, size = 160, showLines = true, className = "" }) {
     const padding = 16;
     const innerSize = size - padding * 2;
+    const filledIndices = constellation.filledIndices || [];
 
     return (
         <svg
@@ -49,7 +51,7 @@ function ConstellationDiagram({ constellation, size = 160, showLines = true, cla
 
             {/* 星（ドット） */}
             {constellation.starPositions.map((pos, i) => {
-                const isFilled = i < constellation.filledStars;
+                const isFilled = filledIndices.includes(i);
                 return (
                     <g key={`star-${i}`}>
                         {/* グロー */}
@@ -117,7 +119,7 @@ function ConstellationCard({ constellation, onClick }) {
 }
 
 // --- 星座詳細ビュー ---
-function ConstellationDetail({ constellation, onBack }) {
+function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
     const isCompleted = !!constellation.completedDate;
 
     return (
@@ -216,10 +218,7 @@ function ConstellationDetail({ constellation, onBack }) {
                 {isCompleted && (
                     <div className="flex justify-center mt-4 mb-8">
                         <button
-                            onClick={() => {
-                                // TODO: カメラを星座の位置に移動
-                                console.log("Navigate to constellation:", constellation.id);
-                            }}
+                            onClick={onViewConstellation}
                             className="px-6 py-3 bg-transparent border-2 border-white/50 text-white/90 rounded-2xl text-sm tracking-widest hover:bg-white/10 transition-all duration-300"
                         >
                             星座を見る
@@ -236,16 +235,68 @@ export function ConstellationModal({ isOpen, onClose }) {
     // 選択中の星座（null = リスト表示）
     const [selectedId, setSelectedId] = useState(null);
 
+    const { stars, setFocusTarget } = useStarStore();
+
     if (!isOpen) return null;
 
+    // 現在の星データに基づいて星座情報を拡張
+    const enrichedConstellations = CONSTELLATIONS.map(c => {
+        const filledIndices = [];
+        let completedDate = null;
+
+        stars.forEach(s => {
+            if (s.analysis_data?.constellation?.id === c.id) {
+                filledIndices.push(s.analysis_data.constellation.nodeIndex);
+            }
+        });
+
+        const isCompleted = filledIndices.length >= c.starCount;
+        if (isCompleted) {
+            const dates = stars
+                .filter(s => s.analysis_data?.constellation?.id === c.id)
+                .map(s => new Date(s.created_at).getTime());
+
+            if (dates.length > 0) {
+                const maxDate = new Date(Math.max(...dates));
+                completedDate = `${maxDate.getFullYear()}/${String(maxDate.getMonth() + 1).padStart(2, '0')}/${String(maxDate.getDate()).padStart(2, '0')}`;
+            }
+        }
+
+        return {
+            ...c,
+            filledStars: filledIndices.length,
+            filledIndices,
+            completedDate
+        };
+    });
+
     const selectedConstellation = selectedId
-        ? CONSTELLATIONS.find((c) => c.id === selectedId)
+        ? enrichedConstellations.find((c) => c.id === selectedId)
         : null;
 
     // モーダルを閉じる（状態もリセット）
     const handleClose = () => {
         setSelectedId(null);
         onClose();
+    };
+
+    const handleViewConstellation = (c) => {
+        const cStars = stars.filter(s => s.analysis_data?.constellation?.id === c.id);
+        if (cStars.length > 0) {
+            let sumX = 0, sumY = 0, sumZ = 0;
+            cStars.forEach(s => {
+                sumX += s.position[0];
+                sumY += s.position[1];
+                sumZ += s.position[2];
+            });
+            const center = [
+                sumX / cStars.length,
+                sumY / cStars.length,
+                sumZ / cStars.length
+            ];
+            setFocusTarget(center);
+            handleClose();
+        }
     };
 
     return (
@@ -294,7 +345,7 @@ export function ConstellationModal({ isOpen, onClose }) {
 
                             {/* 星座リスト */}
                             <div className="flex-1 overflow-y-auto scrollbar-hidden space-y-3">
-                                {CONSTELLATIONS.map((c) => (
+                                {enrichedConstellations.map((c) => (
                                     <ConstellationCard
                                         key={c.id}
                                         constellation={c}
@@ -308,6 +359,7 @@ export function ConstellationModal({ isOpen, onClose }) {
                         <ConstellationDetail
                             constellation={selectedConstellation}
                             onBack={() => setSelectedId(null)}
+                            onViewConstellation={() => handleViewConstellation(selectedConstellation)}
                         />
                     )}
                 </div>
@@ -352,7 +404,7 @@ export function ConstellationModal({ isOpen, onClose }) {
 
                     {/* 星座リスト */}
                     <div className="space-y-3">
-                        {CONSTELLATIONS.map((c) => (
+                        {enrichedConstellations.map((c) => (
                             <ConstellationCard
                                 key={c.id}
                                 constellation={c}
@@ -371,6 +423,7 @@ export function ConstellationModal({ isOpen, onClose }) {
                         <ConstellationDetail
                             constellation={selectedConstellation}
                             onBack={() => setSelectedId(null)}
+                            onViewConstellation={() => handleViewConstellation(selectedConstellation)}
                         />
                     </div>
                 )}

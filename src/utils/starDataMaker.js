@@ -1,6 +1,19 @@
 import * as THREE from "three";
 import { getAppNow } from "./appTime";
 
+import { CONSTELLATIONS } from "../data/constellationData";
+
+// 文字列から簡単なハッシュ値を生成（星座の配置を固定するため）
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+}
+
 /**
  * ムードデータから星を生成する
  * @param {Object} params - パラメータ
@@ -10,9 +23,10 @@ import { getAppNow } from "./appTime";
  *   - social: 社会的適応（孤独・物足りない ↔ 充足感・満タン）
  *   - physical: 生体的メカニズム（ずっしり重たい ↔ すっきり軽やか）
  *   - fulfillment: 刺激の受容（退屈・マンネリ ↔ 新鮮・充実していた）
+ * @param {Array} params.existingStars - 現在画面に存在する星の配列
  * @returns {Object} starData - 星のデータ
  */
-export const starDataMaker = ({ moodValues }) => {
+export const starDataMaker = ({ moodValues, existingStars = [] }) => {
 
     const now = getAppNow();
     // 日付のフォーマット: YY/MM/DD HH:mm (例: 26/1/26 16:25)
@@ -23,20 +37,123 @@ export const starDataMaker = ({ moodValues }) => {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const dateStr = `${year}/${month}/${day} ${hours}:${minutes}`;
 
-    // ランダムな位置設定
-    // カメラの移動可能範囲内(-300~300, -150~150)に収まるように制限する
-    const x = (Math.random() - 0.5) * 600;
-    const y = (Math.random() - 0.5) * 300;
-    const z = -10 + (Math.random() - 0.5) * 15;
+    // --- 星座判定ロジック ---
+    const isConstellationCandidate = (
+        moodValues.emotional >= 50 &&
+        moodValues.motivation >= 50 &&
+        moodValues.social >= 50 &&
+        moodValues.physical >= 50 &&
+        moodValues.fulfillment >= 50
+    );
+
+    let targetConstellation = null;
+    let targetNodeIndex = -1;
+
+    if (isConstellationCandidate) {
+        for (const c of CONSTELLATIONS) {
+            // この星座に既に割り当てられているノードを特定
+            const takenNodes = new Set();
+            existingStars.forEach(s => {
+                if (s.analysis_data?.constellation?.id === c.id) {
+                    takenNodes.add(s.analysis_data.constellation.nodeIndex);
+                }
+            });
+
+            // まだ空きがある場合
+            if (takenNodes.size < c.starCount) {
+                targetConstellation = c;
+                for (let i = 0; i < c.starCount; i++) {
+                    if (!takenNodes.has(i)) {
+                        targetNodeIndex = i;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    let position = [0, 0, 0];
+    let assignedConstellation = null;
+
+    if (targetConstellation) {
+        // 星座のノードとして座標を計算
+        // 星座全体が収まるボックスサイズ
+        const boxWidth = 60;
+        const boxHeight = 60;
+
+        // 全体の移動可能範囲（ユーザー指定）
+        // x= -320 ~ 320,  y = -160 ~ 160
+        // はみ出さないように中心点の範囲を制限
+        const minX = -320 + boxWidth / 2 + 10;
+        const maxX = 320 - boxWidth / 2 - 10;
+        const minY = -160 + boxHeight / 2 + 10;
+        const maxY = 160 - boxHeight / 2 - 10;
+
+        const hash = hashCode(targetConstellation.id);
+        const prngX = (hash % 100) / 100; // 0.0 ~ 0.99
+        const prngY = ((hash * 13) % 100) / 100;
+        const prngZ = ((hash * 17) % 100) / 100;
+
+        const centerX = minX + prngX * (maxX - minX);
+        const centerY = minY + prngY * (maxY - minY);
+        const baseZ = -10 + prngZ * 15; // -10 ~ 5 の間
+
+        const nodeNormalized = targetConstellation.starPositions[targetNodeIndex];
+
+        // 0~1の正規化座標から相対座標へ (-0.5は中心揃えのため)
+        const localX = (nodeNormalized.x - 0.5) * boxWidth;
+        // SVGのy=0は上端だが、3Dのy=0は中心、y>0は上。なので反転させる
+        const localY = (0.5 - nodeNormalized.y) * boxHeight;
+
+        position = [
+            centerX + localX,
+            centerY + localY,
+            baseZ + (Math.random() - 0.5) * 2 // Zにわずかな揺らぎ
+        ];
+
+        assignedConstellation = {
+            id: targetConstellation.id,
+            nodeIndex: targetNodeIndex
+        };
+    } else {
+        // 降格、または候補外の場合はランダム生成（衝突判定付き）
+        // 星座の星の座標リストを取得
+        const constellationPositions = existingStars
+            .filter(s => s.analysis_data?.constellation)
+            .map(s => s.position);
+
+        let validPosition = false;
+        let attempts = 0;
+        let x, y, z;
+
+        while (!validPosition && attempts < 50) {
+            x = (Math.random() - 0.5) * 640; // -320 ~ 320
+            y = (Math.random() - 0.5) * 320; // -160 ~ 160
+            z = -10 + (Math.random() - 0.5) * 15; // -10 ~ 5
+
+            validPosition = true;
+            for (const pos of constellationPositions) {
+                const dx = pos[0] - x;
+                const dy = pos[1] - y;
+                const dz = pos[2] - z;
+                // 他の星座星とXY平面（または3D空間）で被らないようにする
+                // 半径5程度（距離の2乗: 25）
+                if ((dx * dx + dy * dy + dz * dz) < 25) {
+                    validPosition = false;
+                    break;
+                }
+            }
+            attempts++;
+        }
+        position = [x, y, z];
+    }
 
     // ムードに基づいた色生成
-    // comfort: 心地よさ (0=つらい/寒色系, 100=心地よい/暖色系)
-    // intensity: 感情の強さ (0=無感情/彩度低, 100=抑えきれない/彩度高)
-    // connection: つながり (0=孤独/明度低, 100=つながり/明度高)
     const color = generateMoodColor(moodValues);
 
     // 充実感と体の状態に応じてスケールを調整
-    const baseScale = 2.0;
+    const baseScale = assignedConstellation ? 2.5 : 2.0; // 星座の星は少しベースを大きく
     const fulfillmentBonus = (moodValues.fulfillment / 100) * 2.0;
     const physicalBonus = (moodValues.physical / 100) * 1.5;
     const scale = baseScale + fulfillmentBonus + physicalBonus + Math.random() * 0.5;
@@ -54,7 +171,7 @@ export const starDataMaker = ({ moodValues }) => {
 
     const starData = {
         id: generateUUID(),
-        position: [x, y, z],
+        position: position,
         color: color,
         scale: scale,
         random: Math.random(),
@@ -62,6 +179,11 @@ export const starDataMaker = ({ moodValues }) => {
         display_date: dateStr,
         mood_values: moodValues  // スライダー値を保存
     };
+
+    if (assignedConstellation) {
+        starData.constellation = assignedConstellation;
+    }
+
     return starData;
 };
 

@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Experience } from "./components/canvas/Experience";
 import { Effects } from "./components/canvas/effects/Effects";
 import { UI } from "./components/ui/UI";
@@ -79,10 +79,9 @@ function App() {
   }, [setSession, setUser]);
 
   // 星クリックハンドラーをセットする関数
-  const handleSetStarClickHandler = (handler) => {
-    console.log('handleSetStarClickHandler called with:', handler);
+  const handleSetStarClickHandler = useCallback((handler) => {
     setStarClickHandler(() => handler);
-  };
+  }, []);
 
   return (
     <>

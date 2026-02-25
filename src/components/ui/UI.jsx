@@ -191,11 +191,10 @@ export const UI = ({ onSend, onStarClick }) => {
   // 親コンポーネントにコールバックを渡す
   useEffect(() => {
     if (onStarClick) {
-      console.log("Setting star click handler");
+      // NOTE: Remove console.log to avoid spam or keep it lightweight
       onStarClick(showStarDetails);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onStarClick]); // onStarClickを依存配列に追加
+  }, [onStarClick]); // onStarClick自体がApp.jsxで常に再生成されないように依存管理する
 
   // handleSend
   const handleSend = async () => {

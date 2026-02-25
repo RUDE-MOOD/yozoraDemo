@@ -12,6 +12,7 @@ import { useThemeStore } from "../../store/useThemeStore";
 import { FutureStar } from "./stars/FutureStar";
 import { ShootingStar } from "./stars/ShootingStar";
 import { useFutureMessageStore } from "../../store/useFutureMessageStore";
+import { ConstellationLines } from "./ConstellationLines";
 
 const FutureStarWrapper = () => {
   const {
@@ -115,6 +116,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
         )}
         {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <FutureStarWrapper />
+        <ConstellationLines />
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
         <ambientLight intensity={1} />
         <fog attach="fog" args={["#101020", 10, 150]} />

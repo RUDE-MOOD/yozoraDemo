@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "../../../supabaseClient";
 import { useUserStore } from "../../../store/useUserStore";
 import { useStarStore } from "../../../store/useStarStore";
+import { CONSTELLATIONS } from "../../../data/constellationData";
 
 /**
  * プロフィールモーダル
@@ -264,6 +265,28 @@ export function ProfileModal({ isOpen, onClose }) {
 
   const starCount = stars ? stars.length : 0;
 
+  // --- 完成した星座の計算 ---
+  const completedConstellationsCount = (() => {
+    if (!stars || stars.length === 0) return 0;
+
+    // 各星座のIDごとに、その星座に属する星の数を集計
+    const counts = {};
+    stars.forEach(s => {
+      const cid = s.analysis_data?.constellation?.id;
+      if (cid) {
+        counts[cid] = (counts[cid] || 0) + 1;
+      }
+    });
+
+    let completed = 0;
+    CONSTELLATIONS.forEach(c => {
+      if (counts[c.id] && counts[c.id] >= c.starCount) {
+        completed++;
+      }
+    });
+    return completed;
+  })();
+
   // --- 編集アイコンボタン ---
   const editIconButton = (onClick) => (
     <button
@@ -391,7 +414,7 @@ export function ProfileModal({ isOpen, onClose }) {
                 <div className="w-px h-12 bg-white/20" />
                 <div className="text-center px-6">
                   <div className="text-white/95 text-2xl font-bold tabular-nums">
-                    0
+                    {completedConstellationsCount}
                   </div>
                   <div className="text-white/50 text-xs mt-1 leading-tight tracking-wide">
                     完成し

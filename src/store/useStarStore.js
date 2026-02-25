@@ -3,7 +3,7 @@ import { starDataMaker } from '../utils/starDataMaker';
 import { supabase } from '../supabaseClient';
 import { Color } from 'three';
 
-export const useStarStore = create((set) => ({
+export const useStarStore = create((set, get) => ({
     // カメラがフォーカスすべきターゲット位置 (null または [x, y, z])
     focusTarget: null,
 
@@ -37,15 +37,17 @@ export const useStarStore = create((set) => ({
     // analysisResult = null は、エラー回避するための初期値
     // goodThings = { goodThing1, goodThing2, goodThing3 } （3つのいいこと）
     addStar: async (moodValues, analysisResult = null, goodThings = null) => {
-        const newStar = starDataMaker({ moodValues });
+        const currentStars = get().stars;
+        const newStar = starDataMaker({ moodValues, existingStars: currentStars });
 
-        // analysis_data: moodValues + Gemini結果 + goodThings（t_starsにmood_valuesカラムがないためここに格納）
+        // analysis_data: moodValues + Gemini結果 + goodThings + constellation
         const analysisData = {
             moodValues,
             ...(analysisResult || {}),
             ...(goodThings && (goodThings.goodThing1 || goodThings.goodThing2 || goodThings.goodThing3)
                 ? { goodThings }
                 : {}),
+            ...(newStar.constellation ? { constellation: newStar.constellation } : {})
         };
 
         // t_starsの実際のカラムのみ挿入（id, position, color, scale, random, created_at, display_date, analysis_data）
