@@ -420,8 +420,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
         {userMenuOpen && (
           <div
-            className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-0 md:right-auto w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left"
-            style={{ padding: "5px" }}
+            className="absolute bottom-12 right-0 md:bottom-auto md:top-12 md:right-0 w-40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left"
+            style={{ padding: "10px 5px", backgroundColor: "rgba(0,0,0,0.2)" }}
           >
             {!showSettingsSubmenu ? (
               /* --- Main Menu --- */
@@ -434,7 +434,10 @@ export const UI = ({ onSend, onStarClick }) => {
                     setStarOpen(false);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   プロフィール
                 </button>
@@ -446,7 +449,10 @@ export const UI = ({ onSend, onStarClick }) => {
                     setStarOpen(false);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   マイセイザ
                 </button>
@@ -459,7 +465,10 @@ export const UI = ({ onSend, onStarClick }) => {
                       setFocusTarget(futureStarPosition);
                     }}
                     className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                    style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                    style={{
+                      borderRadius: "5px",
+                      padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    }}
                   >
                     未来への手紙
                   </button>
@@ -470,7 +479,10 @@ export const UI = ({ onSend, onStarClick }) => {
                     setThemeModalOpen(true);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   テーマ
                 </button>
@@ -480,7 +492,10 @@ export const UI = ({ onSend, onStarClick }) => {
                     setLogModalOpen(true);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   ログ
                 </button>
@@ -489,7 +504,10 @@ export const UI = ({ onSend, onStarClick }) => {
                     setShowSettingsSubmenu(true);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   設定
                 </button>
@@ -498,8 +516,11 @@ export const UI = ({ onSend, onStarClick }) => {
                     setUserMenuOpen(false);
                     setDebugOpen(true);
                   }}
-                  className="w-full text-left py-3 text-red-400/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
-                  style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
+                  className="w-full text-left py-3 text-red-400/90 hover:bg-red-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                  }}
                 >
                   開発者モード
                 </button>
@@ -532,7 +553,7 @@ export const UI = ({ onSend, onStarClick }) => {
                   </button>
                   <span
                     className="text-white font-sans"
-                    style={{ fontSize: "12px" }}
+                    style={{ fontSize: "12px", padding: "3px" }}
                   >
                     アカウント設定
                   </span>
@@ -552,7 +573,11 @@ export const UI = ({ onSend, onStarClick }) => {
                     setShowSettingsSubmenu(false);
                   }}
                   className="w-full text-left px-6 py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-                  style={{ padding: "0 15px", fontSize: "12px" }}
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontSize: "12px",
+                  }}
                 >
                   ログアウト
                 </button>
