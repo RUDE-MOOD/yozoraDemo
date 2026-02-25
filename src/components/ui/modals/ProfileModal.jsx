@@ -375,6 +375,7 @@ export function ProfileModal({ isOpen, onClose }) {
                       }}
                       maxLength={15}
                       className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-white text-center text-lg font-bold focus:outline-none focus:ring-1 focus:ring-white/30"
+                      style={{ padding: "5px 0px" }}
                     />
                     <button
                       onClick={handleSaveName}
@@ -388,7 +389,7 @@ export function ProfileModal({ isOpen, onClose }) {
                   <>
                     <span
                       className="text-white/95 text-xl font-bold tracking-wide px-5 py-2 bg-white/5 rounded-full border border-white/10"
-                      style={{ padding: "5px 20px" }}
+                      style={{ padding: "5px 40px" }}
                     >
                       {profile?.user_name || "---"}
                     </span>
@@ -468,6 +469,7 @@ export function ProfileModal({ isOpen, onClose }) {
                       value={newEmail}
                       onChange={(e) => setNewEmail(e.target.value)}
                       className="w-full px-4 py-2.5 bg-white/8 border border-white/10 rounded-full text-white/90 text-sm focus:outline-none focus:ring-1 focus:ring-white/30 placeholder-white/30"
+                      style={{ padding: "5px 10px" }}
                     />
                     {emailError && (
                       <p className="text-red-400 text-xs px-2">{emailError}</p>
@@ -477,6 +479,10 @@ export function ProfileModal({ isOpen, onClose }) {
                         onClick={handleSendEmailOtp}
                         disabled={emailSaving}
                         className="flex-1 py-2 bg-white/10 text-white/90 text-xs rounded-full hover:bg-white/20 border border-white/10 transition-colors disabled:opacity-50"
+                        style={{
+                          margin: "10px 0",
+                          padding: "8px 0",
+                        }}
                       >
                         {emailSaving ? "送信中..." : "確認コードを送信"}
                       </button>
@@ -485,7 +491,13 @@ export function ProfileModal({ isOpen, onClose }) {
                           setEmailStep(0);
                           setEmailError("");
                         }}
-                        className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors"
+                        className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors bg-white/10 border border-white/10"
+                        style={{
+                          padding: "0 15px",
+                          margin: "10px 0",
+                          borderRadius: "50px",
+                          height: "40px",
+                        }}
                       >
                         戻る
                       </button>
@@ -560,6 +572,7 @@ export function ProfileModal({ isOpen, onClose }) {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full px-4 py-2.5 bg-white/8 border border-white/10 rounded-full text-white/90 text-sm focus:outline-none focus:ring-1 focus:ring-white/30 placeholder-white/30"
+                      style={{ padding: "5px 10px" }}
                     />
                     {passwordError && (
                       <p className="text-red-400 text-xs px-2">
@@ -571,6 +584,10 @@ export function ProfileModal({ isOpen, onClose }) {
                         onClick={handleSavePassword}
                         disabled={passwordSaving}
                         className="flex-1 py-2 bg-white/10 text-white/90 text-xs rounded-full hover:bg-white/20 border border-white/10 transition-colors disabled:opacity-50"
+                        style={{
+                          margin: "10px 0",
+                          padding: "8px 0",
+                        }}
                       >
                         {passwordSaving ? "変更中..." : "パスワードを変更"}
                       </button>
@@ -580,7 +597,13 @@ export function ProfileModal({ isOpen, onClose }) {
                           setPasswordError("");
                           setNewPassword("");
                         }}
-                        className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors"
+                        className="px-3 py-2 text-white/40 text-xs hover:text-white/70 transition-colors bg-white/10 border border-white/10"
+                        style={{
+                          padding: "0 15px",
+                          margin: "10px 0",
+                          borderRadius: "50px",
+                          height: "40px",
+                        }}
                       >
                         戻る
                       </button>
