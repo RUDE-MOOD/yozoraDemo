@@ -24,17 +24,21 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[1100] flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-[#050510]/60 backdrop-blur-sm transition-opacity duration-300"
+        className="absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
+        style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg mx-4 bg-[#1a1a3a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col">
+      <div
+        className="relative w-full max-w-lg mx-4 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col"
+        style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
+      >
         {/* Header */}
         <div className="relative flex items-center justify-center py-4 border-b border-white/10">
           <h2
             className="text-white/90 font-sans text-lg tracking-widest font-heavy"
-            style={{ margin: "5px" }}
+            style={{ margin: "8px", fontSize: "16px" }}
           >
             テーマ変更
           </h2>
