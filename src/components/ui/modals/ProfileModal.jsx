@@ -123,7 +123,7 @@ export function ProfileModal({ isOpen, onClose }) {
     try {
       // メールアドレス変更の際は updateUser を呼び出すことでOTPが送信されます
       const { error } = await supabase.auth.updateUser({
-        email: newEmail.trim()
+        email: newEmail.trim(),
       });
       if (error) throw error;
       setEmailStep(2);
@@ -271,7 +271,7 @@ export function ProfileModal({ isOpen, onClose }) {
 
     // 各星座のIDごとに、その星座に属する星の数を集計
     const counts = {};
-    stars.forEach(s => {
+    stars.forEach((s) => {
       const cid = s.analysis_data?.constellation?.id;
       if (cid) {
         counts[cid] = (counts[cid] || 0) + 1;
@@ -279,7 +279,7 @@ export function ProfileModal({ isOpen, onClose }) {
     });
 
     let completed = 0;
-    CONSTELLATIONS.forEach(c => {
+    CONSTELLATIONS.forEach((c) => {
       if (counts[c.id] && counts[c.id] >= c.starCount) {
         completed++;
       }
@@ -314,7 +314,7 @@ export function ProfileModal({ isOpen, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 md:justify-start md:pl-8 pointer-events-none"
-    //   onClick={onClose} // Currently commented out
+      //   onClick={onClose} // Currently commented out
     >
       {/* バックドロップ — (現在は使用していないようです。必要なら復活) */}
       {/* <div className="absolute inset-0 bg-black/20 transition-opacity duration-300" /> */}
@@ -325,6 +325,7 @@ export function ProfileModal({ isOpen, onClose }) {
         style={{
           padding: "10px 30px 30px 30px",
           maxHeight: "85vh",
+          margin: "0 1rem",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -385,7 +386,10 @@ export function ProfileModal({ isOpen, onClose }) {
                   </div>
                 ) : (
                   <>
-                    <span className="text-white/95 text-xl font-bold tracking-wide px-5 py-2 bg-white/5 rounded-full border border-white/10">
+                    <span
+                      className="text-white/95 text-xl font-bold tracking-wide px-5 py-2 bg-white/5 rounded-full border border-white/10"
+                      style={{ padding: "5px 20px" }}
+                    >
                       {profile?.user_name || "---"}
                     </span>
                     {editIconButton(() => {
@@ -439,7 +443,10 @@ export function ProfileModal({ isOpen, onClose }) {
                 className="mb-5"
                 style={{ padding: "5px 0", margin: "5px 0" }}
               >
-                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2">
+                <p
+                  className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2"
+                  style={{ margin: "5px 0" }}
+                >
                   メールアドレス
                 </p>
                 {emailStep === 0 && (
@@ -529,7 +536,10 @@ export function ProfileModal({ isOpen, onClose }) {
                 className="mb-6"
                 style={{ padding: "5px 0", margin: "5px 0" }}
               >
-                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2">
+                <p
+                  className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2"
+                  style={{ margin: "5px 0" }}
+                >
                   パスワード
                 </p>
                 {!isEditingPassword ? (
@@ -581,7 +591,10 @@ export function ProfileModal({ isOpen, onClose }) {
 
               {/* --- タグ --- */}
               <div style={{ padding: "5px 0", margin: "20px 0" }}>
-                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center">
+                <p
+                  className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center"
+                  style={{ margin: "10px 0" }}
+                >
                   タグ
                 </p>
                 <div className="flex flex-wrap gap-2 items-center justify-center">
