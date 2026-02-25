@@ -305,9 +305,8 @@ export const UI = ({ onSend, onStarClick }) => {
               setStarOpen(false);
               setConstellationModalOpen(false);
             }}
-            className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${
-              cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
-            }`}
+            className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
+              }`}
             title={cooldown ? `冷却中: ${cooldownTime}` : "日記を書く"}
           >
             {/* ロケットアイコン (Rocket Icon) */}
@@ -671,7 +670,6 @@ export const UI = ({ onSend, onStarClick }) => {
                   <option value="lepus">兎座</option>
                   <option value="bootes">うしかい座</option>
                   <option value="hydra">ウミヘビ座</option>
-                  <option value="eridanus">エリダヌス座</option>
                   <option value="andromeda">アンドロメダ座</option>
                 </select>
                 <button
@@ -778,9 +776,8 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${
-                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                  }`}
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                    }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div
@@ -846,9 +843,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
-                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                  }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                    }`}
                 >
                   <div className="space-y-2">
                     <label className="text-white/90 text-sm font-sans tracking-wide block">
