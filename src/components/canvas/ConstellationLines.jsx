@@ -208,7 +208,7 @@ export function ConstellationLines() {
                     "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 }
                 };
 
-                if (supportedBackgrounds.includes(c.id) && activeCount > 0) {
+                if (supportedBackgrounds.includes(c.id) && activeCount >= c.starCount) {
                     for (let key in cNodes) {
                         centerX += cNodes[key][0];
                         centerY += cNodes[key][1];
@@ -234,7 +234,7 @@ export function ConstellationLines() {
                 return (
                     <group key={`constellation-group-${c.id}`}>
                         {bgRender}
-                        {c.lines.map((lineDef, idx) => {
+                        {activeCount >= c.starCount * 0.8 && c.lines.map((lineDef, idx) => {
                             const [indexA, indexB] = lineDef;
                             const posA = cNodes[indexA];
                             const posB = cNodes[indexB];
