@@ -344,7 +344,7 @@ export function ConstellationModal({ isOpen, onClose }) {
                             </div>
 
                             {/* 星座リスト */}
-                            <div className="flex-1 overflow-y-auto scrollbar-hidden space-y-3">
+                            <div className="flex-1 overflow-y-auto scrollbar-hidden flex flex-col gap-3 pb-6">
                                 {enrichedConstellations.map((c) => (
                                     <ConstellationCard
                                         key={c.id}
@@ -403,7 +403,7 @@ export function ConstellationModal({ isOpen, onClose }) {
                     </div>
 
                     {/* 星座リスト */}
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-3 pb-6">
                         {enrichedConstellations.map((c) => (
                             <ConstellationCard
                                 key={c.id}

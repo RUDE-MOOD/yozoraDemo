@@ -115,6 +115,69 @@ export const useStarStore = create((set, get) => ({
         };
     },
 
+    // デバッグ用: 1分間だけ星座を表示する
+    debug_showConstellation: async (constellationId) => {
+        const { CONSTELLATIONS } = await import('../data/constellationData.js');
+        const target = CONSTELLATIONS.find(c => c.id === constellationId);
+        if (!target) return;
+
+        const hashCode = (s) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+        const boxWidth = 60;
+        const boxHeight = 60;
+        const minX = -320 + boxWidth / 2 + 10;
+        const maxX = 320 - boxWidth / 2 - 10;
+        const minY = -160 + boxHeight / 2 + 10;
+        const maxY = 160 - boxHeight / 2 - 10;
+
+        const hash = Math.abs(hashCode(target.id));
+        const prngX = (hash % 100) / 100;
+        const prngY = ((hash * 13) % 100) / 100;
+        const prngZ = ((hash * 17) % 100) / 100;
+
+        const centerX = minX + prngX * (maxX - minX);
+        const centerY = minY + prngY * (maxY - minY);
+        const baseZ = -10 + prngZ * 15;
+
+        const mockStars = [];
+        for (let i = 0; i < target.starCount; i++) {
+            const nodeNormalized = target.starPositions[i];
+            const localX = (nodeNormalized.x - 0.5) * boxWidth;
+            const localY = (0.5 - nodeNormalized.y) * boxHeight;
+            const position = [
+                centerX + localX,
+                centerY + localY,
+                baseZ
+            ];
+
+            mockStars.push({
+                id: `debug-${target.id}-${i}-${Date.now()}`,
+                position: position,
+                color: new Color(1, 1, 1),
+                scale: 1,
+                random: Math.random(),
+                created_at: new Date().toISOString(),
+                display_date: new Date().toISOString(),
+                analysis_data: {
+                    constellation: {
+                        id: target.id,
+                        nodeIndex: i
+                    }
+                }
+            });
+        }
+
+        set((state) => ({
+            stars: [...state.stars, ...mockStars],
+            focusTarget: [centerX, centerY, baseZ]
+        }));
+
+        setTimeout(() => {
+            set((state) => ({
+                stars: state.stars.filter(s => !s.id.startsWith(`debug-${target.id}`))
+            }));
+        }, 60000);
+    },
+
     // ログアウト時に星をクリアする関数
     clearStars: () => set({ stars: [], focusTarget: null }),
 }));

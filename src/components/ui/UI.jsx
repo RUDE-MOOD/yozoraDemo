@@ -110,7 +110,9 @@ export const UI = ({ onSend, onStarClick }) => {
     debug_loadMockMessage,
   } = useFutureMessageStore();
 
-  const { setFocusTarget, stars } = useStarStore();
+  const { setFocusTarget, stars, debug_showConstellation } = useStarStore();
+
+  const [debugConstellationId, setDebugConstellationId] = useState("monoceros");
 
   // 星座モーダルの開閉状態
   const [constellationModalOpen, setConstellationModalOpen] = useState(false);
@@ -632,6 +634,37 @@ export const UI = ({ onSend, onStarClick }) => {
                 >
                   流れ星を強制表示（モック）
                 </button>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs text-white/50">星座テスト (1分間表示)</p>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 bg-white/10 text-white rounded text-[11px] px-2 py-2 border border-white/20 outline-none [&>option]:text-black"
+                    value={debugConstellationId}
+                    onChange={(e) => setDebugConstellationId(e.target.value)}
+                  >
+                    <option value="monoceros">一角獣座</option>
+                    <option value="sagittarius">射手座</option>
+                    <option value="delphinus">イルカ座</option>
+                    <option value="indus">インディアン座</option>
+                    <option value="pisces">うお座</option>
+                    <option value="lepus">兎座</option>
+                    <option value="bootes">うしかい座</option>
+                    <option value="hydra">ウミヘビ座</option>
+                    <option value="eridanus">エリダヌス座</option>
+                    <option value="andromeda">アンドロメダ座</option>
+                  </select>
+                  <button
+                    onClick={() => {
+                      debug_showConstellation(debugConstellationId);
+                      setDebugOpen(false);
+                    }}
+                    className="py-2 px-3 bg-purple-500/20 text-purple-200 rounded hover:bg-purple-500/40 text-[11px] whitespace-nowrap"
+                  >
+                    表示
+                  </button>
+                </div>
               </div>
 
               <button

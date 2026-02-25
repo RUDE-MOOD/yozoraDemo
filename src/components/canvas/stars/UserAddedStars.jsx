@@ -202,7 +202,7 @@ export function UserAddedStars({ stars, onStarClick }) {
           color={star.color}
           scale={star.scale}
           random={star.random}
-          date={star.display_date}         // 表示用の日付
+          date={typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date}         // 表示用の日付
           starData={star}
           onStarClick={onStarClick}
         />
