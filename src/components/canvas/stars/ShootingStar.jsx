@@ -294,7 +294,7 @@ export function ShootingStar({ onOpenDisplayModal }) {
         <group ref={groupRef} position={startPos}>
             {/* ── Nagareboshiシェーダーによる流星ビジュアル ── */}
             <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
-                <mesh scale={[120, 120, 1]}>
+                <mesh scale={[250, 250, -4]}>
                     <planeGeometry args={[1, 1]} />
                     <nagareboshiMaterial
                         ref={materialRef}
