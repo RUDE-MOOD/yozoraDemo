@@ -107,6 +107,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
           opacity: hasStar ? 1 : 0.5,
           transition: "transform 0.2s",
           cursor: hasStar ? "pointer" : "default",
+          boxShadow: "inset 0 0 5px rgba(0,0,0,0.5)",
         }}
         onClick={(e) => {
           if (hasStar && star && onLogClick) {
@@ -115,7 +116,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
           }
         }}
         onMouseEnter={(e) => {
-          if (hasStar) e.currentTarget.style.transform = "scale(1.02)";
+          if (hasStar) e.currentTarget.style.transform = "scale(1.01)";
         }}
         onMouseLeave={(e) => {
           if (hasStar) e.currentTarget.style.transform = "scale(1)";
