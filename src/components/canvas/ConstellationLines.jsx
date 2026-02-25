@@ -192,24 +192,23 @@ export function ConstellationLines() {
 
                 const supportedBackgrounds = [
                     "monoceros", "andromeda", "sagittarius", "delphinus",
-                    "indus", "pisces", "lepus", "bootes", "hydra", "eridanus"
+                    "indus", "pisces", "lepus", "bootes", "hydra"
                 ];
 
                 // 画像ごとの位置合わせ用オフセットとサイズ
                 const backgroundConfig = {
                     "monoceros": { offsetX: 2, offsetY: 5, scale: 1 },
                     "andromeda": { offsetX: -7, offsetY: -4, scale: 1.4 },
-                    "sagittarius": { offsetX: 0, offsetY: 5, scale: 1.4 },
-                    "delphinus": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "indus": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "pisces": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "lepus": { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    "sagittarius": { offsetX: 0, offsetY: 5, scale: 1.15 },
+                    "delphinus": { offsetX: -3, offsetY: -7, scale: 1.2 },
+                    "indus": { offsetX: 2, offsetY: 5, scale: 1.2 },
+                    "pisces": { offsetX: 0, offsetY: 7, scale: 1.2 },
+                    "lepus": { offsetX: -2, offsetY: 4, scale: 1 },
                     "bootes": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "eridanus": { offsetX: 0, offsetY: 0, scale: 1.2 }
+                    "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 }
                 };
 
-                if (supportedBackgrounds.includes(c.id) && activeCount > 0) {
+                if (supportedBackgrounds.includes(c.id) && activeCount >= c.starCount) {
                     for (let key in cNodes) {
                         centerX += cNodes[key][0];
                         centerY += cNodes[key][1];
@@ -235,7 +234,7 @@ export function ConstellationLines() {
                 return (
                     <group key={`constellation-group-${c.id}`}>
                         {bgRender}
-                        {c.lines.map((lineDef, idx) => {
+                        {activeCount >= c.starCount * 0.8 && c.lines.map((lineDef, idx) => {
                             const [indexA, indexB] = lineDef;
                             const posA = cNodes[indexA];
                             const posB = cNodes[indexB];
