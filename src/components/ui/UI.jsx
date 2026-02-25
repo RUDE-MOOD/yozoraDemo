@@ -419,7 +419,10 @@ export const UI = ({ onSend, onStarClick }) => {
         </button>
 
         {userMenuOpen && (
-          <div className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-0 md:right-auto w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left">
+          <div
+            className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-0 md:right-auto w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left"
+            style={{ padding: "5px" }}
+          >
             {!showSettingsSubmenu ? (
               /* --- Main Menu --- */
               <>
@@ -428,6 +431,7 @@ export const UI = ({ onSend, onStarClick }) => {
                     setUserMenuOpen(false);
                     setProfileModalOpen(true);
                     setConstellationModalOpen(false);
+                    setStarOpen(false);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
@@ -439,6 +443,7 @@ export const UI = ({ onSend, onStarClick }) => {
                     setUserMenuOpen(false);
                     setConstellationModalOpen(true);
                     setProfileModalOpen(false);
+                    setStarOpen(false);
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
@@ -450,6 +455,7 @@ export const UI = ({ onSend, onStarClick }) => {
                     onClick={() => {
                       setUserMenuOpen(false);
                       setProfileModalOpen(false);
+                      setStarOpen(false);
                       setFocusTarget(futureStarPosition);
                     }}
                     className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
