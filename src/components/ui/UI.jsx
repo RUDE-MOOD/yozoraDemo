@@ -474,7 +474,7 @@ export const UI = ({ onSend, onStarClick }) => {
 
         {userMenuOpen && (
           <div
-            className="absolute bottom-12 right-0 md:bottom-auto md:top-12 md:right-0 w-40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-left"
+            className="absolute bottom-12 left-0 md:bottom-auto md:top-12 md:left-auto md:right-0 w-40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-responsive origin-bottom-left md:origin-top-right"
             style={{ padding: "10px 5px", backgroundColor: "rgba(0,0,0,0.2)" }}
           >
             {!showSettingsSubmenu ? (
