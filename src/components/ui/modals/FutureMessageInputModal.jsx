@@ -356,6 +356,7 @@ export const FutureMessageInputModal = () => {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="未来の自分へ..."
           maxLength={500}
+          spellcheck="false"
           className="w-full h-32 px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none scrollbar-hidden"
           style={{
             padding: "10px",

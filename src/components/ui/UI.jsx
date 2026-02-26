@@ -1008,6 +1008,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       <span className="text-white/50">(必須)</span>
                     </label>
                     <textarea
+                      spellcheck="false"
                       value={goodThing1}
                       onChange={(e) => setGoodThing1(e.target.value)}
                       maxLength={300}
@@ -1031,6 +1032,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       <span className="text-white/50">(任意)</span>
                     </label>
                     <textarea
+                      spellcheck="false"
                       value={goodThing2}
                       onChange={(e) => setGoodThing2(e.target.value)}
                       maxLength={300}
@@ -1054,6 +1056,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       <span className="text-white/50">(任意)</span>
                     </label>
                     <textarea
+                      spellcheck="false"
                       value={goodThing3}
                       onChange={(e) => setGoodThing3(e.target.value)}
                       maxLength={300}
