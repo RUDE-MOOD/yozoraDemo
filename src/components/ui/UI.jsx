@@ -100,6 +100,10 @@ export const UI = ({ onSend, onStarClick }) => {
   // スマホ用: 0=スライダー, 1=テキスト入力
   const [mobileDiaryStep, setMobileDiaryStep] = useState(0);
 
+  // --- タグ関連 ---
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
+
   // Future Message Store
   const {
     isFutureStarVisible,
@@ -109,6 +113,8 @@ export const UI = ({ onSend, onStarClick }) => {
     debug_setShootingStarVisible,
     debug_loadMockMessage,
   } = useFutureMessageStore();
+
+  const { user } = useUserStore();
 
   const { setFocusTarget, stars, debug_showConstellation } = useStarStore();
 
@@ -147,6 +153,27 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // フルスクリーン状態（PC用）
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // タグの取得
+  useEffect(() => {
+    const fetchTags = async () => {
+      if (!user) return;
+      try {
+        const { data, error } = await supabase
+          .from("t_tag")
+          .select("id, tag_name")
+          .eq("creator_id", user.id)
+          .order("creation_date", { ascending: true });
+        if (error) throw error;
+        setAvailableTags(data || []);
+      } catch (err) {
+        console.error("タグ取得エラー:", err);
+      }
+    };
+    if (diaryOpen) {
+      fetchTags();
+    }
+  }, [diaryOpen, user]);
 
   // フルスクリーン状態の監視
   useEffect(() => {
@@ -237,7 +264,12 @@ export const UI = ({ onSend, onStarClick }) => {
       }
       // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
       if (onSend) {
-        await onSend(moodValues, analysisResult, goodThings);
+        // Tag情報を送るために、analysisResult がなければ空オブジェクトを作り、そこにタグを混ぜる
+        const finalAnalysisResult = {
+          ...(analysisResult || {}),
+          ...(selectedTag ? { tag: selectedTag.tag_name } : {})
+        };
+        await onSend(moodValues, finalAnalysisResult, goodThings);
       }
       console.log("Mood Entry Saved!");
 
@@ -251,6 +283,7 @@ export const UI = ({ onSend, onStarClick }) => {
       setGoodThing1("");
       setGoodThing2("");
       setGoodThing3("");
+      setSelectedTag(null);
       setMobileDiaryStep(0);
       setDiaryOpen(false);
 
@@ -989,6 +1022,35 @@ export const UI = ({ onSend, onStarClick }) => {
                       }}
                     />
                   </div>
+
+                  {/* タグ選択 */}
+                  {availableTags.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      <label className="text-white/90 text-sm font-sans tracking-wide block">
+                        タグ
+                      </label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {availableTags.map((tag) => {
+                          const isSelected = selectedTag?.id === tag.id;
+                          return (
+                            <button
+                              key={tag.id}
+                              onClick={() => {
+                                if (isSelected) setSelectedTag(null);
+                                else setSelectedTag(tag);
+                              }}
+                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
+                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                                }`}
+                            >
+                              #{tag.tag_name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* 打ち上げボタン */}
                   <div className="mt-6 md:mt-auto flex justify-center">
