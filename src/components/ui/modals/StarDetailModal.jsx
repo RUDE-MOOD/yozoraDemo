@@ -243,20 +243,34 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
               </div>
             </div>
 
-            {/* 日付 */}
-            <div className="text-center mb-6" style={{ padding: "5px" }}>
-              <p
-                className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1"
-                style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
-              >
+            {/* 日付・タグ */}
+            <div
+              className="flex flex-col items-center justify-center gap-2 mb-6"
+              style={{
+                padding: "5px",
+                fontFamily: "Kiwi Maru",
+                letterSpacing: "0rem",
+              }}
+            >
+              <p className="text-white/50 text-xs tracking-[0.2em] font-sans">
                 日付
               </p>
-              <p
-                className="text-white/95 text-lg font-sans tracking-wide"
-                style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
-              >
-                {formatDateOnly(starData.display_date)}
-              </p>
+              <div className="flex items-center gap-3">
+                <p
+                  className="text-white/95 text-lg font-sans tracking-wide"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
+                  {formatDateOnly(starData.display_date)}
+                </p>
+                {analysis.tag && (
+                  <span
+                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-white/90 text-xs font-sans shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                    style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                  >
+                    #{analysis.tag}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 感情 */}

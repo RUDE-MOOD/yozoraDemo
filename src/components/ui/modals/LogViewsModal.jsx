@@ -1,12 +1,38 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { getAppNow } from "../../../utils/appTime";
 import { useStarStore } from "../../../store/useStarStore";
+import { useUserStore } from "../../../store/useUserStore";
 import { getFallbackAnalysis } from "../../../utils/fallbackAnalysis";
+import { supabase } from "../../../supabaseClient";
 
 export const LogViewsModal = ({ onClose, onLogClick }) => {
   const { stars } = useStarStore();
+  const { user } = useUserStore();
+
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
+
+  // 初回マウント時にユーザーのアクティブなタグを取得
+  useEffect(() => {
+    const fetchTags = async () => {
+      if (!user) return;
+      try {
+        const { data, error } = await supabase
+          .from("t_tag")
+          .select("id, tag_name")
+          .eq("creator_id", user.id)
+          .order("creation_date", { ascending: true });
+        if (error) throw error;
+        setAvailableTags(data || []);
+      } catch (err) {
+        console.error("タグ取得エラー:", err);
+      }
+    };
+    fetchTags();
+  }, [user]);
 
   // 現在表示中の年月（初期値は現在日時）
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(getAppNow());
 
   // 表示用データを作成
   const calendarData = useMemo(() => {
@@ -21,8 +47,22 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
       // display_date は "YY/MM/DD HH:mm" 形式でブラウザが正しくパースできないため使わない
       const date = new Date(star.created_at);
       if (isNaN(date.getTime())) return false;
+      const inMonth = date >= startDate && date <= endDate;
+
+      // タグで絞り込み
+      const passTag = selectedTag ? (star.analysis_data?.tag === selectedTag) : true;
+
+      return inMonth && passTag;
+    });
+
+    const monthStars = stars.filter((star) => {
+      const date = new Date(star.created_at);
+      if (isNaN(date.getTime())) return false;
       return date >= startDate && date <= endDate;
     });
+
+    // 今月の星からタグを抽出（削除されたタグも含む）
+    const tagsInMonth = [...new Set(monthStars.map(s => s.analysis_data?.tag).filter(Boolean))];
 
     const daysMap = {};
     const lastDay = endDate.getDate();
@@ -39,14 +79,26 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
       }
     });
 
-    return { year, month: month + 1, daysMap, lastDay };
-  }, [stars, currentDate]);
+    return { year, month: month + 1, daysMap, lastDay, tagsInMonth };
+  }, [stars, currentDate, selectedTag]);
 
   // 月移動
-  const now = new Date();
-  const isCurrentMonth =
-    currentDate.getFullYear() === now.getFullYear() &&
-    currentDate.getMonth() === now.getMonth();
+  const now = getAppNow();
+
+  // ログ画面で進める「最大月」を決定（現在のアプリ時間 または 未来に書かれた星の時間の、どちらか遅い方）
+  let maxDate = new Date(now);
+  if (stars && stars.length > 0) {
+    const latestStarTime = Math.max(...stars.map(s => new Date(s.created_at).getTime()));
+    if (latestStarTime > maxDate.getTime()) {
+      maxDate = new Date(latestStarTime);
+    }
+  }
+
+  const isMaxMonth =
+    currentDate.getFullYear() > maxDate.getFullYear() ||
+    (currentDate.getFullYear() === maxDate.getFullYear() &&
+      currentDate.getMonth() >= maxDate.getMonth());
+
   const isMinMonth =
     currentDate.getFullYear() === 2025 && currentDate.getMonth() === 11;
 
@@ -57,11 +109,18 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     );
   };
   const handleNextMonth = () => {
-    if (isCurrentMonth) return;
+    if (isMaxMonth) return;
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
     );
   };
+
+  // 表示するタグの完全なリスト（現在のアクティブなタグ + 今月の星で使われている削除済みタグ）
+  const allDisplayTags = useMemo(() => {
+    const activeTagNames = availableTags.map(t => t.tag_name);
+    const deletedButUsedTags = calendarData.tagsInMonth.filter(t => !activeTagNames.includes(t));
+    return [...activeTagNames, ...deletedButUsedTags];
+  }, [availableTags, calendarData.tagsInMonth]);
 
   // 感情ラベルを取得するヘルパー
   const getEmotionLabel = (star) => {
@@ -312,24 +371,24 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
             </span>
             <button
               onClick={handleNextMonth}
-              disabled={isCurrentMonth}
+              disabled={isMaxMonth}
               style={{
                 background: "transparent",
                 border: "none",
-                color: isCurrentMonth
+                color: isMaxMonth
                   ? "rgba(255,255,255,0.15)"
                   : "rgba(255,255,255,0.5)",
-                cursor: isCurrentMonth ? "not-allowed" : "pointer",
+                cursor: isMaxMonth ? "not-allowed" : "pointer",
                 padding: "4px 8px",
                 transition: "color 0.2s",
                 display: "flex",
                 alignItems: "center",
               }}
               onMouseEnter={(e) => {
-                if (!isCurrentMonth) e.currentTarget.style.color = "#fff";
+                if (!isMaxMonth) e.currentTarget.style.color = "#fff";
               }}
               onMouseLeave={(e) => {
-                if (!isCurrentMonth)
+                if (!isMaxMonth)
                   e.currentTarget.style.color = "rgba(255,255,255,0.5)";
               }}
             >
@@ -344,29 +403,55 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
             </button>
           </div>
 
-          {/* 右: ✕ */}
-          <button
-            onClick={onClose}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "rgba(255,255,255,0.5)",
-              fontSize: "20px",
-              cursor: "pointer",
-              width: "36px",
-              height: "36px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "rgba(255,255,255,0.5)")
-            }
-          >
-            ✕
-          </button>
+          {/* 右: タグ絞り込み ＆ ✕ */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            {allDisplayTags.length > 0 && (
+              <select
+                value={selectedTag || ""}
+                onChange={(e) => setSelectedTag(e.target.value || null)}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: "20px",
+                  color: "#fff",
+                  padding: "4px 12px",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="" style={{ color: "#000" }}>すべてのタグ</option>
+                {allDisplayTags.map(tag => (
+                  <option key={tag} value={tag} style={{ color: "#000" }}>
+                    #{tag}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              onClick={onClose}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,0.5)",
+                fontSize: "20px",
+                cursor: "pointer",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "rgba(255,255,255,0.5)")
+              }
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* ===== モバイル用ヘッダー ===== */}
@@ -465,19 +550,46 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
             </span>
             <button
               onClick={handleNextMonth}
-              disabled={isCurrentMonth}
+              disabled={isMaxMonth}
               style={{
                 background: "transparent",
                 border: "none",
-                color: isCurrentMonth ? "rgba(255,255,255,0.15)" : "#fff",
+                color: isMaxMonth ? "rgba(255,255,255,0.15)" : "#fff",
                 fontSize: "1.3rem",
-                cursor: isCurrentMonth ? "not-allowed" : "pointer",
+                cursor: isMaxMonth ? "not-allowed" : "pointer",
                 padding: "4px 8px",
               }}
             >
               {">"}
             </button>
           </div>
+
+          {/* モバイル用: タグ絞り込み */}
+          {allDisplayTags.length > 0 && (
+            <div style={{ marginTop: "4px" }}>
+              <select
+                value={selectedTag || ""}
+                onChange={(e) => setSelectedTag(e.target.value || null)}
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: "20px",
+                  color: "#fff",
+                  padding: "4px 12px",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="" style={{ color: "#000" }}>すべてのタグ</option>
+                {allDisplayTags.map(tag => (
+                  <option key={tag} value={tag} style={{ color: "#000" }}>
+                    #{tag}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* ===== カレンダーグリッド ===== */}

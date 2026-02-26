@@ -85,12 +85,17 @@ export function getDiaryCycleEnd(date) {
 export function isCooldownActive(stars) {
     if (!stars || stars.length === 0) return false;
 
-    // 最新の星を取得（created_at で比較）
-    const latestStar = stars.reduce((a, b) =>
+    const now = getAppNow();
+
+    // 現在のアプリ時間より「前」に作られた星のみを対象にする
+    const pastStars = stars.filter(s => new Date(s.created_at) <= now);
+    if (pastStars.length === 0) return false;
+
+    // 過去の星の中で最新のものを取得
+    const latestStar = pastStars.reduce((a, b) =>
         new Date(a.created_at) > new Date(b.created_at) ? a : b
     );
 
-    const now = getAppNow();
     const currentCycleStart = getDiaryCycleStart(now);
     const starDate = new Date(latestStar.created_at);
 
@@ -118,11 +123,17 @@ export function getCooldownRemaining() {
 export function getCooldownProgress(stars) {
     if (!stars || stars.length === 0) return 1;
 
-    const latestStar = stars.reduce((a, b) =>
+    const now = getAppNow();
+
+    // 現在のアプリ時間より「前」に作られた星のみを対象にする
+    const pastStars = stars.filter(s => new Date(s.created_at) <= now);
+    if (pastStars.length === 0) return 1;
+
+    // 過去の星の中で最新のものを取得
+    const latestStar = pastStars.reduce((a, b) =>
         new Date(a.created_at) > new Date(b.created_at) ? a : b
     );
 
-    const now = getAppNow();
     const currentCycleStart = getDiaryCycleStart(now);
     const starDate = new Date(latestStar.created_at);
 
