@@ -1,18 +1,18 @@
-import * as THREE from 'three'
-import { shaderMaterial } from '@react-three/drei'
-import { extend, useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
-import { DistantStars } from '../stars/DistantStars'
-import { DistantNagareboshi } from '../stars/DistantNagareboshi'
+import * as THREE from "three";
+import { shaderMaterial } from "@react-three/drei";
+import { extend, useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import { DistantStars } from "../stars/DistantStars";
+import { DistantNagareboshi } from "../stars/DistantNagareboshi";
 
 // テーマ変更用
-import { useThemeStore } from '../../../store/useThemeStore'
+import { useThemeStore } from "../../../store/useThemeStore";
 
 // --- Layer 1: Background Shader (Vertical Gradient) ---
 const BackgroundMaterial = shaderMaterial(
   {
-    colorTop: new THREE.Color('#000000'),
-    colorBottom: new THREE.Color('#101035')
+    colorTop: new THREE.Color("#000000"),
+    colorBottom: new THREE.Color("#101035"),
   },
   // Vertex Shader
   `
@@ -34,15 +34,15 @@ const BackgroundMaterial = shaderMaterial(
       vec3 finalColor = mix(colorBottom, colorTop, t);
       gl_FragColor = vec4(finalColor, 1.0);
     }
-  `
-)
+  `,
+);
 
 // --- Layer 2: Fluid/Galaxy Shader (Noise) ---
 const FluidMaterial = shaderMaterial(
   {
     time: 0,
-    colorA: new THREE.Color('#1a1a3a'),
-    colorB: new THREE.Color('#4b0082') // Deep Indigo
+    colorA: new THREE.Color("#1a1a3a"),
+    colorB: new THREE.Color("#4b0082"), // Deep Indigo
   },
   // Vertex Shader
   `
@@ -108,17 +108,15 @@ const FluidMaterial = shaderMaterial(
         
         gl_FragColor = vec4(color, brightness * 0.8); 
     }
-  `
-)
-
-
+  `,
+);
 
 // --- Layer 4: Fog/Volume Shader ---
 const FogMaterial = shaderMaterial(
   {
     time: 0,
-    color: new THREE.Color('#aaaaff'),
-    opacity: 0.2
+    color: new THREE.Color("#aaaaff"),
+    opacity: 0.2,
   },
   // Vertex Shader
   `
@@ -171,21 +169,21 @@ const FogMaterial = shaderMaterial(
         
         gl_FragColor = vec4(color, density * opacity);
     }
-  `
-)
+  `,
+);
 
-extend({ BackgroundMaterial, FluidMaterial, FogMaterial })
+extend({ BackgroundMaterial, FluidMaterial, FogMaterial });
 
 export function SkyBox() {
-  const fluidRef = useRef()
-  const fogRef = useRef()
+  const fluidRef = useRef();
+  const fogRef = useRef();
 
-  const { currentTheme } = useThemeStore()
+  const { currentTheme } = useThemeStore();
 
   useFrame((state, delta) => {
-    if (fluidRef.current) fluidRef.current.time += delta
-    if (fogRef.current) fogRef.current.time += delta
-  })
+    if (fluidRef.current) fluidRef.current.time += delta;
+    if (fogRef.current) fogRef.current.time += delta;
+  });
 
   return (
     <group name="SkyBox">
@@ -245,5 +243,5 @@ export function SkyBox() {
         />
       </mesh>
     </group>
-  )
+  );
 }

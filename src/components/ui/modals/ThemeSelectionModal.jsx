@@ -12,6 +12,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
     { id: "green", name: "Green", img: "/thumbnails/theme-green.png" },
     { id: "space", name: "Space", img: "/thumbnails/theme-space.png" },
     { id: "orange", name: "Orange", img: "/thumbnails/theme-orange.png" },
+    { id: "red", name: "Red", img: "/thumbnails/theme-red.png" },
   ];
 
   const skyboxes = [
@@ -160,16 +161,6 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             ))}
           </div>
         </div>
-
-        {/* Footer */}
-        {/* <div className="p-4 border-t border-white/10 bg-black/20">
-          <button
-            onClick={onClose}
-            className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white rounded-xl transition-all duration-200 tracking-widest text-sm"
-          >
-            閉じる
-          </button>
-        </div> */}
       </div>
     </div>
   );
