@@ -5,7 +5,6 @@ import { SkyBox } from "./environment/SkyBox";
 import { SkyBoxUpGrade } from "./environment/skyBoxUpGrade";
 import { SkyBoxMixed } from "./environment/skyBoxMixed";
 import { DistantStars } from "./stars/DistantStars";
-import { MyStars } from "./stars/MyStars";
 import { UserAddedStars } from "./stars/UserAddedStars";
 import { Suspense, useRef, useEffect, useMemo } from "react";
 import { useThemeStore } from "../../store/useThemeStore";
@@ -114,7 +113,6 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
         ) : (
           <SkyBox />
         )}
-        {/* <MyStars /> - Temporarily disabled to focus on UserStars */}
         <FutureStarWrapper />
         <ConstellationLines />
         <UserAddedStars stars={userStars} onStarClick={onStarClick} />
