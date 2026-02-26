@@ -49,6 +49,17 @@ const themeData = {
     // 背景霧
     color: "#175676",
   },
+  bright_blue: {
+    colorTop: "#000000",
+    // メインカラー
+    colorBottom: "#0077be",
+    // 上半色
+    colorA: "#ffffff",
+    // セカンダリーカラー
+    colorB: "#0000FF",
+    // 背景霧
+    color: "#0077be",
+  },
 };
 
 export { themeData };

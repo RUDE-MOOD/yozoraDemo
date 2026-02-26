@@ -13,6 +13,11 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
     { id: "space", name: "Space", img: "/thumbnails/theme-space.png" },
     { id: "orange", name: "Orange", img: "/thumbnails/theme-orange.png" },
     { id: "red", name: "Red", img: "/thumbnails/theme-red.png" },
+    {
+      id: "bright_blue",
+      name: "Bright Blue",
+      img: "/thumbnails/theme-bright-blue.png",
+    },
   ];
 
   const skyboxes = [
