@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { shaderMaterial, Billboard, Text } from '@react-three/drei'
+import { shaderMaterial, Text } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import { useUserStore } from '../../../store/useUserStore'
@@ -16,10 +16,32 @@ const SingleStarMaterial = shaderMaterial(
   },
   // Vertex Shader
   `
+    uniform vec3 color; // explicitly declare uniform used in fallback
+    
     varying vec2 vUv;
+    varying vec3 vColor;
+    varying vec3 vWorldPosition;
+
     void main() {
       vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      vec4 localPosition = vec4(position, 1.0);
+      
+      #ifdef USE_INSTANCING
+        vec4 mPosition = instanceMatrix * localPosition;
+        #ifdef USE_INSTANCING_COLOR
+          vColor = instanceColor;
+        #else
+          vColor = color;
+        #endif
+      #else
+        vec4 mPosition = localPosition;
+        vColor = color;
+      #endif
+      
+      // modelMatrix is defined by Three.js
+      vWorldPosition = (modelMatrix * mPosition).xyz;
+      
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * mPosition;
     }
   `,
   // Fragment Shader
@@ -30,6 +52,8 @@ const SingleStarMaterial = shaderMaterial(
     uniform float random;
     
     varying vec2 vUv;
+    varying vec3 vColor;
+    varying vec3 vWorldPosition;
 
     void main() {
       vec2 uv = vUv - 0.5;
@@ -47,11 +71,16 @@ const SingleStarMaterial = shaderMaterial(
 
       float brightness = (core * 1.2 + spikes * 0.8) * baseBrightness;
 
-      // Twinkle (瞬き)
-      float twinkle = sin(time * 1.5 + random * 10.0) * 0.15 + 0.85;
+      // Twinkle (瞬き) - use world position x + y for random phase if instanced
+      #ifdef USE_INSTANCING
+        float r = fract(sin(dot(vWorldPosition.xy, vec2(12.9898, 78.233))) * 43758.5453);
+        float twinkle = sin(time * 1.5 + r * 10.0) * 0.15 + 0.85;
+      #else
+        float twinkle = sin(time * 1.5 + random * 10.0) * 0.15 + 0.85;
+      #endif
       brightness *= twinkle;
 
-      vec3 finalColor = color * brightness;
+      vec3 finalColor = vColor * brightness;
 
       float alpha = smoothstep(0.05, 1.0, brightness);
       alpha *= 1.0 - smoothstep(0.4, 0.5, d);
@@ -108,33 +137,31 @@ export function UserStar({ position, color, scale, random, date, starData, onSta
 
   return (
     <group position={position}>
-      <Billboard>
-        <mesh scale={[scale, scale, 1]} onClick={handleClick}>
-          <planeGeometry args={[1, 1]} />
-          <singleStarMaterial
-            ref={materialRef}
-            transparent
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-            color={color}
-            random={random}
-          />
-        </mesh>
-        {/* 日付ラベル */}
-        {showStarDate && (
-          <Text
-            position={[0, -scale * 0.6, 0]} // 星の下に配置
-            fontSize={0.5}
-            color="white"
-            anchorX="center"
-            anchorY="top"
-            outlineWidth={0.02}
-            outlineColor="#000000"
-          >
-            {date}
-          </Text>
-        )}
-      </Billboard>
+      <mesh scale={[scale, scale, 1]} onClick={handleClick}>
+        <planeGeometry args={[1, 1]} />
+        <singleStarMaterial
+          ref={materialRef}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          color={color}
+          random={random}
+        />
+      </mesh>
+      {/* 日付ラベル */}
+      {showStarDate && (
+        <Text
+          position={[0, -scale * 0.6, 0]} // 星の下に配置
+          fontSize={0.5}
+          color="white"
+          anchorX="center"
+          anchorY="top"
+          outlineWidth={0.02}
+          outlineColor="#000000"
+        >
+          {date}
+        </Text>
+      )}
     </group>
   )
 }

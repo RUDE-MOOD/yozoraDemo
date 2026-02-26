@@ -1,5 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { useState, useEffect, useCallback } from "react";
+import { PerformanceMonitor } from "@react-three/drei";
 import { Experience } from "./components/canvas/Experience";
 import { Effects } from "./components/canvas/effects/Effects";
 import { UI } from "./components/ui/UI";
@@ -46,6 +47,10 @@ function App() {
 
   // Yozora 3Dシーンの表示（registerSuccessのグリッチ中にバックグラウンドで表示開始）
   const [showApp, setShowApp] = useState(false);
+
+  // 動的パフォーマンス監視用
+  const [dpr, setDpr] = useState([1, 1.5]);
+  const [isLowPerformance, setIsLowPerformance] = useState(false);
 
   // ★ セッション復元・監視ロジック ★
   useEffect(() => {
@@ -218,17 +223,34 @@ function App() {
           <Canvas
             camera={{ position: [0, 0, 10], fov: 50 }}
             style={{ width: '100%', height: '100%' }}
-            dpr={[1, 1.5]}
+            dpr={dpr}
           >
-            <color attach="background" args={['#101020']} />
-            <Experience userStars={stars} onStarClick={starClickHandler} focusTarget={focusTarget} />
-            <Effects />
+            <PerformanceMonitor
+              onIncline={() => {
+                setDpr([1, 1.5]);
+                setIsLowPerformance(false);
+              }}
+              onDecline={() => {
+                setDpr([0.5, 1.0]);
+                setIsLowPerformance(true);
+              }}
+              flipflops={3}
+              onFallback={() => {
+                setDpr([0.5, 1.0]);
+                setIsLowPerformance(true);
+              }}
+            >
+              <color attach="background" args={['#101020']} />
+              <Experience userStars={stars} onStarClick={starClickHandler} focusTarget={focusTarget} />
+              <Effects isLowPerformance={isLowPerformance} />
+            </PerformanceMonitor>
           </Canvas>
           <UI onSend={addStar} onStarClick={handleSetStarClickHandler} />
         </>
       )}
 
       {/* 登録成功画面（グリッチオーバーレイはYozoraの上に残る） */}
+
       {phase === 'registerSuccess' && (
         <RegisterSuccessScreen
           onStartApp={() => {

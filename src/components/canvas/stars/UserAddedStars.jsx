@@ -190,19 +190,89 @@
   ユーザー入力 → App.jsx (ステート更新) → Experience.jsx (プロップ) 
     → UserAddedStars.jsx (プロップ) → UserStar.jsx (個別レンダリング)
 */
+import * as THREE from 'three'
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { Instances, Instance, Text } from '@react-three/drei'
+import { useUserStore } from '../../../store/useUserStore'
 import { UserStar } from './UserStar'
 
 export function UserAddedStars({ stars, onStarClick }) {
+  const { showStarDate } = useUserStore();
+  const materialRef = useRef();
+
+  // 1. 静的な星（すでに描画が完了している過去の星）
+  const staticStars = stars.filter((s) => !s.isJustCreated);
+  // 2. 動的な星（今まさにユーザーが追加してフェードイン中の星）
+  const dynamicStars = stars.filter((s) => s.isJustCreated);
+
+  useFrame((state, delta) => {
+    if (materialRef.current) {
+      materialRef.current.time += delta;
+      materialRef.current.baseBrightness = 1.0;
+    }
+  });
+
   return (
     <group name="Layer6_UserStars">
-      {stars.map((star) => (
+      {/* 1. 静的な星のインスタンスレンダリング (ドローコールを1回に圧縮) */}
+      {staticStars.length > 0 && (
+        <>
+          <Instances limit={10000} range={staticStars.length}>
+            <planeGeometry args={[1, 1]} />
+            <singleStarMaterial
+              ref={materialRef}
+              transparent
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+            {staticStars.map((star) => (
+              <Instance
+                key={star.id}
+                position={star.position}
+                scale={star.scale}
+                color={star.color}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('=== Instanced Star clicked! ===');
+                  console.log(`日付：${star.date}、座標:${star.position}`);
+                  if (onStarClick) onStarClick(star);
+                }}
+              />
+            ))}
+          </Instances>
+
+          {/* 日付ラベル (TextはInstancedMeshに含められないため独立レンダリング, ただしBillboardを外して超軽量化) */}
+          {showStarDate && staticStars.map((star) => {
+            const dateStr = typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date;
+            if (!dateStr) return null;
+            return (
+              <Text
+                key={`date-${star.id}`}
+                position={[star.position[0], star.position[1] - (star.scale * 0.6), star.position[2]]}
+                fontSize={0.5}
+                color="white"
+                anchorX="center"
+                anchorY="top"
+                outlineWidth={0.02}
+                outlineColor="#000000"
+              >
+                {dateStr}
+              </Text>
+            );
+          })}
+        </>
+      )}
+
+      {/* 2. 動的な星 (フェードインアニメーション中。Animation終了時にstaticへ移行) */}
+      {dynamicStars.map((star) => (
         <UserStar
-          key={star.id}
+          key={`dynamic-${star.id}`}
           position={star.position}
           color={star.color}
           scale={star.scale}
           random={star.random}
-          date={typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date}         // 表示用の日付
+          date={typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date}
           starData={star}
           onStarClick={onStarClick}
         />

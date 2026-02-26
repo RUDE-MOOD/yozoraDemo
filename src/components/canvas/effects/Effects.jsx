@@ -8,7 +8,7 @@ import {
 import { BlendFunction } from "postprocessing";
 import { useControls } from "leva";
 
-export const Effects = () => {
+export const Effects = ({ isLowPerformance = false }) => {
   const bloomProps = useControls('Effects.Bloom', {
     luminanceThreshold: { value: 0.12, min: 0, max: 1, label: '輝度しきい値' },
     intensity: { value: 1.1, min: 0, max: 10, label: '強度' },
@@ -32,25 +32,30 @@ export const Effects = () => {
   }, { collapsed: true });
 
   return (
-    <EffectComposer disableNormalPass>
+    <EffectComposer disableNormalPass multisampling={0}>
       {/* 
         Bloom (輝き):
         星の輝きや発光感を強調します。
+        低パフォーマンス時は重いミップマップブラーを避けます。
       */}
       <Bloom
         luminanceThreshold={bloomProps.luminanceThreshold}
-        mipmapBlur={bloomProps.mipmapBlur}
+        mipmapBlur={isLowPerformance ? false : bloomProps.mipmapBlur}
         intensity={bloomProps.intensity}
+        levels={isLowPerformance ? 4 : 8}
       />
 
       {/* 
         Noise (ノイズ/粒子感):
         画面全体に微細な粒子を加え、デジタル特有の「プラスチック感」を消します。
+        重いピクセル処理なので、低パフォーマンス時は完全にカットします。
       */}
-      <Noise
-        opacity={noiseProps.opacity}
-        premultiply
-      />
+      {!isLowPerformance && (
+        <Noise
+          opacity={noiseProps.opacity}
+          premultiply
+        />
+      )}
 
       {/* 
         Vignette (周辺減光):
