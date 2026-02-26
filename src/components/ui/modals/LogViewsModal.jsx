@@ -50,7 +50,9 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
       const inMonth = date >= startDate && date <= endDate;
 
       // タグで絞り込み
-      const passTag = selectedTag ? (star.analysis_data?.tag === selectedTag) : true;
+      const passTag = selectedTag
+        ? star.analysis_data?.tag === selectedTag
+        : true;
 
       return inMonth && passTag;
     });
@@ -62,7 +64,9 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     });
 
     // 今月の星からタグを抽出（削除されたタグも含む）
-    const tagsInMonth = [...new Set(monthStars.map(s => s.analysis_data?.tag).filter(Boolean))];
+    const tagsInMonth = [
+      ...new Set(monthStars.map((s) => s.analysis_data?.tag).filter(Boolean)),
+    ];
 
     const daysMap = {};
     const lastDay = endDate.getDate();
@@ -88,7 +92,9 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
   // ログ画面で進める「最大月」を決定（現在のアプリ時間 または 未来に書かれた星の時間の、どちらか遅い方）
   let maxDate = new Date(now);
   if (stars && stars.length > 0) {
-    const latestStarTime = Math.max(...stars.map(s => new Date(s.created_at).getTime()));
+    const latestStarTime = Math.max(
+      ...stars.map((s) => new Date(s.created_at).getTime()),
+    );
     if (latestStarTime > maxDate.getTime()) {
       maxDate = new Date(latestStarTime);
     }
@@ -117,8 +123,10 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
 
   // 表示するタグの完全なリスト（現在のアクティブなタグ + 今月の星で使われている削除済みタグ）
   const allDisplayTags = useMemo(() => {
-    const activeTagNames = availableTags.map(t => t.tag_name);
-    const deletedButUsedTags = calendarData.tagsInMonth.filter(t => !activeTagNames.includes(t));
+    const activeTagNames = availableTags.map((t) => t.tag_name);
+    const deletedButUsedTags = calendarData.tagsInMonth.filter(
+      (t) => !activeTagNames.includes(t),
+    );
     return [...activeTagNames, ...deletedButUsedTags];
   }, [availableTags, calendarData.tagsInMonth]);
 
@@ -420,9 +428,26 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                   cursor: "pointer",
                 }}
               >
-                <option value="" style={{ color: "#000" }}>すべてのタグ</option>
-                {allDisplayTags.map(tag => (
-                  <option key={tag} value={tag} style={{ color: "#000" }}>
+                <option
+                  value=""
+                  style={{
+                    color: "#000",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
+                >
+                  すべてのタグ
+                </option>
+                {allDisplayTags.map((tag) => (
+                  <option
+                    key={tag}
+                    value={tag}
+                    style={{
+                      color: "#000",
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
+                    }}
+                  >
                     #{tag}
                   </option>
                 ))}
@@ -581,9 +606,26 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                   cursor: "pointer",
                 }}
               >
-                <option value="" style={{ color: "#000" }}>すべてのタグ</option>
-                {allDisplayTags.map(tag => (
-                  <option key={tag} value={tag} style={{ color: "#000" }}>
+                <option
+                  value=""
+                  style={{
+                    color: "#000",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
+                >
+                  すべてのタグ
+                </option>
+                {allDisplayTags.map((tag) => (
+                  <option
+                    key={tag}
+                    value={tag}
+                    style={{
+                      color: "#000",
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
+                    }}
+                  >
                     #{tag}
                   </option>
                 ))}

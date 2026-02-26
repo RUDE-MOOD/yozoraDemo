@@ -267,7 +267,7 @@ export const UI = ({ onSend, onStarClick }) => {
         // Tag情報を送るために、analysisResult がなければ空オブジェクトを作り、そこにタグを混ぜる
         const finalAnalysisResult = {
           ...(analysisResult || {}),
-          ...(selectedTag ? { tag: selectedTag.tag_name } : {})
+          ...(selectedTag ? { tag: selectedTag.tag_name } : {}),
         };
         await onSend(moodValues, finalAnalysisResult, goodThings);
       }
@@ -1085,10 +1085,11 @@ export const UI = ({ onSend, onStarClick }) => {
                                 if (isSelected) setSelectedTag(null);
                                 else setSelectedTag(tag);
                               }}
-                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
-                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
-                                }`}
+                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${
+                                isSelected
+                                  ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                  : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                              }`}
                             >
                               #{tag.tag_name}
                             </button>

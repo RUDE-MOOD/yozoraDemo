@@ -153,7 +153,12 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
             />
           </svg>
         </button>
-        <span className="text-white/70 text-sm tracking-wide">マイセイザ</span>
+        <span
+          className="text-white/70 text-sm tracking-wide"
+          style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+        >
+          マイセイザ
+        </span>
       </div>
 
       {/* 詳細コンテンツ（スクロール可能） */}
@@ -170,7 +175,10 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
         {/* 星座名 + 進捗 */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-white/95 text-2xl font-bold tracking-wide">
+            <h2
+              className="text-white/95 text-2xl font-bold tracking-wide"
+              style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+            >
               {constellation.name}
             </h2>
             {isCompleted ? (
@@ -187,7 +195,10 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
             )}
           </div>
           {isCompleted && (
-            <p className="text-white/30 text-xs tracking-wide">
+            <p
+              className="text-white/30 text-xs tracking-wide"
+              style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+            >
               {constellation.completedDate}に完成
             </p>
           )}
@@ -197,7 +208,11 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
         <div className="mb-6">
           <p
             className="text-white/70 text-sm leading-relaxed whitespace-pre-line"
-            style={{ margin: "10px" }}
+            style={{
+              margin: "10px",
+              fontFamily: "Kiwi Maru",
+              letterSpacing: "0rem",
+            }}
           >
             {constellation.description}
           </p>
@@ -211,7 +226,11 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
             </h3>
             <p
               className="text-white/70 text-sm leading-relaxed whitespace-pre-line"
-              style={{ margin: "10px" }}
+              style={{
+                margin: "10px",
+                fontFamily: "Kiwi Maru",
+                letterSpacing: "0rem",
+              }}
             >
               {constellation.features}
             </p>
@@ -221,12 +240,19 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
         {/* 由来と歴史 */}
         {constellation.history && (
           <div className="mb-6">
-            <h3 className="text-white/90 text-lg font-bold mb-3 tracking-wide">
+            <h3
+              className="text-white/90 text-lg font-bold mb-3 tracking-wide"
+              style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+            >
               由来と歴史
             </h3>
             <p
               className="text-white/70 text-sm leading-relaxed whitespace-pre-line"
-              style={{ margin: "10px" }}
+              style={{
+                margin: "10px",
+                fontFamily: "Kiwi Maru",
+                letterSpacing: "0rem",
+              }}
             >
               {constellation.history}
             </p>
@@ -344,7 +370,10 @@ export function ConstellationModal({ isOpen, onClose }) {
             <>
               {/* ヘッダー */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-white/95 text-xl font-bold tracking-[0.15em]">
+                <h2
+                  className="text-white/95 text-xl font-bold tracking-[0.15em]"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
                   マイセイザ
                 </h2>
                 <button
