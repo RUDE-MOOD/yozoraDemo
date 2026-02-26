@@ -314,7 +314,7 @@ export function ProfileModal({ isOpen, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 md:justify-start md:pl-8 pointer-events-none"
-      //   onClick={onClose} // Currently commented out
+    //   onClick={onClose} // Currently commented out
     >
       {/* バックドロップ — (現在は使用していないようです。必要なら復活) */}
       {/* <div className="absolute inset-0 bg-black/20 transition-opacity duration-300" /> */}
@@ -636,7 +636,7 @@ export function ProfileModal({ isOpen, onClose }) {
                 </p>
                 <div className="flex flex-wrap gap-2 items-center justify-center">
                   {tags.map((tag) => (
-                    <div key={tag.id} className="relative group">
+                    <div key={tag.id} className="relative group flex items-center">
                       {editingTagId === tag.id ? (
                         <input
                           ref={editTagRef}
@@ -653,29 +653,33 @@ export function ProfileModal({ isOpen, onClose }) {
                           style={{ padding: "4px 7px" }}
                         />
                       ) : (
-                        <div className="flex items-center">
-                          <button
-                            onClick={() => {
-                              setEditingTagId(tag.id);
-                              setEditingTagValue(tag.tag_name);
-                            }}
-                            className="px-4 py-1.5 bg-white/8 hover:bg-white/15 border border-white/10 rounded-full text-white/80 text-xs transition-colors duration-200 cursor-pointer"
-                            style={{ padding: "8px 15px" }}
-                          >
-                            #{tag.tag_name}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteTag(tag.id);
-                            }}
-                            className="w-5 h-5 -ml-2 flex items-center justify-center rounded-full bg-red-500/60 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-500/90 text-[10px]"
-                            style={{ lineHeight: 1 }}
-                          >
-                            ✕
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => {
+                            setEditingTagId(tag.id);
+                            setEditingTagValue(tag.tag_name);
+                          }}
+                          className="px-4 py-1.5 bg-white/8 hover:bg-white/15 border border-white/10 rounded-full text-white/80 text-xs transition-colors duration-200 cursor-pointer"
+                          style={{ padding: "8px 15px" }}
+                        >
+                          #{tag.tag_name}
+                        </button>
                       )}
+
+                      {/* Delete button with animation */}
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDeleteTag(tag.id);
+                        }}
+                        className={`absolute -right-2 -top-2 z-10 flex items-center justify-center rounded-full bg-red-500/80 text-white transition-all duration-300 ease-out hover:bg-red-500 hover:scale-110 text-[10px] ${editingTagId === tag.id
+                            ? "w-5 h-5 opacity-100 scale-100 translate-y-0"
+                            : "w-0 h-0 opacity-0 scale-50 translate-y-1 overflow-hidden"
+                          }`}
+                        style={{ lineHeight: 1 }}
+                      >
+                        ✕
+                      </button>
                     </div>
                   ))}
 
