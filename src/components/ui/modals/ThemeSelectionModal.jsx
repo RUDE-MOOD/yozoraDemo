@@ -37,7 +37,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
 
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-sm md:max-w-lg mx-6 md:mx-4 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-sm md:max-w-lg mx-6 md:mx-4 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible"
         style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
       >
         {/* Header */}
@@ -87,8 +87,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             背景色
           </p>
           <div
-            className={`flex flex-wrap justify-center gap-y-4 gap-x-4 transition-opacity duration-300 ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
-            style={{ maxWidth: "340px", margin: "0 auto" }}
+            className={`flex flex-wrap md:grid md:grid-cols-3 justify-center md:place-items-center gap-y-4 gap-x-4 md:gap-x-0 transition-opacity duration-300 max-w-[340px] md:max-w-none mx-auto ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
           >
             {themes.map((theme) => (
               <div
@@ -131,8 +130,8 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             背景タイプ
           </p>
           <div
-            className="flex flex-wrap justify-center gap-y-4 gap-x-4"
-            style={{ marginBottom: "20px", maxWidth: "340px", margin: "0 auto" }}
+            className="flex flex-wrap md:flex-nowrap justify-center gap-y-4 md:gap-y-0 gap-x-4 md:gap-x-10 max-w-[340px] md:max-w-none mx-auto md:mx-0"
+            style={{ marginBottom: "20px" }}
           >
             {skyboxes.map((skybox) => (
               <div
