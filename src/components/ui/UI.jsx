@@ -292,7 +292,11 @@ export const UI = ({ onSend, onStarClick }) => {
                 stroke="currentColor"
                 className="w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
+                />
               </svg>
             </button>
           )}
@@ -336,8 +340,9 @@ export const UI = ({ onSend, onStarClick }) => {
                 setStarOpen(false);
                 setConstellationModalOpen(false);
               }}
-              className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
-                }`}
+              className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${
+                cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
+              }`}
               title={cooldown ? `冷却中: ${cooldownTime}` : "日記を書く"}
             >
               {/* ロケットアイコン (Rocket Icon) */}
@@ -363,21 +368,6 @@ export const UI = ({ onSend, onStarClick }) => {
             </button>
           </div>
         </div>
-
-        {/* {menuOpen && (
-          <div className="absolute bottom-12 right-0 w-40 bg-[#1a1a3a]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden animate-fade-in-up origin-bottom-right">
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                setDiaryOpen(true);
-              }}
-              className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs"
-              style={{ paddingLeft: "1rem", paddingRight: "1.25rem" }}
-            >
-              日記を書く
-            </button>
-          </div>
-        )} */}
       </div>
 
       {/* --- ユーザーメニュー (User Menu) --- */}
@@ -468,6 +458,8 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   プロフィール
@@ -483,6 +475,8 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   マイセイザ
@@ -499,6 +493,8 @@ export const UI = ({ onSend, onStarClick }) => {
                     style={{
                       borderRadius: "5px",
                       padding: "0.2rem 1.25rem 0.2rem 1rem",
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
                     }}
                   >
                     未来への手紙
@@ -513,6 +509,8 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   テーマ
@@ -526,6 +524,8 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   ログ
@@ -538,6 +538,8 @@ export const UI = ({ onSend, onStarClick }) => {
                   style={{
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   設定
@@ -584,7 +586,12 @@ export const UI = ({ onSend, onStarClick }) => {
                   </button>
                   <span
                     className="text-white font-sans"
-                    style={{ fontSize: "12px", padding: "3px" }}
+                    style={{
+                      fontSize: "12px",
+                      padding: "3px",
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
+                    }}
                   >
                     アカウント設定
                   </span>
@@ -608,6 +615,8 @@ export const UI = ({ onSend, onStarClick }) => {
                     borderRadius: "5px",
                     padding: "0.2rem 1.25rem 0.2rem 1rem",
                     fontSize: "12px",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
                   }}
                 >
                   ログアウト
@@ -699,7 +708,10 @@ export const UI = ({ onSend, onStarClick }) => {
                   className="w-4 h-4 rounded bg-white/10 border-white/20 text-yellow-500 cursor-pointer"
                   style={{ accentColor: "#eab308" }}
                 />
-                <label htmlFor="showRocketSkip" className="text-[11px] text-white/70 cursor-pointer select-none">
+                <label
+                  htmlFor="showRocketSkip"
+                  className="text-[11px] text-white/70 cursor-pointer select-none"
+                >
                   クイックスキップボタンを表示 (右下)
                 </label>
               </div>
@@ -829,7 +841,12 @@ export const UI = ({ onSend, onStarClick }) => {
               {/* 中央: 日付 */}
               <h2
                 className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
-                style={{ fontSize: "28px", marginBottom: "15px" }}
+                style={{
+                  fontSize: "28px",
+                  marginBottom: "15px",
+                  fontFamily: "Kiwi Maru",
+                  letterSpacing: "0rem",
+                }}
               >
                 {getFormattedDate()}
               </h2>
@@ -865,8 +882,9 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                    }`}
+                  className={`flex-1 space-y-6 min-w-0 ${
+                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                  }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div
@@ -874,7 +892,13 @@ export const UI = ({ onSend, onStarClick }) => {
                       className="space-y-2"
                       style={{ margin: "12px 0" }}
                     >
-                      <p className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left">
+                      <p
+                        className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left"
+                        style={{
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      >
                         {q.question}
                       </p>
                       <div className="relative px-3">
@@ -898,7 +922,13 @@ export const UI = ({ onSend, onStarClick }) => {
                           }}
                         />
                       </div>
-                      <div className="flex justify-between text-white/50 text-xs font-sans">
+                      <div
+                        className="flex justify-between text-white/50 text-xs font-sans"
+                        style={{
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      >
                         <span>{q.leftLabel}</span>
                         <span>{q.rightLabel}</span>
                       </div>
@@ -932,11 +962,15 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                    }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
+                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                  }`}
                 >
                   <div className="space-y-2">
-                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                    <label
+                      className="text-white/90 text-sm font-sans tracking-wide block"
+                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                    >
                       今日のいいこと1{" "}
                       <span className="text-white/50">(必須)</span>
                     </label>
@@ -950,11 +984,16 @@ export const UI = ({ onSend, onStarClick }) => {
                         height: "80px",
                         margin: "10px 0",
                         padding: "10px",
+                        fontFamily: "Kiwi Maru",
+                        letterSpacing: "0rem",
                       }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                    <label
+                      className="text-white/90 text-sm font-sans tracking-wide block"
+                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                    >
                       今日のいいこと2{" "}
                       <span className="text-white/50">(任意)</span>
                     </label>
@@ -968,11 +1007,16 @@ export const UI = ({ onSend, onStarClick }) => {
                         height: "80px",
                         margin: "10px 0",
                         padding: "10px",
+                        fontFamily: "Kiwi Maru",
+                        letterSpacing: "0rem",
                       }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-white/90 text-sm font-sans tracking-wide block">
+                    <label
+                      className="text-white/90 text-sm font-sans tracking-wide block"
+                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                    >
                       今日のいいこと3{" "}
                       <span className="text-white/50">(任意)</span>
                     </label>
@@ -986,6 +1030,8 @@ export const UI = ({ onSend, onStarClick }) => {
                         height: "80px",
                         margin: "10px 0",
                         padding: "10px",
+                        fontFamily: "Kiwi Maru",
+                        letterSpacing: "0rem",
                       }}
                     />
                   </div>
@@ -996,7 +1042,12 @@ export const UI = ({ onSend, onStarClick }) => {
                       onClick={handleSend}
                       disabled={isSending || !goodThing1.trim()}
                       className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white/70 text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                      style={{ padding: "8px", fontWeight: "bold" }}
+                      style={{
+                        padding: "8px",
+                        fontWeight: "bold",
+                        fontFamily: "Kiwi Maru",
+                        letterSpacing: "0rem",
+                      }}
                     >
                       {isSending ? (
                         <span className="flex items-center justify-center gap-2">

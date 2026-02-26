@@ -338,7 +338,12 @@ export const FutureMessageInputModal = () => {
         {/* 説明テキスト */}
         <p
           className="text-white/80 text-sm text-center leading-relaxed font-sans mb-5 px-2"
-          style={{ padding: "20px", fontSize: "12px" }}
+          style={{
+            padding: "20px",
+            fontSize: "14px",
+            fontFamily: "Kiwi Maru",
+            letterSpacing: "0rem",
+          }}
         >
           今の気持ちや未来の自分に伝えたいことを書いてください。
           <br />
@@ -352,14 +357,22 @@ export const FutureMessageInputModal = () => {
           placeholder="未来の自分へ..."
           maxLength={500}
           className="w-full h-32 px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none scrollbar-hidden"
-          style={{ padding: "10px" }}
+          style={{
+            padding: "10px",
+            fontFamily: "Kiwi Maru",
+            letterSpacing: "0rem",
+          }}
         />
 
         {/* テキストが空の場合のヒント */}
         {!message.trim() && (
           <p
             className="text-white/30 text-xs text-center mt-3 font-sans"
-            style={{ paddingTop: "20px" }}
+            style={{
+              paddingTop: "20px",
+              fontFamily: "Kiwi Maru",
+              letterSpacing: "0rem",
+            }}
           >
             メッセージを入力してから星を上にスワイプしてください
           </p>

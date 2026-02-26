@@ -326,6 +326,8 @@ export function ProfileModal({ isOpen, onClose }) {
           padding: "10px 30px 30px 30px",
           maxHeight: "85vh",
           margin: "0 1rem",
+          fontFamily: "Kiwi Maru",
+          letterSpacing: "0rem",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -446,7 +448,11 @@ export function ProfileModal({ isOpen, onClose }) {
               >
                 <p
                   className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2"
-                  style={{ margin: "5px 0" }}
+                  style={{
+                    margin: "5px 0",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
                 >
                   メールアドレス
                 </p>
@@ -550,7 +556,11 @@ export function ProfileModal({ isOpen, onClose }) {
               >
                 <p
                   className="text-white/50 text-xs tracking-[0.2em] font-sans mb-2"
-                  style={{ margin: "5px 0" }}
+                  style={{
+                    margin: "5px 0",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
                 >
                   パスワード
                 </p>
@@ -616,7 +626,11 @@ export function ProfileModal({ isOpen, onClose }) {
               <div style={{ padding: "5px 0", margin: "20px 0" }}>
                 <p
                   className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center"
-                  style={{ margin: "10px 0" }}
+                  style={{
+                    margin: "10px 0",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
                 >
                   タグ
                 </p>

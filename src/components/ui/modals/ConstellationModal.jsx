@@ -95,7 +95,10 @@ function ConstellationCard({ constellation, onClick }) {
       style={{ padding: "0 10px" }}
     >
       {/* 左: テキスト */}
-      <div className="flex-1 min-w-0">
+      <div
+        className="flex-1 min-w-0"
+        style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+      >
         <h3 className="text-white/95 text-xl font-bold tracking-wide mb-2">
           {constellation.name}
         </h3>
@@ -394,6 +397,7 @@ export function ConstellationModal({ isOpen, onClose }) {
       <div
         className="relative z-10 hidden md:flex items-start gap-4 max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
+        style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
       >
         {/* 左パネル: リスト */}
         <div

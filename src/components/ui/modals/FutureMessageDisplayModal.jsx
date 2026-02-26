@@ -38,11 +38,18 @@ export const FutureMessageDisplayModal = () => {
         style={{
           margin: "50px",
           padding: "20px",
+          fontFamily: "Kiwi Maru",
+          letterSpacing: "0rem",
         }}
       >
         <h2
           className="text-center text-white/95 font-sans text-xl tracking-[0.2em] font-light mb-8 drop-shadow-[0_0_10px_rgba(255,200,200,0.5)]"
-          style={{ fontSize: "16px", margin: "10px" }}
+          style={{
+            fontSize: "16px",
+            margin: "10px",
+            fontFamily: "Kiwi Maru",
+            letterSpacing: "0rem",
+          }}
         >
           何億光年を渡ってあなたの光が届きました
         </h2>

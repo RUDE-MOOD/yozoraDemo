@@ -188,7 +188,10 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
             className="w-full bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-4 max-h-[120px] overflow-y-auto scrollbar-hidden"
             style={{ padding: "20px" }}
           >
-            <p className="text-white/90 text-sm leading-relaxed text-center font-sans">
+            <p
+              className="text-white/90 text-sm leading-relaxed text-center font-sans"
+              style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+            >
               {displayAnalysis.feedback}
             </p>
           </div>
@@ -242,10 +245,16 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
 
             {/* 日付 */}
             <div className="text-center mb-6" style={{ padding: "5px" }}>
-              <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1">
+              <p
+                className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1"
+                style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+              >
                 日付
               </p>
-              <p className="text-white/95 text-lg font-sans tracking-wide">
+              <p
+                className="text-white/95 text-lg font-sans tracking-wide"
+                style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+              >
                 {formatDateOnly(starData.display_date)}
               </p>
             </div>
@@ -253,10 +262,16 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
             {/* 感情 */}
             {hasAnalysis && displayAnalysis.emotion && (
               <div className="text-center mb-6" style={{ padding: "5px" }}>
-                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1">
+                <p
+                  className="text-white/50 text-xs tracking-[0.2em] font-sans mb-1"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
                   感情
                 </p>
-                <p className="text-white/95 text-lg font-sans tracking-wide">
+                <p
+                  className="text-white/95 text-lg font-sans tracking-wide"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
                   {displayAnalysis.emotion}
                 </p>
               </div>
@@ -265,7 +280,10 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
             {/* 3 Good Things */}
             {goodThingsList.length > 0 && (
               <div className="mb-4" style={{ padding: "5px" }}>
-                <p className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center">
+                <p
+                  className="text-white/50 text-xs tracking-[0.2em] font-sans mb-3 text-center"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
                   3 Good Things
                 </p>
                 <div className="space-y-2.5">
@@ -278,7 +296,13 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                       <span className="text-white/60 text-sm mt-0.5 flex-shrink-0">
                         •
                       </span>
-                      <p className="text-white/90 text-sm leading-relaxed font-sans break-words min-w-0">
+                      <p
+                        className="text-white/90 text-sm leading-relaxed font-sans break-words min-w-0"
+                        style={{
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      >
                         {thing}
                       </p>
                     </div>

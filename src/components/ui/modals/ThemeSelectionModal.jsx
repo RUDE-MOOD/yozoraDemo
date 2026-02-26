@@ -44,7 +44,12 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         <div className="relative flex items-center justify-center py-4 border-b border-white/10">
           <h2
             className="text-white/90 font-sans text-lg tracking-widest font-heavy"
-            style={{ margin: "8px", fontSize: "16px" }}
+            style={{
+              margin: "8px",
+              fontSize: "16px",
+              fontFamily: "Kiwi Maru",
+              letterSpacing: "0rem",
+            }}
           >
             テーマ変更
           </h2>
@@ -73,7 +78,11 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         <div className="px-8 pt-6 pb-2">
           <p
             className="text-white/50 text-xs tracking-widest text-center mb-4"
-            style={{ margin: "10px" }}
+            style={{
+              margin: "10px",
+              fontFamily: "Kiwi Maru",
+              letterSpacing: "0rem",
+            }}
           >
             背景色
           </p>
@@ -112,7 +121,11 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
         <div className="px-8 pt-4 pb-6">
           <p
             className="text-white/50 text-xs tracking-widest text-center mb-4"
-            style={{ margin: "30px 0 10px 0" }}
+            style={{
+              margin: "30px 0 10px 0",
+              fontFamily: "Kiwi Maru",
+              letterSpacing: "0rem",
+            }}
           >
             背景タイプ
           </p>
@@ -153,7 +166,10 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Label */}
-                <span className="text-white/60 text-xs tracking-wider">
+                <span
+                  className="text-white/60 text-xs tracking-wider"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
                   {skybox.name}
                 </span>
 

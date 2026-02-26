@@ -174,7 +174,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
         justifyContent: "center",
         zIndex: 2000,
         color: "#fff",
-        fontFamily: "sans-serif",
+        fontFamily: "Kiwi Maru",
       }}
       onClick={onClose}
     >
@@ -229,7 +229,6 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-
         {/* ===== デスクトップ用ヘッダー（横一列） ===== */}
         <div
           className="log-header-desktop"
@@ -248,7 +247,8 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                 margin: 0,
                 fontSize: "1.3rem",
                 color: "#fff",
-                letterSpacing: "0.15em",
+                letterSpacing: "0r  em",
+                fontFamily: "Kiwi Maru",
               }}
             >
               ログ一覧
@@ -304,7 +304,8 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
                 minWidth: "180px",
                 textAlign: "center",
                 display: "inline-block",
-                letterSpacing: "0.2rem",
+                letterSpacing: "0rem",
+                fontFamily: "Kiwi Maru",
               }}
             >
               {calendarData.month}月 {calendarData.year}年
