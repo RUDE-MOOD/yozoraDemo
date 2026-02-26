@@ -37,7 +37,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
 
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-lg mx-4 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col"
+        className="relative w-full max-w-sm md:max-w-lg mx-6 md:mx-4 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-100 opacity-100 flex flex-col max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
       >
         {/* Header */}
@@ -87,7 +87,8 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             背景色
           </p>
           <div
-            className={`grid grid-cols-3 gap-y-4 transition-opacity duration-300 place-items-center ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
+            className={`flex flex-wrap justify-center gap-y-4 gap-x-4 transition-opacity duration-300 ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
+            style={{ maxWidth: "340px", margin: "0 auto" }}
           >
             {themes.map((theme) => (
               <div
@@ -130,8 +131,8 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             背景タイプ
           </p>
           <div
-            className="flex justify-center gap-x-10"
-            style={{ marginBottom: "20px" }}
+            className="flex flex-wrap justify-center gap-y-4 gap-x-4"
+            style={{ marginBottom: "20px", maxWidth: "340px", margin: "0 auto" }}
           >
             {skyboxes.map((skybox) => (
               <div
@@ -149,18 +150,18 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                     style={
                       skybox.id === "classic"
                         ? {
-                            background:
-                              "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
-                          }
+                          background:
+                            "linear-gradient(180deg, #000000 0%, #1a0b2e 40%, #4b0082 70%, #8900f2 100%)",
+                        }
                         : skybox.id === "mixed"
                           ? {
-                              background:
-                                "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
-                            }
+                            background:
+                              "linear-gradient(180deg, #000000 0%, #1a0b2e 30%, #4b0082 50%, #7b68ee 80%, #8900f2 100%)",
+                          }
                           : {
-                              background:
-                                "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
-                            }
+                            background:
+                              "radial-gradient(ellipse at 30% 50%, #7b68ee 0%, #4b0082 30%, #1a0a2e 60%, #0a0a1a 100%)",
+                          }
                     }
                   />
                 </div>
