@@ -161,6 +161,7 @@ export const useStarStore = create((set, get) => ({
                 random: Math.random(),
                 created_at: new Date().toISOString(),
                 display_date: new Date().toISOString(),
+                isJustCreated: true,
                 analysis_data: {
                     constellation: {
                         id: target.id,

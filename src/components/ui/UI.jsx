@@ -212,6 +212,7 @@ export const UI = ({ onSend, onStarClick }) => {
   const closeDiaryModal = () => {
     setDiaryOpen(false);
     setMobileDiaryStep(0);
+    window.scrollTo(0, 0);
   };
 
   // 星の詳細を表示する関数
@@ -286,6 +287,7 @@ export const UI = ({ onSend, onStarClick }) => {
       setSelectedTag(null);
       setMobileDiaryStep(0);
       setDiaryOpen(false);
+      window.scrollTo(0, 0);
 
       // 4. Trigger Check for Future Message (Shooting Star)
       // We need to access the store (but hooks can't be used inside callbacks easily if not defined at top)
@@ -1108,8 +1110,8 @@ export const UI = ({ onSend, onStarClick }) => {
                                 else setSelectedTag(tag);
                               }}
                               className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
-                                  ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                                  : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
                                 }`}
                             >
                               #{tag.tag_name}
