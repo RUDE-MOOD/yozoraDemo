@@ -15,6 +15,8 @@ import { supabase } from './supabaseClient';
 
 import { useUserStore } from './store/useUserStore';
 
+import { translateAuthError } from './utils/errorTranslator';
+
 function App() {
   // Zustand storeから星のデータと追加関数を取得
   const { stars, addStar, fetchStars, subscribeToStars, focusTarget } = useStarStore();
@@ -96,10 +98,7 @@ function App() {
               password,
             });
             if (error) {
-              if (error.message === 'Invalid login credentials') {
-                throw new Error('メールアドレスまたはパスワードが間違っています。');
-              }
-              throw error;
+              throw new Error(translateAuthError(error));
             }
             setPhase('success');
           }}
@@ -120,7 +119,7 @@ function App() {
               email,
               options: { shouldCreateUser: false },
             });
-            if (error) throw error;
+            if (error) throw new Error(translateAuthError(error));
           }}
           onSubmitCode={async (email, code) => {
             const { error } = await supabase.auth.verifyOtp({
@@ -128,13 +127,13 @@ function App() {
               token: code,
               type: 'email',
             });
-            if (error) throw error;
+            if (error) throw new Error(translateAuthError(error));
           }}
           onSubmitNewPassword={async (email, code, password) => {
             const { error } = await supabase.auth.updateUser({
               password: password
             });
-            if (error) throw error;
+            if (error) throw new Error(translateAuthError(error));
             setShowApp(true);
             setPhase('app');
           }}
@@ -156,10 +155,7 @@ function App() {
             });
 
             if (authError) {
-              if (authError.message === 'User already registered') {
-                throw new Error('このメールアドレスは既に登録されています。');
-              }
-              throw authError;
+              throw new Error(translateAuthError(authError));
             }
             if (!authData.user) throw new Error('ユーザー登録に失敗しました');
 

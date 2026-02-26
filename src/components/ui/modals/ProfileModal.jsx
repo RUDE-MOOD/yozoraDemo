@@ -3,6 +3,7 @@ import { supabase } from "../../../supabaseClient";
 import { useUserStore } from "../../../store/useUserStore";
 import { useStarStore } from "../../../store/useStarStore";
 import { CONSTELLATIONS } from "../../../data/constellationData";
+import { translateAuthError } from "../../../utils/errorTranslator";
 
 /**
  * プロフィールモーダル
@@ -128,7 +129,7 @@ export function ProfileModal({ isOpen, onClose }) {
       if (error) throw error;
       setEmailStep(2);
     } catch (err) {
-      setEmailError(err.message || "OTP送信に失敗しました");
+      setEmailError(translateAuthError(err) || "OTP送信に失敗しました");
     } finally {
       setEmailSaving(false);
     }
@@ -152,7 +153,7 @@ export function ProfileModal({ isOpen, onClose }) {
       setNewEmail("");
       setEmailOtp("");
     } catch (err) {
-      setEmailError(err.message || "検証に失敗しました");
+      setEmailError(translateAuthError(err) || "検証に失敗しました");
     } finally {
       setEmailSaving(false);
     }
@@ -174,7 +175,7 @@ export function ProfileModal({ isOpen, onClose }) {
       setIsEditingPassword(false);
       setNewPassword("");
     } catch (err) {
-      setPasswordError(err.message || "パスワード変更に失敗しました");
+      setPasswordError(translateAuthError(err) || "パスワード変更に失敗しました");
     } finally {
       setPasswordSaving(false);
     }
@@ -673,8 +674,8 @@ export function ProfileModal({ isOpen, onClose }) {
                           handleDeleteTag(tag.id);
                         }}
                         className={`absolute -right-2 -top-2 z-10 flex items-center justify-center rounded-full bg-red-500/80 text-white transition-all duration-300 ease-out hover:bg-red-500 hover:scale-110 text-[10px] ${editingTagId === tag.id
-                            ? "w-5 h-5 opacity-100 scale-100 translate-y-0"
-                            : "w-0 h-0 opacity-0 scale-50 translate-y-1 overflow-hidden"
+                          ? "w-5 h-5 opacity-100 scale-100 translate-y-0"
+                          : "w-0 h-0 opacity-0 scale-50 translate-y-1 overflow-hidden"
                           }`}
                         style={{ lineHeight: 1 }}
                       >

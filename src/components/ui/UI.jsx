@@ -114,7 +114,7 @@ export const UI = ({ onSend, onStarClick }) => {
     debug_loadMockMessage,
   } = useFutureMessageStore();
 
-  const { user } = useUserStore();
+  const { user, showStarDate, toggleShowStarDate } = useUserStore();
 
   const { setFocusTarget, stars, debug_showConstellation } = useStarStore();
 
@@ -373,9 +373,8 @@ export const UI = ({ onSend, onStarClick }) => {
                 setStarOpen(false);
                 setConstellationModalOpen(false);
               }}
-              className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${
-                cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
-              }`}
+              className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
+                }`}
               title={cooldown ? `冷却中: ${cooldownTime}` : "日記を書く"}
             >
               {/* ロケットアイコン (Rocket Icon) */}
@@ -628,6 +627,28 @@ export const UI = ({ onSend, onStarClick }) => {
                   >
                     アカウント設定
                   </span>
+                </div>
+
+                {/* Date Display Toggle */}
+                <div className="px-6 py-3 flex items-center justify-between border-b border-white/5">
+                  <span
+                    className="text-white/90 font-sans tracking-widest text-xs"
+                    style={{
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
+                    }}
+                  >
+                    星の日付を表示
+                  </span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={showStarDate}
+                      onChange={toggleShowStarDate}
+                    />
+                    <div className="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                  </label>
                 </div>
 
                 {/* Logout */}
@@ -915,9 +936,8 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${
-                    mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                  }`}
+                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                    }`}
                 >
                   {MOOD_QUESTIONS.map((q) => (
                     <div
@@ -995,9 +1015,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${
-                    mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                  }`}
+                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                    }`}
                 >
                   <div className="space-y-2">
                     <label
@@ -1088,11 +1107,10 @@ export const UI = ({ onSend, onStarClick }) => {
                                 if (isSelected) setSelectedTag(null);
                                 else setSelectedTag(tag);
                               }}
-                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${
-                                isSelected
+                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
                                   ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
                                   : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
-                              }`}
+                                }`}
                             >
                               #{tag.tag_name}
                             </button>

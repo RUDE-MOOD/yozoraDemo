@@ -72,6 +72,7 @@ export const useStarStore = create((set, get) => ({
         const starForShow = {
             ...newStar,
             analysis_data: analysisData,
+            isJustCreated: true, // 新しく追加された星であることを示すフラグ
         };
         // 成功したら、画面を更新し、カメラのフォーカス対象を設定する
         set((state) => ({

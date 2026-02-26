@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { shaderMaterial, Billboard, Text } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
+import { useUserStore } from '../../../store/useUserStore'
 
 // --- SingleStarMaterial ---
 // MyStarMaterialを単一の星用に調整したシェーダー
@@ -66,10 +67,24 @@ extend({ SingleStarMaterial })
 
 export function UserStar({ position, color, scale, random, date, starData, onStarClick }) {
   const materialRef = useRef()
+  const { showStarDate } = useUserStore();
+
+  // マウント時に、この星が新しく作られたものか判定（isJustCreatedフラグ）
+  const isNewRef = useRef(starData?.isJustCreated === true);
+  const elapsedRef = useRef(0);
 
   useFrame((state, delta) => {
     if (materialRef.current) {
       materialRef.current.time += delta
+
+      if (isNewRef.current) {
+        elapsedRef.current += delta;
+        // 1.5秒待機（カメラが移動する時間）後、1.5秒かけてフェードイン
+        const progress = Math.min(Math.max((elapsedRef.current - 1.5) / 1.5, 0.0), 1.0);
+        materialRef.current.baseBrightness = progress;
+      } else {
+        materialRef.current.baseBrightness = 1.0;
+      }
     }
   })
 
@@ -106,18 +121,21 @@ export function UserStar({ position, color, scale, random, date, starData, onSta
           />
         </mesh>
         {/* 日付ラベル */}
-        <Text
-          position={[0, -scale * 0.6, 0]} // 星の下に配置
-          fontSize={0.5}
-          color="white"
-          anchorX="center"
-          anchorY="top"
-          outlineWidth={0.02}
-          outlineColor="#000000"
-        >
-          {date}
-        </Text>
+        {showStarDate && (
+          <Text
+            position={[0, -scale * 0.6, 0]} // 星の下に配置
+            fontSize={0.5}
+            color="white"
+            anchorX="center"
+            anchorY="top"
+            outlineWidth={0.02}
+            outlineColor="#000000"
+          >
+            {date}
+          </Text>
+        )}
       </Billboard>
     </group>
   )
 }
+

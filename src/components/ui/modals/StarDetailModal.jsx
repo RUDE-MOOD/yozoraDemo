@@ -227,8 +227,8 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
               </button>
             </div>
 
-            {/* 埋め込み3D星プレビュー */}
-            <div className="flex justify-center mb-6">
+            {/* 埋め込み3D星プレビューとタグ */}
+            <div className="flex flex-col items-center justify-center mb-6 gap-2">
               <div style={{ width: 100, height: 100 }}>
                 <Canvas
                   gl={{ alpha: true, antialias: true }}
@@ -241,9 +241,17 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                   />
                 </Canvas>
               </div>
+              {analysis.tag && (
+                <span
+                  className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-white/90 text-xs font-sans shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                  style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                >
+                  #{analysis.tag}
+                </span>
+              )}
             </div>
 
-            {/* 日付・タグ */}
+            {/* 日付 */}
             <div
               className="flex flex-col items-center justify-center gap-2 mb-6"
               style={{
@@ -262,14 +270,6 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                 >
                   {formatDateOnly(starData.display_date)}
                 </p>
-                {analysis.tag && (
-                  <span
-                    className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-white/90 text-xs font-sans shadow-[0_0_10px_rgba(255,255,255,0.1)]"
-                    style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
-                  >
-                    #{analysis.tag}
-                  </span>
-                )}
               </div>
             </div>
 
