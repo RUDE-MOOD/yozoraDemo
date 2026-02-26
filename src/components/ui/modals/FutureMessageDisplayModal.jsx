@@ -29,7 +29,7 @@ export const FutureMessageDisplayModal = () => {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-[#050510]/80 backdrop-blur-sm transition-opacity duration-300"
-        onClick={handleClose}
+        // onClick={handleClose}
       ></div>
 
       {/* Modal Content */}
@@ -55,7 +55,7 @@ export const FutureMessageDisplayModal = () => {
         </h2>
 
         <div className="mb-6 flex justify-center">
-          <span className="text-pink-200/50 text-xs tracking-widest border-b border-pink-200/20 pb-1">
+          <span className="text-pink-200/50 text-xs tracking-widest pb-1">
             {currentMessage.display_date || "Unknown Date"}
           </span>
         </div>
@@ -63,7 +63,7 @@ export const FutureMessageDisplayModal = () => {
         <div className="space-y-6">
           <p
             className="text-white/90 text-lg text-center leading-loose font-serif italic"
-            style={{ fontSize: "16px", margin: "10px" }}
+            style={{ fontSize: "18px", margin: "10px" }}
           >
             "{currentMessage.message}"
           </p>
@@ -76,6 +76,20 @@ export const FutureMessageDisplayModal = () => {
             >
               受け取る
             </button>
+          </div>
+          <div className="flex justify-center mt-8">
+            <p
+              className="text-white/90 text-lg text-center leading-loose font-serif italic"
+              style={{
+                fontSize: "12px",
+                margin: "10px",
+                opacity: "50%",
+                fontFamily: "Kiwi Maru",
+                letterSpacing: "0rem",
+              }}
+            >
+              この画面を閉じると二度とこのメッセージを見ることができません
+            </p>
           </div>
         </div>
       </div>
