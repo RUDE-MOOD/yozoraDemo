@@ -50,9 +50,9 @@ const themeData = {
     color: "#175676",
   },
   bright_blue: {
-    colorTop: "#000000",
+    colorTop: "#111199",
     // メインカラー
-    colorBottom: "#0077be",
+    colorBottom: "#3333ff",
     // 上半色
     colorA: "#ffffff",
     // セカンダリーカラー
