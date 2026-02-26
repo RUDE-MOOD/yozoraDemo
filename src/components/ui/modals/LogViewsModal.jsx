@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { getAppNow } from "../../../utils/appTime";
 import { useStarStore } from "../../../store/useStarStore";
 import { getFallbackAnalysis } from "../../../utils/fallbackAnalysis";
 
@@ -6,7 +7,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
   const { stars } = useStarStore();
 
   // 現在表示中の年月（初期値は現在日時）
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(getAppNow());
 
   // 表示用データを作成
   const calendarData = useMemo(() => {
@@ -43,10 +44,22 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
   }, [stars, currentDate]);
 
   // 月移動
-  const now = new Date();
-  const isCurrentMonth =
-    currentDate.getFullYear() === now.getFullYear() &&
-    currentDate.getMonth() === now.getMonth();
+  const now = getAppNow();
+
+  // ログ画面で進める「最大月」を決定（現在のアプリ時間 または 未来に書かれた星の時間の、どちらか遅い方）
+  let maxDate = new Date(now);
+  if (stars && stars.length > 0) {
+    const latestStarTime = Math.max(...stars.map(s => new Date(s.created_at).getTime()));
+    if (latestStarTime > maxDate.getTime()) {
+      maxDate = new Date(latestStarTime);
+    }
+  }
+
+  const isMaxMonth =
+    currentDate.getFullYear() > maxDate.getFullYear() ||
+    (currentDate.getFullYear() === maxDate.getFullYear() &&
+      currentDate.getMonth() >= maxDate.getMonth());
+
   const isMinMonth =
     currentDate.getFullYear() === 2025 && currentDate.getMonth() === 11;
 
@@ -57,7 +70,7 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     );
   };
   const handleNextMonth = () => {
-    if (isCurrentMonth) return;
+    if (isMaxMonth) return;
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
     );
@@ -311,24 +324,24 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
             </span>
             <button
               onClick={handleNextMonth}
-              disabled={isCurrentMonth}
+              disabled={isMaxMonth}
               style={{
                 background: "transparent",
                 border: "none",
-                color: isCurrentMonth
+                color: isMaxMonth
                   ? "rgba(255,255,255,0.15)"
                   : "rgba(255,255,255,0.5)",
-                cursor: isCurrentMonth ? "not-allowed" : "pointer",
+                cursor: isMaxMonth ? "not-allowed" : "pointer",
                 padding: "4px 8px",
                 transition: "color 0.2s",
                 display: "flex",
                 alignItems: "center",
               }}
               onMouseEnter={(e) => {
-                if (!isCurrentMonth) e.currentTarget.style.color = "#fff";
+                if (!isMaxMonth) e.currentTarget.style.color = "#fff";
               }}
               onMouseLeave={(e) => {
-                if (!isCurrentMonth)
+                if (!isMaxMonth)
                   e.currentTarget.style.color = "rgba(255,255,255,0.5)";
               }}
             >
@@ -464,13 +477,13 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
             </span>
             <button
               onClick={handleNextMonth}
-              disabled={isCurrentMonth}
+              disabled={isMaxMonth}
               style={{
                 background: "transparent",
                 border: "none",
-                color: isCurrentMonth ? "rgba(255,255,255,0.15)" : "#fff",
+                color: isMaxMonth ? "rgba(255,255,255,0.15)" : "#fff",
                 fontSize: "1.3rem",
-                cursor: isCurrentMonth ? "not-allowed" : "pointer",
+                cursor: isMaxMonth ? "not-allowed" : "pointer",
                 padding: "4px 8px",
               }}
             >
