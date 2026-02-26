@@ -73,7 +73,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             背景色
           </p>
           <div
-            className={`grid grid-cols-3 gap-x-2 gap-y-4 transition-opacity duration-300 place-items-center ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
+            className={`grid grid-cols-3 gap-y-4 transition-opacity duration-300 place-items-center ${skyboxType === "upgrade" ? "opacity-40 pointer-events-none" : ""}`}
           >
             {themes.map((theme) => (
               <div
@@ -120,6 +120,7 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
                 key={skybox.id}
                 onClick={() => setSkyboxType(skybox.id)}
                 className="flex flex-col items-center gap-3 cursor-pointer group"
+                style={{ margin: "0px 8px 25px 8px" }}
               >
                 {/* CSS-based preview card */}
                 <div
