@@ -11,7 +11,7 @@ import { LoginSuccessScreen } from './components/ui/screens/LoginSuccessScreen';
 import { RegisterModal } from './components/ui/modals/RegisterModal';
 import { RegisterSuccessScreen } from './components/ui/screens/RegisterSuccessScreen';
 import { ForgotPasswordModal } from './components/ui/modals/ForgotPasswordModal';
-
+import { NostargiaIntro } from './components/ui/screens/NostargiaIntro';
 import { supabase } from './supabaseClient';
 
 import { useUserStore } from './store/useUserStore';
@@ -231,12 +231,12 @@ function App() {
                 setIsLowPerformance(false);
               }}
               onDecline={() => {
-                setDpr([0.5, 1.0]);
+                setDpr([0.8, 1.0]);
                 setIsLowPerformance(true);
               }}
               flipflops={3}
               onFallback={() => {
-                setDpr([0.5, 1.0]);
+                setDpr([0.8, 1.0]);
                 setIsLowPerformance(true);
               }}
             >
@@ -246,6 +246,7 @@ function App() {
             </PerformanceMonitor>
           </Canvas>
           <UI onSend={addStar} onStarClick={handleSetStarClickHandler} />
+          {phase === 'app' && <NostargiaIntro />}
         </>
       )}
 
