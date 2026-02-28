@@ -10,6 +10,8 @@ import { FutureMessageDisplayModal } from "./modals/FutureMessageDisplayModal";
 import { useFutureMessageStore } from "../../store/useFutureMessageStore";
 import { useStarStore } from "../../store/useStarStore";
 import { useUserStore } from "../../store/useUserStore";
+import { useTutorialStore } from "../../store/useTutorialStore";
+import { TutorialOverlay } from "./TutorialOverlay";
 import {
   getAppNow,
   isCooldownActive,
@@ -118,6 +120,41 @@ export const UI = ({ onSend, onStarClick }) => {
 
   const { setFocusTarget, stars, debug_showConstellation } = useStarStore();
 
+  // チュートリアル
+  const tutorial = useTutorialStore();
+
+  // チュートリアル: 自動ステップ遷移
+  useEffect(() => {
+    if (!tutorial.isActive) return;
+
+    // Step 13: FutureStar が見えない場合は自動生成
+    if (tutorial.currentStep === 13 && !isFutureStarVisible) {
+      debug_setFutureStarVisible(true);
+      setTimeout(() => {
+        const pos = useFutureMessageStore.getState().futureStarPosition;
+        if (pos) setFocusTarget(pos);
+      }, 100);
+    }
+
+    // Step 15: 2回目の日記を書くためにdate+1
+    if (tutorial.currentStep === 15 && !tutorial.isSecondDiary) {
+      tutorial.skipForSecondDiary();
+    }
+  }, [tutorial.isActive, tutorial.currentStep]);
+
+  // チュートリアル: 3 Good Things チェック
+  useEffect(() => {
+    if (!tutorial.isActive || tutorial.currentStep !== 4) return;
+    const count = [goodThing1, goodThing2, goodThing3].filter(v => v.trim()).length;
+    // カウントを更新（UIに表示するため）
+    if (count !== tutorial.filledGoodThings) {
+      useTutorialStore.setState({ filledGoodThings: count });
+    }
+    if (count >= 3) {
+      tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+    }
+  }, [goodThing1, goodThing2, goodThing3, tutorial.isActive, tutorial.currentStep]);
+
   const [debugConstellationId, setDebugConstellationId] = useState("monoceros");
 
   // 星座モーダルの開閉状態
@@ -197,6 +234,10 @@ export const UI = ({ onSend, onStarClick }) => {
   // スライダー値の更新
   const handleSliderChange = (id, value) => {
     setMoodValues((prev) => ({ ...prev, [id]: value }));
+    // チュートリアル: スライダー移動を記録
+    if (tutorial.isActive) {
+      tutorial.recordSliderMove(id);
+    }
   };
 
   // 今日の日付をフォーマット
@@ -220,6 +261,11 @@ export const UI = ({ onSend, onStarClick }) => {
     console.log("showStarDetails called with:", starData);
     setSelectedStarData(starData);
     setStarOpen(true);
+    // チュートリアル: 星の詳細を開いた（クロージャ問題回避のため getState() を使用）
+    const tutState = useTutorialStore.getState();
+    if (tutState.isActive) {
+      tutState.triggerEvent('STAR_DETAIL_OPENED');
+    }
   };
 
   // 親コンポーネントにコールバックを渡す
@@ -273,6 +319,15 @@ export const UI = ({ onSend, onStarClick }) => {
         await onSend(moodValues, finalAnalysisResult, goodThings);
       }
       console.log("Mood Entry Saved!");
+
+      // チュートリアル: 星が発射された
+      if (tutorial.isActive) {
+        if (tutorial.isSecondDiary) {
+          tutorial.triggerEvent('SLIDERS_LOW_AND_LAUNCHED');
+        } else {
+          tutorial.triggerEvent('STAR_LAUNCHED');
+        }
+      }
 
       // カメラが日記星にフォーカスして安定してから流れ星チェック（1.5秒後）
       setTimeout(() => {
@@ -367,6 +422,7 @@ export const UI = ({ onSend, onStarClick }) => {
               </svg>
             )}
             <button
+              id="rocket-button"
               onClick={() => {
                 if (cooldown) return;
                 setDiaryOpen(true);
@@ -374,6 +430,14 @@ export const UI = ({ onSend, onStarClick }) => {
                 setProfileModalOpen(false);
                 setStarOpen(false);
                 setConstellationModalOpen(false);
+                // チュートリアル: 日記モーダルを開いた
+                if (tutorial.isActive) {
+                  if (tutorial.isSecondDiary) {
+                    tutorial.triggerEvent('DIARY_OPENED_2');
+                  } else {
+                    tutorial.triggerEvent('DIARY_OPENED');
+                  }
+                }
               }}
               className={`w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 transition-all duration-300 ${cooldown ? "opacity-40 cursor-not-allowed" : "hover:bg-white/20"
                 }`}
@@ -408,6 +472,7 @@ export const UI = ({ onSend, onStarClick }) => {
       {/* モバイル: 左下 / PC: 右上（フルスクリーンボタン付き） */}
       <div className="fixed bottom-6 left-6 md:bottom-auto md:left-auto md:top-6 md:right-6 z-[1000] flex items-center gap-[10px]">
         <button
+          id="user-menu-btn"
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
@@ -499,11 +564,16 @@ export const UI = ({ onSend, onStarClick }) => {
                   プロフィール
                 </button>
                 <button
+                  id="menu-constellation"
                   onClick={() => {
                     setUserMenuOpen(false);
                     setConstellationModalOpen(true);
                     setProfileModalOpen(false);
                     setStarOpen(false);
+                    // チュートリアル: 星座を開いた
+                    if (tutorial.isActive) {
+                      tutorial.triggerEvent('CONSTELLATION_OPENED');
+                    }
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{
@@ -517,6 +587,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 </button>
                 {isFutureStarVisible && futureStarPosition && (
                   <button
+                    id="menu-future-letter"
                     onClick={() => {
                       setUserMenuOpen(false);
                       setProfileModalOpen(false);
@@ -535,9 +606,14 @@ export const UI = ({ onSend, onStarClick }) => {
                   </button>
                 )}
                 <button
+                  id="menu-theme"
                   onClick={() => {
                     setUserMenuOpen(false);
                     setThemeModalOpen(true);
+                    // チュートリアル: テーマを開いた
+                    if (tutorial.isActive) {
+                      tutorial.triggerEvent('THEME_OPENED');
+                    }
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{
@@ -550,9 +626,14 @@ export const UI = ({ onSend, onStarClick }) => {
                   テーマ
                 </button>
                 <button
+                  id="menu-log"
                   onClick={() => {
                     setUserMenuOpen(false);
                     setLogModalOpen(true);
+                    // チュートリアル: ログを開いた
+                    if (tutorial.isActive) {
+                      tutorial.triggerEvent('LOG_OPENED');
+                    }
                   }}
                   className="w-full text-left py-3 text-white/90 hover:bg-white/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                   style={{
@@ -577,6 +658,22 @@ export const UI = ({ onSend, onStarClick }) => {
                   }}
                 >
                   設定
+                </button>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    // チュートリアル開始
+                    tutorial.startTutorial(isCooldownActive, stars);
+                  }}
+                  className="w-full text-left py-3 text-cyan-400/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
+                  style={{
+                    borderRadius: "5px",
+                    padding: "0.2rem 1.25rem 0.2rem 1rem",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
+                >
+                  チュートリアル
                 </button>
                 <button
                   onClick={() => {
@@ -941,61 +1038,64 @@ export const UI = ({ onSend, onStarClick }) => {
               <div className="flex flex-col md:flex-row md:gap-8">
                 {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
                 <div
-                  className={`flex-1 space-y-6 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                  id="diary-sliders"
+                  className={`flex-1 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
                     }`}
                 >
-                  {MOOD_QUESTIONS.map((q) => (
-                    <div
-                      key={q.id}
-                      className="space-y-2"
-                      style={{ margin: "12px 0" }}
-                    >
-                      <p
-                        className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left"
-                        style={{
-                          fontFamily: "Kiwi Maru",
-                          letterSpacing: "0rem",
-                        }}
-                      >
-                        {q.question}
-                      </p>
-                      <div className="relative px-3">
-                        {/* 左端ドット */}
-                        <div className="absolute left-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
-                        {/* 右端ドット */}
-                        <div className="absolute right-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
-                        {/* 中央インジケーター（50%） */}
-                        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/3 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={moodValues[q.id]}
-                          onChange={(e) =>
-                            handleSliderChange(q.id, parseInt(e.target.value))
-                          }
-                          className="mood-slider w-full appearance-none cursor-pointer"
-                          style={{
-                            background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`,
-                          }}
-                        />
-                      </div>
+                  <div id="diary-sliders-only" className="space-y-6">
+                    {MOOD_QUESTIONS.map((q) => (
                       <div
-                        className="flex justify-between text-white/50 text-xs font-sans"
-                        style={{
-                          fontFamily: "Kiwi Maru",
-                          letterSpacing: "0rem",
-                        }}
+                        key={q.id}
+                        className="space-y-2"
+                        style={{ margin: "12px 0" }}
                       >
-                        <span>{q.leftLabel}</span>
-                        <span>{q.rightLabel}</span>
+                        <p
+                          className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left"
+                          style={{
+                            fontFamily: "Kiwi Maru",
+                            letterSpacing: "0rem",
+                          }}
+                        >
+                          {q.question}
+                        </p>
+                        <div className="relative px-3">
+                          {/* 左端ドット */}
+                          <div className="absolute left-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
+                          {/* 右端ドット */}
+                          <div className="absolute right-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
+                          {/* 中央インジケーター（50%） */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/3 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={moodValues[q.id]}
+                            onChange={(e) =>
+                              handleSliderChange(q.id, parseInt(e.target.value))
+                            }
+                            className="mood-slider w-full appearance-none cursor-pointer"
+                            style={{
+                              background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`,
+                            }}
+                          />
+                        </div>
+                        <div
+                          className="flex justify-between text-white/50 text-xs font-sans"
+                          style={{
+                            fontFamily: "Kiwi Maru",
+                            letterSpacing: "0rem",
+                          }}
+                        >
+                          <span>{q.leftLabel}</span>
+                          <span>{q.rightLabel}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
 
                   {/* タグ選択 */}
                   {availableTags.length > 0 && (
-                    <div className="space-y-2 mt-2">
+                    <div id="diary-tags" className="space-y-2 mt-2">
                       <label
                         className="text-white/90 text-sm font-sans tracking-wide block"
                         style={{
@@ -1041,7 +1141,12 @@ export const UI = ({ onSend, onStarClick }) => {
                               key={tag.id}
                               onClick={() => {
                                 if (isSelected) setSelectedTag(null);
-                                else setSelectedTag(tag);
+                                else {
+                                  setSelectedTag(tag);
+                                  if (tutorial.isActive) {
+                                    tutorial.triggerEvent('TAG_SELECTED');
+                                  }
+                                }
                               }}
                               className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
                                 ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
@@ -1088,6 +1193,7 @@ export const UI = ({ onSend, onStarClick }) => {
 
                 {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
                 <div
+                  id="diary-good-things"
                   className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
                     }`}
                 >
@@ -1165,7 +1271,7 @@ export const UI = ({ onSend, onStarClick }) => {
                   </div>
 
                   {/* 打ち上げボタン */}
-                  <div className="mt-6 md:mt-auto flex justify-center">
+                  <div id="diary-launch-btn" className="mt-6 md:mt-auto flex justify-center">
                     <button
                       onClick={handleSend}
                       disabled={isSending || !goodThing1.trim()}
@@ -1222,6 +1328,10 @@ export const UI = ({ onSend, onStarClick }) => {
               setFocusTarget(star.position);
             }
             setLogModalOpen(false);
+            // チュートリアル: ログの星にフォーカスした
+            if (tutorial.isActive) {
+              tutorial.triggerEvent('LOG_STAR_FOCUSED');
+            }
           }}
         />
       )}
@@ -1259,6 +1369,9 @@ export const UI = ({ onSend, onStarClick }) => {
 
       {/* --- 過去の自分からの手紙表示モーダル --- */}
       <FutureMessageDisplayModal />
+
+      {/* --- チュートリアルオーバーレイ --- */}
+      <TutorialOverlay />
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { useFutureMessageStore } from "../../../store/useFutureMessageStore";
+import { useTutorialStore } from "../../../store/useTutorialStore";
 
 export const FutureMessageDisplayModal = () => {
   const {
@@ -8,6 +9,7 @@ export const FutureMessageDisplayModal = () => {
     startShootingStarExit,
     markMessageAsRead,
   } = useFutureMessageStore();
+  const tutorial = useTutorialStore();
 
   if (!isDisplayModalOpen || !currentMessage) return null;
 
@@ -22,6 +24,11 @@ export const FutureMessageDisplayModal = () => {
 
     // 3. Trigger Shooting Star Exit Animation
     startShootingStarExit();
+
+    // 4. チュートリアル: 未来メッセージを受け取った
+    if (tutorial.isActive) {
+      tutorial.triggerEvent('FUTURE_MESSAGE_READ');
+    }
   };
 
   return (
@@ -29,7 +36,7 @@ export const FutureMessageDisplayModal = () => {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-[#050510]/80 backdrop-blur-sm transition-opacity duration-300"
-        // onClick={handleClose}
+      // onClick={handleClose}
       ></div>
 
       {/* Modal Content */}

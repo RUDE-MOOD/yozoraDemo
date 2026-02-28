@@ -3,6 +3,7 @@ import { shaderMaterial, Billboard, Text } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import { useFutureMessageStore } from '../../../store/useFutureMessageStore'
+import { useTutorialStore } from '../../../store/useTutorialStore'
 
 // FutureStarMaterial: A distinct, pulsing shader for the Future Star
 const FutureStarMaterial = shaderMaterial(
@@ -82,6 +83,11 @@ export function FutureStar({ position, onOpenInputModal }) {
                     onClick={(e) => {
                         e.stopPropagation()
                         onOpenInputModal()
+                        // チュートリアル: 未来への手紙をクリックした
+                        const tutorial = useTutorialStore.getState()
+                        if (tutorial.isActive) {
+                            tutorial.triggerEvent('FUTURE_INPUT_OPENED')
+                        }
                     }}
                     onPointerOver={() => document.body.style.cursor = 'pointer'}
                     onPointerOut={() => document.body.style.cursor = 'auto'}

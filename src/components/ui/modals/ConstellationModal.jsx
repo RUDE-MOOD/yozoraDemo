@@ -17,6 +17,7 @@
 import { useState } from "react";
 import { CONSTELLATIONS } from "../../../data/constellationData";
 import { useStarStore } from "../../../store/useStarStore";
+import { useTutorialStore } from "../../../store/useTutorialStore";
 
 // --- 星座図を描画するSVGコンポーネント ---
 function ConstellationDiagram({
@@ -281,6 +282,7 @@ export function ConstellationModal({ isOpen, onClose }) {
   const [selectedId, setSelectedId] = useState(null);
 
   const { stars, setFocusTarget } = useStarStore();
+  const tutorial = useTutorialStore();
 
   if (!isOpen) return null;
 
@@ -404,7 +406,13 @@ export function ConstellationModal({ isOpen, onClose }) {
                   <ConstellationCard
                     key={c.id}
                     constellation={c}
-                    onClick={() => setSelectedId(c.id)}
+                    onClick={() => {
+                      setSelectedId(c.id);
+                      // チュートリアル: 星座詳細を見た
+                      if (tutorial.isActive) {
+                        tutorial.triggerEvent('CONSTELLATION_DETAIL_VIEWED');
+                      }
+                    }}
                   />
                 ))}
               </div>
@@ -469,7 +477,13 @@ export function ConstellationModal({ isOpen, onClose }) {
               <ConstellationCard
                 key={c.id}
                 constellation={c}
-                onClick={() => setSelectedId(c.id)}
+                onClick={() => {
+                  setSelectedId(c.id);
+                  // チュートリアル: 星座詳細を見た
+                  if (tutorial.isActive) {
+                    tutorial.triggerEvent('CONSTELLATION_DETAIL_VIEWED');
+                  }
+                }}
               />
             ))}
           </div>

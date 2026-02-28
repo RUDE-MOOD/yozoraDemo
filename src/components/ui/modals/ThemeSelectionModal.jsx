@@ -1,8 +1,10 @@
 import { useThemeStore } from "../../../store/useThemeStore";
+import { useTutorialStore } from "../../../store/useTutorialStore";
 
 export const ThemeSelectionModal = ({ isOpen, onClose }) => {
   const { currentThemeName, setTheme, skyboxType, setSkyboxType } =
     useThemeStore();
+  const tutorial = useTutorialStore();
 
   if (!isOpen) return null;
 
@@ -92,7 +94,13 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             {themes.map((theme) => (
               <div
                 key={theme.id}
-                onClick={() => setTheme(theme.id)}
+                onClick={() => {
+                  setTheme(theme.id);
+                  // チュートリアル: テーマ選択
+                  if (tutorial.isActive) {
+                    tutorial.triggerEvent('THEME_SELECTED');
+                  }
+                }}
                 className="flex flex-col items-center gap-3 cursor-pointer group"
               >
                 {/* Thumbnail Container */}

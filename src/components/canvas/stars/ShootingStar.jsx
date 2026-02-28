@@ -4,6 +4,7 @@ import { useFrame, useThree, extend } from '@react-three/fiber'
 import { Billboard, shaderMaterial } from '@react-three/drei'
 import { useFutureMessageStore } from '../../../store/useFutureMessageStore'
 import { useStarStore } from '../../../store/useStarStore'
+import { useTutorialStore } from '../../../store/useTutorialStore'
 
 // ══════════════════════════════════════════════════════
 // NagareboshiMaterial: 流星描画用カスタムシェーダー
@@ -311,7 +312,14 @@ export function ShootingStar({ onOpenDisplayModal }) {
             <mesh
                 onClick={(e) => {
                     e.stopPropagation()
-                    if (phase === 'idle') onOpenDisplayModal()
+                    if (phase === 'idle') {
+                        onOpenDisplayModal()
+                        // チュートリアル: 流れ星をクリックした
+                        const tutorial = useTutorialStore.getState()
+                        if (tutorial.isActive) {
+                            tutorial.triggerEvent('SHOOTING_STAR_CLICKED')
+                        }
+                    }
                 }}
                 onPointerOver={() => { if (phase === 'idle') document.body.style.cursor = 'pointer' }}
                 onPointerOut={() => document.body.style.cursor = 'auto'}

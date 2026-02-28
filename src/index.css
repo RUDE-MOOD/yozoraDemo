@@ -161,3 +161,93 @@ body,
   border-radius: 8px;
   background: transparent;
 }
+
+/* ===== チュートリアルモード ===== */
+
+.tutorial-tooltip {
+  background: rgba(10, 15, 40, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(50, 150, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: tutorial-fade-in 0.3s ease-out forwards;
+}
+
+.tutorial-step-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00aaff, #0066cc);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: 'Kiwi Maru', sans-serif;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(0, 170, 255, 0.4);
+}
+
+.tutorial-abort-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-family: 'Kiwi Maru', sans-serif;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tutorial-abort-btn:hover {
+  background: rgba(255, 80, 80, 0.15);
+  border-color: rgba(255, 80, 80, 0.4);
+  color: rgba(255, 120, 120, 0.9);
+}
+
+@keyframes tutorial-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tutorial-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 170, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(0, 170, 255, 0);
+  }
+}
+
+.tutorial-highlight-pulse {
+  animation: tutorial-pulse 1.5s ease-in-out infinite;
+  border: 2px solid rgba(0, 170, 255, 0.5);
+}
+
+/* モバイル用の調整 */
+@media (max-width: 768px) {
+  .tutorial-tooltip {
+    padding: 16px 18px;
+    border-radius: 14px;
+  }
+
+  .tutorial-step-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+}

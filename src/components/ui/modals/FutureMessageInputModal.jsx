@@ -24,6 +24,7 @@ import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { Billboard, shaderMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { useFutureMessageStore } from "../../../store/useFutureMessageStore";
+import { useTutorialStore } from "../../../store/useTutorialStore";
 
 // --- 光球シェーダー（FutureStar.jsxと同一のオーブ型シェーダー） ---
 const FuturePreviewMaterial = shaderMaterial(
@@ -110,6 +111,7 @@ function FutureStarPreview() {
 export const FutureMessageInputModal = () => {
   const { isInputModalOpen, setInputModalOpen, saveFutureMessage, loading } =
     useFutureMessageStore();
+  const tutorial = useTutorialStore();
   const [message, setMessage] = useState("");
 
   // ドラッグ状態
@@ -125,7 +127,11 @@ export const FutureMessageInputModal = () => {
     await saveFutureMessage(message);
     setMessage("");
     setInputModalOpen(false);
-  }, [message, loading, saveFutureMessage, setInputModalOpen]);
+    // チュートリアル: 未来メッセージが送信された
+    if (tutorial.isActive) {
+      tutorial.triggerEvent('FUTURE_MESSAGE_SENT');
+    }
+  }, [message, loading, saveFutureMessage, setInputModalOpen, tutorial]);
 
   // --- モーダル外判定 ---
   const isOutsideModal = useCallback((clientX, clientY) => {
@@ -219,6 +225,10 @@ export const FutureMessageInputModal = () => {
   ]);
 
   if (!isInputModalOpen) return null;
+
+  // チュートリアル: 未来メッセージ入力モーダルが開いた
+  // (useEffectを使えないので、運劶的に判定する)
+  // → イベントはFutureStar.jsxから発火されるためここでは不要
 
   // 星が十分ドラッグされているか（送信可能な視覚フィードバック用）
   const dragDistance = Math.sqrt(dragOffset.x ** 2 + dragOffset.y ** 2);
