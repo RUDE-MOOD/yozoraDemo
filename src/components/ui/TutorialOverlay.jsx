@@ -134,8 +134,9 @@ export function TutorialOverlay() {
             return {
                 position: 'fixed',
                 bottom: '15%',
-                left: '50%',
-                transform: 'translateX(-50%)',
+                left: '0',
+                right: '0',
+                margin: '0 auto',
                 maxWidth: '90vw',
                 width: '420px',
             };
@@ -232,8 +233,18 @@ export function TutorialOverlay() {
                         // Step 4: 日記モーダルの底辺に固定（入力欄を遮らない）
                         position: 'fixed',
                         bottom: '8px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
+                        maxWidth: '90vw',
+                        width: '420px',
+                    } : currentStep === 6 ? {
+                        // Step 6: 星の正下方（画面中央やや下）に配置
+                        position: 'fixed',
+                        top: '72.5%',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
                         maxWidth: '90vw',
                         width: '420px',
                     } : getTooltipStyle()),
