@@ -131,12 +131,38 @@ function ConstellationDetail({ constellation, onBack, onViewConstellation }) {
   const isCompleted = !!constellation.completedDate;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
+      {/* PC用閉じるボタン（スマホでは非表示） */}
+      <button
+        onClick={() => {
+          onBack();
+          // チュートリアル: 星座詳細からリストに戻った
+          const tut = useTutorialStore.getState();
+          if (tut.isActive) {
+            tut.triggerEvent('CONSTELLATION_BACK');
+          }
+        }}
+        className="constellation-back-btn hidden md:flex absolute top-0 right-0 items-center justify-center w-8 h-8 text-white/50 hover:text-white transition-colors z-[1] bg-black/20 rounded-full border border-white/10 hover:bg-black/40"
+        aria-label="閉じる"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
       {/* モバイル戻るボタン（PCでは非表示） */}
       <div className="flex md:hidden items-center mb-4">
         <button
-          onClick={onBack}
-          className="flex items-center justify-center w-10 h-10 text-white/70 hover:text-white transition-colors"
+          onClick={() => {
+            onBack();
+            // チュートリアル: 星座詳細からリストに戻った
+            const tut = useTutorialStore.getState();
+            if (tut.isActive) {
+              tut.triggerEvent('CONSTELLATION_BACK');
+            }
+          }}
+          id="constellation-back-btn"
+          className="constellation-back-btn flex items-center justify-center w-10 h-10 text-white/70 hover:text-white transition-colors"
           aria-label="戻る"
         >
           <svg
@@ -379,8 +405,15 @@ export function ConstellationModal({ isOpen, onClose }) {
                   マイセイザ
                 </h2>
                 <button
-                  onClick={handleClose}
-                  className="text-white/50 hover:text-white transition-colors w-10 h-10 flex items-center justify-center"
+                  id="constellation-close-btn"
+                  onClick={() => {
+                    handleClose();
+                    // チュートリアル: マイセイザを閉じた
+                    if (tutorial.isActive) {
+                      tutorial.triggerEvent('CONSTELLATION_CLOSED');
+                    }
+                  }}
+                  className="constellation-close-btn text-white/50 hover:text-white transition-colors w-10 h-10 flex items-center justify-center"
                   aria-label="閉じる"
                 >
                   <svg
@@ -450,8 +483,15 @@ export function ConstellationModal({ isOpen, onClose }) {
               マイセイザ
             </h2>
             <button
-              onClick={handleClose}
-              className="text-white/50 hover:text-white transition-colors w-8 h-8 flex items-center justify-center"
+              id="constellation-close-btn"
+              onClick={() => {
+                handleClose();
+                // チュートリアル: マイセイザを閉じた
+                if (tutorial.isActive) {
+                  tutorial.triggerEvent('CONSTELLATION_CLOSED');
+                }
+              }}
+              className="constellation-close-btn text-white/50 hover:text-white transition-colors w-8 h-8 flex items-center justify-center"
               aria-label="閉じる"
             >
               <svg

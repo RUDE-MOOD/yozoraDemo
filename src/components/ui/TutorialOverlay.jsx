@@ -42,7 +42,14 @@ export function TutorialOverlay() {
 
         if (!isActive || !step?.highlightTarget) return;
 
-        const el = document.querySelector(step.highlightTarget);
+        const els = document.querySelectorAll(step.highlightTarget);
+        let el = null;
+        for (const e of els) {
+            if (e.offsetWidth > 0 || e.offsetHeight > 0 || e.getClientRects().length > 0) {
+                el = e;
+                break;
+            }
+        }
         if (!el) return;
 
         // ターゲット要素自体を引き上げ
@@ -94,7 +101,14 @@ export function TutorialOverlay() {
             setHighlightRect(null);
             return;
         }
-        const el = document.querySelector(step.highlightTarget);
+        const els = document.querySelectorAll(step.highlightTarget);
+        let el = null;
+        for (const e of els) {
+            if (e.offsetWidth > 0 || e.offsetHeight > 0 || e.getClientRects().length > 0) {
+                el = e;
+                break;
+            }
+        }
         if (el) {
             const rect = el.getBoundingClientRect();
             const padding = 8;
@@ -257,8 +271,27 @@ export function TutorialOverlay() {
                         margin: '0 auto',
                         maxWidth: '90vw',
                         width: '420px',
+                    } : [8, 16].includes(currentStep) ? {
+                        // Step 8, 16: ユーザーメニューを開くため、メニューを遮らないように画面中央やや下に配置
+                        position: 'fixed',
+                        top: '50%',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
+                        maxWidth: '90vw',
+                        width: '420px',
+                    } : currentStep === 11 ? {
+                        // Step 11: マイセイザ案内（画面下部に配置してメニューを遮らない）
+                        position: 'fixed',
+                        top: '72.5%',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
+                        maxWidth: '90vw',
+                        width: '420px',
                     } : getTooltipStyle()),
                     zIndex: 10002,
+                    padding: '16px 20px', // StarDetailModal の px-5 py-4 に合わせる
                 }}
             >
                 {/* ステップバッジ + タイトル */}

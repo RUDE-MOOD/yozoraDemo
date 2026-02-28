@@ -62,12 +62,19 @@ const TUTORIAL_STEPS = [
     {
         id: 8,
         title: 'チュートリアル',
-        message: '今までに見つけた星や飛ばした星は「ログ」\nから振り返ることができます。右上のメニュー（PC）\nまたは左下のメニュー（スマホ）から「ログ」\nを開いてみましょう。',
+        message: '今までに見つけた星や飛ばした星は\n「ログ」から振り返ることができます。\nまずは、メニューを開いてみましょう。',
         highlightTarget: '#user-menu-btn',
-        completionEvent: 'LOG_OPENED',
+        completionEvent: 'MENU_OPENED',
     },
     {
         id: 9,
+        title: 'チュートリアル',
+        message: 'メニューから「ログ」を選んで、\n今までの記録を見てみましょう。',
+        highlightTarget: '#menu-log',
+        completionEvent: 'LOG_OPENED',
+    },
+    {
+        id: 10,
         title: 'チュートリアル',
         message: 'カレンダーから今日の記録をタップすると、\nその星にフォーカスされます。\n試してみましょう！',
         highlightTarget: null, // LogViewsModal内の日付は動的
@@ -75,14 +82,21 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 10,
+        id: 11,
         title: 'チュートリアル',
-        message: 'メニューから「マイセイザ」を\n開いてみましょう。',
+        message: 'いつでも星をタップして確認できますが、\n先に次の機能を紹介します。\nメニューを開いてみましょう。',
         highlightTarget: '#user-menu-btn',
+        completionEvent: 'MENU_OPENED',
+    },
+    {
+        id: 12,
+        title: 'チュートリアル',
+        message: 'メニューから「マイセイザ」を選んで、\n自分だけの星座を見てみましょう。',
+        highlightTarget: '#menu-constellation',
         completionEvent: 'CONSTELLATION_OPENED',
     },
     {
-        id: 11,
+        id: 13,
         title: 'チュートリアル',
         message: '星座の詳細を確認してみましょう。\nどれか一つをタップしてみてください。',
         highlightTarget: null, // ConstellationModal内の要素
@@ -90,22 +104,45 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 12,
+        id: 14,
         title: 'チュートリアル',
-        message: 'メニューから「テーマ」を\n開いてみましょう。',
+        message: '詳細を閉じて、\n星座の一覧に戻りましょう。',
+        highlightTarget: '.constellation-back-btn',
+        completionEvent: 'CONSTELLATION_BACK',
+        noOverlay: true,
+    },
+    {
+        id: 15,
+        title: 'チュートリアル',
+        message: '右上の「×」ボタンを押して、\nマイセイザを閉じましょう。',
+        highlightTarget: '.constellation-close-btn',
+        completionEvent: 'CONSTELLATION_CLOSED',
+        noOverlay: true,
+    },
+    {
+        id: 16,
+        title: 'チュートリアル',
+        message: 'メニューを開いて、\n「テーマ」を選んでみましょう。',
         highlightTarget: '#user-menu-btn',
+        completionEvent: 'MENU_OPENED',
+    },
+    {
+        id: 17,
+        title: 'チュートリアル',
+        message: '好きなテーマを選んで、\n夜空の雰囲気を変えてみましょう。',
+        highlightTarget: '#menu-theme',
         completionEvent: 'THEME_OPENED',
     },
     {
-        id: 13,
+        id: 18,
         title: 'チュートリアル',
-        message: '好きなテーマを選んで、\n夜空の雰囲気を変えてみましょう。',
+        message: 'テーマを選んでみましょう。\n夜空の見た目が変わります。',
         highlightTarget: null, // ThemeSelectionModal内の要素
         completionEvent: 'THEME_SELECTED',
         noOverlay: true,
     },
     {
-        id: 14,
+        id: 19,
         title: 'チュートリアル',
         message: '画面に浮かぶ「未来への手紙」を\n見つけてタップしてみましょう。\n未来の自分にメッセージを送れます。',
         highlightTarget: null, // 3D空間のFutureStar
@@ -113,7 +150,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 15,
+        id: 20,
         title: 'チュートリアル',
         message: '未来の自分へメッセージを書いて、\n星を発射しましょう。',
         highlightTarget: null, // FutureMessageInputModal内
@@ -121,21 +158,21 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 16,
+        id: 21,
         title: 'チュートリアル',
         message: 'もう一度日記を書いてみましょう。\nロケットボタンを押してください。',
         highlightTarget: '#rocket-button',
         completionEvent: 'DIARY_OPENED_2',
     },
     {
-        id: 17,
+        id: 22,
         title: 'チュートリアル',
         message: '今度はスライダーを全て左側（25以下）に\n動かしてみてください。\n特別なことが起こるかもしれません。',
         highlightTarget: '#diary-sliders-only',
         completionEvent: 'SLIDERS_LOW_AND_LAUNCHED',
     },
     {
-        id: 18,
+        id: 23,
         title: 'チュートリアル',
         message: '流れ星が現れました！\n流れ星をタップして、\n過去の自分からのメッセージを受け取りましょう。',
         highlightTarget: null, // 3D空間のShootingStar
@@ -143,7 +180,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 19,
+        id: 24,
         title: 'チュートリアル',
         message: '過去の自分からのメッセージです。\n読み終わったら閉じましょう。',
         highlightTarget: null,
@@ -151,7 +188,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 20,
+        id: 25,
         title: 'チュートリアル完了！',
         message: 'すべてのチュートリアルが完了しました。\n夜空の世界を自由にお楽しみください。',
         highlightTarget: null,

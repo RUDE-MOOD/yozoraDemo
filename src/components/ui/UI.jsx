@@ -486,7 +486,13 @@ export const UI = ({ onSend, onStarClick }) => {
       <div className="fixed bottom-6 left-6 md:bottom-auto md:left-auto md:top-6 md:right-6 z-[1000] flex items-center gap-[10px]">
         <button
           id="user-menu-btn"
-          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          onClick={() => {
+            const opening = !userMenuOpen;
+            setUserMenuOpen(opening);
+            if (opening && tutorial.isActive) {
+              tutorial.triggerEvent('MENU_OPENED');
+            }
+          }}
           className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
         >
           {/* 人のアイコン (User Icon) */}
@@ -1158,6 +1164,10 @@ export const UI = ({ onSend, onStarClick }) => {
                                   setSelectedTag(tag);
                                   if (tutorial.isActive) {
                                     tutorial.triggerEvent('TAG_SELECTED');
+                                    // チュートリアル中かつスマホサイズの場合、タグ選択で自動的に次のステップへ進む
+                                    if (window.innerWidth < 768) {
+                                      setTimeout(() => setMobileDiaryStep(1), 300);
+                                    }
                                   }
                                 }
                               }}
