@@ -246,8 +246,8 @@ export function TutorialOverlay() {
             <div
                 className="tutorial-tooltip"
                 style={{
-                    ...(currentStep === 4 ? {
-                        // Step 4: 日記モーダルの底辺に固定（入力欄を遮らない）
+                    ...([4, 27].includes(currentStep) ? {
+                        // Step 4, 27: 日記モーダルの底辺に固定（入力欄を遮らない）
                         position: 'fixed',
                         bottom: '8px',
                         left: '0',
@@ -374,8 +374,8 @@ export function TutorialOverlay() {
                     </div>
                 )}
 
-                {/* Step 4: 3 Good Things カウンター */}
-                {currentStep === 4 && (
+                {/* Step 4, 27: 3 Good Things カウンター */}
+                {[4, 27].includes(currentStep) && (
                     <div style={{
                         marginTop: '12px',
                         padding: '8px 14px',
@@ -406,10 +406,10 @@ export function TutorialOverlay() {
                             width: '100%',
                             marginTop: '16px',
                             padding: '12px',
-                            background: 'linear-gradient(135deg, #0066ff, #0099ff)',
-                            border: 'none',
+                            background: 'rgba(0, 170, 255, 0.1)',
+                            border: '1px solid rgba(0, 170, 255, 0.3)',
                             borderRadius: '12px',
-                            color: 'white',
+                            color: 'rgba(255, 255, 255, 0.9)',
                             fontSize: '14px',
                             fontWeight: 'bold',
                             fontFamily: 'Kiwi Maru, sans-serif',
@@ -417,10 +417,16 @@ export function TutorialOverlay() {
                             letterSpacing: '0.1em',
                             transition: 'all 0.2s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.filter = 'brightness(1.2)'}
-                        onMouseLeave={(e) => e.target.style.filter = 'brightness(1)'}
+                        onMouseEnter={(e) => {
+                            e.target.style.background = 'rgba(0, 170, 255, 0.2)';
+                            e.target.style.borderColor = 'rgba(0, 170, 255, 0.5)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.background = 'rgba(0, 170, 255, 0.1)';
+                            e.target.style.borderColor = 'rgba(0, 170, 255, 0.3)';
+                        }}
                     >
-                        完了 / はじめる
+                        空へ
                     </button>
                 )}
             </div>

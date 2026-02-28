@@ -630,7 +630,7 @@ export function ProfileModal({ isOpen, onClose }) {
                   style={{
                     margin: "10px 0",
                     fontFamily: "Kiwi Maru",
-                    letterSpacing: "-3rem",
+                    letterSpacing: "O.1rem",
                     fontSize: "14px",
                   }}
                 >

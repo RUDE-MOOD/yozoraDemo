@@ -27,7 +27,9 @@ export const FutureMessageDisplayModal = () => {
 
     // 4. チュートリアル: 未来メッセージを受け取った
     if (tutorial.isActive) {
-      tutorial.triggerEvent('FUTURE_MESSAGE_READ');
+      setTimeout(() => {
+        tutorial.triggerEvent('FUTURE_MESSAGE_READ');
+      }, 4000); // 退場2秒 + 待機1秒 + カメラ移動1秒
     }
   };
 

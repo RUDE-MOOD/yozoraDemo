@@ -136,8 +136,8 @@ export const UI = ({ onSend, onStarClick }) => {
       }, 100);
     }
 
-    // Step 15: 2回目の日記を書くためにdate+1
-    if (tutorial.currentStep === 15 && !tutorial.isSecondDiary) {
+    // Step 24: 2回目の日記を書くためにdate+1
+    if (tutorial.currentStep === 24 && !tutorial.isSecondDiary) {
       tutorial.skipForSecondDiary();
     }
 
@@ -157,9 +157,9 @@ export const UI = ({ onSend, onStarClick }) => {
     }
   }, [tutorial.isActive, tutorial.currentStep, starOpen, logModalOpen, isFutureStarVisible]);
 
-  // チュートリアル: 3 Good Things チェック
+  // チュートリアル: 3 Good Things チェック (Step 4, Step 27)
   useEffect(() => {
-    if (!tutorial.isActive || tutorial.currentStep !== 4) return;
+    if (!tutorial.isActive || (tutorial.currentStep !== 4 && tutorial.currentStep !== 27)) return;
     const count = [goodThing1, goodThing2, goodThing3].filter(v => v.trim()).length;
     // カウントを更新（UIに表示するため）
     if (count !== tutorial.filledGoodThings) {
@@ -169,11 +169,25 @@ export const UI = ({ onSend, onStarClick }) => {
     // 入力が完了したとみなすまで少し待機（デバウンス）する
     if (count >= 3) {
       const timer = setTimeout(() => {
-        tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+        if (tutorial.currentStep === 4) {
+          tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+        } else if (tutorial.currentStep === 27) {
+          tutorial.triggerEvent('SECOND_ALL_GOOD_THINGS_FILLED');
+        }
       }, 2000);
       return () => clearTimeout(timer);
     }
   }, [goodThing1, goodThing2, goodThing3, tutorial.isActive, tutorial.currentStep]);
+
+  // チュートリアル: 全てのスライダーが0になったかチェック (Step 25)
+  useEffect(() => {
+    if (tutorial.isActive && tutorial.currentStep === 25) {
+      const allZero = Object.values(moodValues).every(val => val === 0);
+      if (allZero) {
+        tutorial.triggerEvent('ALL_SLIDERS_ZERO');
+      }
+    }
+  }, [tutorial.isActive, tutorial.currentStep, moodValues]);
 
   const [debugConstellationId, setDebugConstellationId] = useState("monoceros");
 
@@ -1189,7 +1203,7 @@ export const UI = ({ onSend, onStarClick }) => {
                                   else {
                                     setSelectedTag(tag);
                                     if (tutorial.isActive) {
-                                      tutorial.triggerEvent('TAG_SELECTED');
+                                      tutorial.markTagSelected();
                                       // チュートリアル中かつスマホサイズの場合、タグ選択で自動的に次のステップへ進む
                                       if (window.innerWidth < 768) {
                                         setTimeout(() => setMobileDiaryStep(1), 300);

@@ -189,12 +189,33 @@ const TUTORIAL_STEPS = [
     {
         id: 25,
         title: 'チュートリアル',
-        message: '今度はスライダーを全て左側（25以下）に\n動かしてみてください。\n特別なことが起こるかもしれません。',
+        message: '今度は全てのスライダーを一番左（0）に\n動かしてみてください。',
         highlightTarget: '#diary-sliders-only',
-        completionEvent: 'SLIDERS_LOW_AND_LAUNCHED',
+        completionEvent: 'ALL_SLIDERS_ZERO',
     },
     {
         id: 26,
+        title: 'チュートリアル',
+        message: '今度もタグを選んで、気持ちを分類しましょう。',
+        highlightTarget: '#diary-tags',
+        completionEvent: 'SECOND_TAG_SELECTED',
+    },
+    {
+        id: 27,
+        title: 'チュートリアル',
+        message: '今度も今日あった「いいこと」を３つ\n書いてみましょう。',
+        highlightTarget: '#diary-good-things',
+        completionEvent: 'SECOND_ALL_GOOD_THINGS_FILLED',
+    },
+    {
+        id: 28,
+        title: 'チュートリアル',
+        message: '準備ができました！\n「打ち上げ」ボタンを押してみましょう。\n特別なことが起こるかもしれません。',
+        highlightTarget: '#diary-launch-btn',
+        completionEvent: 'SLIDERS_LOW_AND_LAUNCHED',
+    },
+    {
+        id: 29,
         title: 'チュートリアル',
         message: '流れ星が現れました！\n流れ星をタップして、\n過去の自分からのメッセージを受け取りましょう。',
         highlightTarget: null, // 3D空間のShootingStar
@@ -202,7 +223,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 27,
+        id: 30,
         title: 'チュートリアル',
         message: '過去の自分からのメッセージです。\n読み終わったら閉じましょう。',
         highlightTarget: null,
@@ -210,7 +231,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 28,
+        id: 31,
         title: 'チュートリアル完了！',
         message: 'すべてのチュートリアルが完了しました。\n夜空の世界を自由にお楽しみください。',
         highlightTarget: null,
@@ -305,7 +326,11 @@ export const useTutorialStore = create((set, get) => ({
     markTagSelected: () => {
         const { isActive, currentStep } = get();
         if (!isActive || currentStep === 0) return;
-        get().triggerEvent('TAG_SELECTED');
+        if (currentStep === 3) {
+            get().triggerEvent('TAG_SELECTED');
+        } else if (currentStep === 26) {
+            get().triggerEvent('SECOND_TAG_SELECTED');
+        }
     },
 
     /**
