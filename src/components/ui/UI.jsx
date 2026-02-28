@@ -1012,10 +1012,10 @@ export const UI = ({ onSend, onStarClick }) => {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="lucide lucide-tag-icon lucide-tag"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-tag-icon lucide-tag"
                             style={{
                               height: "18px",
                               width: "18px",
@@ -1044,8 +1044,8 @@ export const UI = ({ onSend, onStarClick }) => {
                                 else setSelectedTag(tag);
                               }}
                               className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
-                                  ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                                  : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
                                 }`}
                               style={{
                                 padding: "8px 15px",

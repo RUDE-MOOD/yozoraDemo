@@ -4,6 +4,7 @@ import { Billboard, useTexture } from "@react-three/drei";
 import { useStarStore } from "../../store/useStarStore";
 import { CONSTELLATIONS } from "../../data/constellationData";
 import * as THREE from "three";
+import { Suspense, useState, useEffect } from "react";
 
 // --- カスタムシェーダーマテリアル ---
 // 距離カリングと流れる光の効果を組み合わせた軽量なラインマテリアル
@@ -276,7 +277,7 @@ export function ConstellationLines() {
                                 if (posA && posB) {
                                     return (
                                         <ShaderGlowingLine
-                                            key={`line-${c.id}-${idx}`}
+                                            key={`line - ${c.id} - ${idx}`}
                                             start={posA}
                                             end={posB}
                                             color="#e0e0ff"
