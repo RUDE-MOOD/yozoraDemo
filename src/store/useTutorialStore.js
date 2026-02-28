@@ -254,6 +254,9 @@ export const useTutorialStore = create((set, get) => ({
     // 2回目の日記フラグ (Step 15-16用)
     isSecondDiary: false,
 
+    // チュートリアル中に作成された星のIDリスト（完了/中止時に削除する）
+    tutorialStarIds: [],
+
     // --- アクション ---
 
     /**
@@ -276,7 +279,24 @@ export const useTutorialStore = create((set, get) => ({
             movedSliders: new Set(),
             filledGoodThings: 0,
             isSecondDiary: false,
+            tutorialStarIds: [],
         });
+    },
+
+    /**
+     * チュートリアル中に作成された星のIDを記録する
+     */
+    registerTutorialStar: (starId) => {
+        if (!starId) return;
+        set((state) => ({
+            tutorialStarIds: [...state.tutorialStarIds, starId],
+        }));
+        // ブラウザ強制終了時の兜底としてlocalStorageにも保存
+        try {
+            const existing = JSON.parse(localStorage.getItem('pending_tutorial_cleanup') || '[]');
+            existing.push(starId);
+            localStorage.setItem('pending_tutorial_cleanup', JSON.stringify(existing));
+        } catch (e) { /* ignore */ }
     },
 
     /**
@@ -345,26 +365,44 @@ export const useTutorialStore = create((set, get) => ({
     /**
      * 中止
      */
-    abortTutorial: () => {
+    abortTutorial: async () => {
+        const { tutorialStarIds } = get();
+        // 教程星を削除
+        if (tutorialStarIds.length > 0) {
+            const { removeStarsByIds } = await import('./useStarStore').then(m => m.useStarStore.getState());
+            await removeStarsByIds(tutorialStarIds);
+        }
+        // localStorage のクリーンアップ記録を削除
+        try { localStorage.removeItem('pending_tutorial_cleanup'); } catch (e) { /* ignore */ }
         set({
             isActive: false,
             currentStep: 0,
             movedSliders: new Set(),
             filledGoodThings: 0,
             isSecondDiary: false,
+            tutorialStarIds: [],
         });
     },
 
     /**
      * 完了
      */
-    completeTutorial: () => {
+    completeTutorial: async () => {
+        const { tutorialStarIds } = get();
+        // 教程星を削除
+        if (tutorialStarIds.length > 0) {
+            const { removeStarsByIds } = await import('./useStarStore').then(m => m.useStarStore.getState());
+            await removeStarsByIds(tutorialStarIds);
+        }
+        // localStorage のクリーンアップ記録を削除
+        try { localStorage.removeItem('pending_tutorial_cleanup'); } catch (e) { /* ignore */ }
         set({
             isActive: false,
             currentStep: 0,
             movedSliders: new Set(),
             filledGoodThings: 0,
             isSecondDiary: false,
+            tutorialStarIds: [],
         });
     },
 

@@ -62,6 +62,21 @@ function App() {
         // すでにログイン済みなら、ログイン画面などはスキップしてアプリを表示
         setShowApp(true);
         setPhase('app');
+
+        // チュートリアル星の残留クリーンアップ（ブラウザ強制終了時の兜底）
+        try {
+          const pending = JSON.parse(localStorage.getItem('pending_tutorial_cleanup') || '[]');
+          if (pending.length > 0) {
+            supabase.from('t_stars').delete().in('id', pending).then(({ error }) => {
+              if (error) {
+                console.error('チュートリアル星の残留クリーンアップ失敗:', error);
+              } else {
+                console.log('チュートリアル星の残留をクリーンアップしました:', pending);
+              }
+              localStorage.removeItem('pending_tutorial_cleanup');
+            });
+          }
+        } catch (e) { /* ignore */ }
       } else {
         // セッションがなければログイン画面へ
         setPhase('login');

@@ -79,6 +79,8 @@ export const useStarStore = create((set, get) => ({
             stars: [...state.stars, starForShow],
             focusTarget: newStar.position
         }));
+
+        return newStar.id; // チュートリアル用に星IDを返す
     },
 
     // フォーカスをリセットする関数 (必要に応じて)
@@ -86,6 +88,23 @@ export const useStarStore = create((set, get) => ({
 
     // フォーカスを設定する関数（毎回新しい配列参照を生成してuseEffectを確実に発火させる）
     setFocusTarget: (target) => set({ focusTarget: [...target] }),
+
+    // 指定IDの星をSupabase＋ローカルから一括削除する（チュートリアル用）
+    removeStarsByIds: async (ids) => {
+        if (!ids || ids.length === 0) return;
+        try {
+            const { error } = await supabase.from('t_stars').delete().in('id', ids);
+            if (error) {
+                console.error('チュートリアル星の削除エラー:', error);
+            }
+        } catch (err) {
+            console.error('チュートリアル星の削除に失敗:', err);
+        }
+        // ローカルからも削除（DB削除が失敗しても画面上は消す）
+        set((state) => ({
+            stars: state.stars.filter((s) => !ids.includes(s.id)),
+        }));
+    },
 
     // --- Supabase Realtime: 他デバイスからの星追加をリアルタイム同期 ---
     subscribeToStars: () => {

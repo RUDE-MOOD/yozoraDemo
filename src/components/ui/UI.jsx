@@ -351,13 +351,18 @@ export const UI = ({ onSend, onStarClick }) => {
         analysisResult = getFallbackAnalysis(moodValues, goodThings);
       }
       // 2. 結果と共にデータベースに保存する (APIが失敗しても日記は保存される)
+      let newStarId = null;
       if (onSend) {
         // Tag情報を送るために、analysisResult がなければ空オブジェクトを作り、そこにタグを混ぜる
         const finalAnalysisResult = {
           ...(analysisResult || {}),
           ...(selectedTag ? { tag: selectedTag.tag_name } : {}),
         };
-        await onSend(moodValues, finalAnalysisResult, goodThings);
+        newStarId = await onSend(moodValues, finalAnalysisResult, goodThings);
+      }
+      // チュートリアル: 作成された星のIDを記録（完了/中止時に削除するため）
+      if (tutorial.isActive && newStarId) {
+        tutorial.registerTutorialStar(newStarId);
       }
       console.log("Mood Entry Saved!");
 
