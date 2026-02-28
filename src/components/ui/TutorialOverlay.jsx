@@ -123,7 +123,8 @@ export function TutorialOverlay() {
         };
     }, [isActive, step, updateHighlightPosition]);
 
-    if (!isActive || !step) return null;
+    // Step 7 は StarDetailModal 内部で直接レンダリングするため、TutorialOverlay 自体は null を返す。
+    if (!isActive || !step || currentStep === 7) return null;
 
     const isLastStep = currentStep === steps.length;
 
@@ -242,6 +243,15 @@ export function TutorialOverlay() {
                         // Step 6: 星の正下方（画面中央やや下）に配置
                         position: 'fixed',
                         top: '72.5%',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
+                        maxWidth: '90vw',
+                        width: '420px',
+                    } : currentStep === 7 ? {
+                        // Step 7: 星の詳細モーダルの上部に配置
+                        position: 'fixed',
+                        top: '12%',
                         left: '0',
                         right: '0',
                         margin: '0 auto',

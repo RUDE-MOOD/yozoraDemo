@@ -29,6 +29,7 @@ import { Billboard, shaderMaterial } from "@react-three/drei";
 import { useRef } from "react";
 import * as THREE from "three";
 import { getFallbackAnalysis } from "../../../utils/fallbackAnalysis";
+import { useTutorialStore } from "../../../store/useTutorialStore";
 
 // --- SingleStarMaterial（UserStar.jsxと同一のシェーダー） ---
 const PreviewStarMaterial = shaderMaterial(
@@ -141,6 +142,8 @@ function formatDateOnly(displayDate) {
 
 // --- メインコンポーネント ---
 export const StarDetailModal = ({ isOpen, onClose, starData }) => {
+  const tutorial = useTutorialStore();
+
   if (!isOpen || !starData) return null;
 
   // 感情分析データ取得（なければフォールバック）
@@ -173,7 +176,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
   ].filter(Boolean);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
       {/* バックドロップ */}
       <div
         className="absolute inset-0 bg-black/20 transition-opacity duration-300"
@@ -182,6 +185,25 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
 
       {/* モーダル全体コンテナ（AI褒め言葉 + 本体を縦に並べる） */}
       <div className="relative z-10 flex flex-col items-center gap-3 w-full max-w-sm mx-auto">
+        {/* チュートリアル: Step 7 埋め込み (AI褒め言葉の上) */}
+        {tutorial.isActive && tutorial.currentStep === 7 && (
+          <div
+            className="w-full bg-[rgba(10,15,40,0.85)] border border-[rgba(100,200,255,0.2)] rounded-2xl px-5 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_20px_rgba(50,150,255,0.08),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl animate-[tutorial-fade-in_0.3s_ease-out_forwards]"
+          >
+            <div className="flex items-center gap-[10px] mb-3">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#00aaff] to-[#0066cc] text-white text-[13px] font-bold shadow-[0_0_12px_rgba(0,170,255,0.4)] shrink-0" style={{ fontFamily: "'Kiwi Maru', sans-serif" }}>
+                7
+              </span>
+              <span className="text-white text-[14px] font-bold tracking-[0.05em]" style={{ fontFamily: "'Kiwi Maru', sans-serif" }}>
+                チュートリアル
+              </span>
+            </div>
+            <p className="text-[rgba(255,255,255,0.9)] text-[13px] leading-[1.8] whitespace-pre-line m-0" style={{ fontFamily: "'Kiwi Maru', sans-serif" }}>
+              今日のあなたへのメッセージです。{'\n'}読み終わったら、右上の「×」ボタンを押して{'\n'}詳細を閉じてみましょう。
+            </p>
+          </div>
+        )}
+
         {/* ===== AI褒め言葉カード（独立浮動） ===== */}
         {hasAnalysis && displayAnalysis.feedback && (
           <div

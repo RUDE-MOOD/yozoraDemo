@@ -150,8 +150,13 @@ export const UI = ({ onSend, onStarClick }) => {
     if (count !== tutorial.filledGoodThings) {
       useTutorialStore.setState({ filledGoodThings: count });
     }
+
+    // 入力が完了したとみなすまで少し待機（デバウンス）する
     if (count >= 3) {
-      tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+      const timer = setTimeout(() => {
+        tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [goodThing1, goodThing2, goodThing3, tutorial.isActive, tutorial.currentStep]);
 
@@ -325,7 +330,15 @@ export const UI = ({ onSend, onStarClick }) => {
         if (tutorial.isSecondDiary) {
           tutorial.triggerEvent('SLIDERS_LOW_AND_LAUNCHED');
         } else {
-          tutorial.triggerEvent('STAR_LAUNCHED');
+          // もしStep4（入力中）に打ち上げボタンを押した場合はStep5をスキップして進める
+          if (tutorial.currentStep === 4) {
+            tutorial.triggerEvent('ALL_GOOD_THINGS_FILLED');
+            setTimeout(() => {
+              useTutorialStore.getState().triggerEvent('STAR_LAUNCHED');
+            }, 50);
+          } else {
+            tutorial.triggerEvent('STAR_LAUNCHED');
+          }
         }
       }
 
@@ -1360,6 +1373,10 @@ export const UI = ({ onSend, onStarClick }) => {
         onClose={() => {
           setStarOpen(false);
           setSelectedStarData(null);
+          // チュートリアル: 星の詳細（Step 7）を閉じた
+          if (tutorial.isActive) {
+            tutorial.triggerEvent('STAR_DETAIL_VIEWED');
+          }
         }}
         starData={selectedStarData}
       />
