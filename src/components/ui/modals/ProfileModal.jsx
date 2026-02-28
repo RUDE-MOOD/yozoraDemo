@@ -630,7 +630,8 @@ export function ProfileModal({ isOpen, onClose }) {
                   style={{
                     margin: "10px 0",
                     fontFamily: "Kiwi Maru",
-                    letterSpacing: "0rem",
+                    letterSpacing: "-3rem",
+                    fontSize: "14px",
                   }}
                 >
                   タグ

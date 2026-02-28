@@ -638,9 +638,12 @@ export const UI = ({ onSend, onStarClick }) => {
                     style={{
                       fontFamily: "Kiwi Maru",
                       letterSpacing: "0rem",
+                      borderRadius: "5px",
+                      padding: "0.2rem 1.25rem 0.2rem 1rem",
+                      fontSize: "12px",
                     }}
                   >
-                    星の日付を表示
+                    星の日付表示
                   </span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -649,7 +652,7 @@ export const UI = ({ onSend, onStarClick }) => {
                       checked={showStarDate}
                       onChange={toggleShowStarDate}
                     />
-                    <div className="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                    <div className="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-blue after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
                   </label>
                 </div>
 
@@ -1001,7 +1004,34 @@ export const UI = ({ onSend, onStarClick }) => {
                           margin: "20px 0 10px 0",
                         }}
                       >
-                        タグ
+                        <div class="icon-text" style={{ display: "flex" }}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-tag-icon lucide-tag"
+                            style={{
+                              height: "18px",
+                              width: "18px",
+                              padding: "3px 3px 0 0",
+                            }}
+                          >
+                            <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
+                            <circle
+                              cx="7.5"
+                              cy="7.5"
+                              r=".5"
+                              fill="currentColor"
+                            />
+                          </svg>
+                          <p>タグ</p>
+                        </div>
                       </label>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {availableTags.map((tag) => {
