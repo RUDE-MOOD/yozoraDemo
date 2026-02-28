@@ -105,8 +105,15 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     (currentDate.getFullYear() === maxDate.getFullYear() &&
       currentDate.getMonth() >= maxDate.getMonth());
 
+  let minDate = new Date(2025, 11, 1);
+  if (user && user.created_at) {
+    minDate = new Date(user.created_at);
+  }
+
   const isMinMonth =
-    currentDate.getFullYear() === 2025 && currentDate.getMonth() === 11;
+    currentDate.getFullYear() < minDate.getFullYear() ||
+    (currentDate.getFullYear() === minDate.getFullYear() &&
+      currentDate.getMonth() <= minDate.getMonth());
 
   const handlePrevMonth = () => {
     if (isMinMonth) return;
