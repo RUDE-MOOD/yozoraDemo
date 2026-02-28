@@ -899,7 +899,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
                 style={{
                   fontSize: "28px",
-                  marginBottom: "15px",
+                  marginBottom: "10px",
                   fontFamily: "Kiwi Maru",
                   letterSpacing: "0rem",
                 }}
@@ -989,6 +989,47 @@ export const UI = ({ onSend, onStarClick }) => {
                       </div>
                     </div>
                   ))}
+
+                  {/* タグ選択 */}
+                  {availableTags.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      <label
+                        className="text-white/90 text-sm font-sans tracking-wide block"
+                        style={{
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "-2px",
+                          margin: "20px 0 10px 0",
+                        }}
+                      >
+                        タグ
+                      </label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {availableTags.map((tag) => {
+                          const isSelected = selectedTag?.id === tag.id;
+                          return (
+                            <button
+                              key={tag.id}
+                              onClick={() => {
+                                if (isSelected) setSelectedTag(null);
+                                else setSelectedTag(tag);
+                              }}
+                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
+                                  ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                  : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                                }`}
+                              style={{
+                                padding: "8px 15px",
+                                fontFamily: "Kiwi Maru",
+                                letterSpacing: "0rem",
+                              }}
+                            >
+                              #{tag.tag_name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* スマホステップ0: →ボタンで次へ */}
                   <div className="flex md:hidden justify-end items-center mt-8">
@@ -1092,35 +1133,6 @@ export const UI = ({ onSend, onStarClick }) => {
                       }}
                     />
                   </div>
-
-                  {/* タグ選択 */}
-                  {availableTags.length > 0 && (
-                    <div className="space-y-2 mt-2">
-                      <label className="text-white/90 text-sm font-sans tracking-wide block">
-                        タグ
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {availableTags.map((tag) => {
-                          const isSelected = selectedTag?.id === tag.id;
-                          return (
-                            <button
-                              key={tag.id}
-                              onClick={() => {
-                                if (isSelected) setSelectedTag(null);
-                                else setSelectedTag(tag);
-                              }}
-                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
-                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
-                                }`}
-                            >
-                              #{tag.tag_name}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
 
                   {/* 打ち上げボタン */}
                   <div className="mt-6 md:mt-auto flex justify-center">
