@@ -31,8 +31,16 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
     fetchTags();
   }, [user]);
 
-  // 現在表示中の年月（初期値は現在日時）
-  const [currentDate, setCurrentDate] = useState(getAppNow());
+  // 現在表示中の年月（初期値は最新の星があればその月、なければ現在日時）
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (stars && stars.length > 0) {
+      const latestStarTime = Math.max(
+        ...stars.map((s) => new Date(s.created_at).getTime()),
+      );
+      return new Date(latestStarTime);
+    }
+    return getAppNow();
+  });
 
   // 表示用データを作成
   const calendarData = useMemo(() => {
