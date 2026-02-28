@@ -127,8 +127,8 @@ export const UI = ({ onSend, onStarClick }) => {
   useEffect(() => {
     if (!tutorial.isActive) return;
 
-    // Step 13: FutureStar が見えない場合は自動生成
-    if (tutorial.currentStep === 13 && !isFutureStarVisible) {
+    // Step 20: FutureStar が見えない場合は自動生成
+    if (tutorial.currentStep === 20 && !isFutureStarVisible) {
       debug_setFutureStarVisible(true);
       setTimeout(() => {
         const pos = useFutureMessageStore.getState().futureStarPosition;
@@ -140,7 +140,22 @@ export const UI = ({ onSend, onStarClick }) => {
     if (tutorial.currentStep === 15 && !tutorial.isSecondDiary) {
       tutorial.skipForSecondDiary();
     }
-  }, [tutorial.isActive, tutorial.currentStep]);
+
+    // Step 6: 稀なレースコンディションで星の詳細が開いているのにステップが進まない問題の救済
+    if (tutorial.currentStep === 6 && starOpen) {
+      tutorial.triggerEvent('STAR_DETAIL_OPENED');
+    }
+
+    // Step 8, 9: すでにログが開いている場合の救済（強制スキップ）
+    if ((tutorial.currentStep === 8 || tutorial.currentStep === 9) && logModalOpen) {
+      if (tutorial.currentStep === 8) {
+        tutorial.triggerEvent('MENU_OPENED');
+      }
+      setTimeout(() => {
+        useTutorialStore.getState().triggerEvent('LOG_OPENED');
+      }, 50);
+    }
+  }, [tutorial.isActive, tutorial.currentStep, starOpen, logModalOpen, isFutureStarVisible]);
 
   // チュートリアル: 3 Good Things チェック
   useEffect(() => {
@@ -490,7 +505,11 @@ export const UI = ({ onSend, onStarClick }) => {
             const opening = !userMenuOpen;
             setUserMenuOpen(opening);
             if (opening && tutorial.isActive) {
-              tutorial.triggerEvent('MENU_OPENED');
+              if ([8, 11, 16].includes(tutorial.currentStep)) {
+                tutorial.triggerEvent('MENU_OPENED');
+              } else if (tutorial.currentStep === 20) {
+                tutorial.triggerEvent('FUTURE_MENU_OPENED');
+              }
             }
           }}
           className="relative w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg shadow-purple-900/20 hover:bg-white/20 transition-all duration-300"
@@ -604,7 +623,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 >
                   マイセイザ
                 </button>
-                {isFutureStarVisible && futureStarPosition && (
+                {(isFutureStarVisible && futureStarPosition) || (tutorial.isActive && tutorial.currentStep >= 20 && tutorial.currentStep <= 21) ? (
                   <button
                     id="menu-future-letter"
                     onClick={() => {
@@ -612,6 +631,10 @@ export const UI = ({ onSend, onStarClick }) => {
                       setProfileModalOpen(false);
                       setStarOpen(false);
                       setFocusTarget(futureStarPosition);
+                      // チュートリアル: 未来への手紙選択
+                      if (tutorial.isActive) {
+                        tutorial.triggerEvent('FUTURE_MENU_CLICKED');
+                      }
                     }}
                     className="w-full text-left py-3 text-cyan-300/90 hover:bg-cyan-500/10 transition-colors duration-200 font-sans tracking-widest text-xs border-t border-white/5"
                     style={{
@@ -623,7 +646,7 @@ export const UI = ({ onSend, onStarClick }) => {
                   >
                     未来への手紙
                   </button>
-                )}
+                ) : null}
                 <button
                   id="menu-theme"
                   onClick={() => {
@@ -800,401 +823,203 @@ export const UI = ({ onSend, onStarClick }) => {
             )}
           </div>
         )}
-      </div>
+      </div >
 
       {/* --- Debug Panel --- */}
-      {debugOpen && (
-        <div
-          className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setDebugOpen(false)}
-        >
+      {
+        debugOpen && (
           <div
-            className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setDebugOpen(false)}
           >
-            <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">
-              開発者モード
-            </h3>
-
-            {/* 現在のアプリ時間 */}
-            <div className="text-center py-2 bg-white/5 rounded-lg">
-              <p className="text-[10px] text-white/40 mb-1">アプリ時間</p>
-              <p className="text-white/90 font-mono text-sm">
-                {getAppNow().toLocaleString("ja-JP")}
-              </p>
-              {debugOffset > 0 && (
-                <p className="text-yellow-300/70 text-[10px] mt-1">
-                  +{debugOffset}日 スキップ中
-                </p>
-              )}
-            </div>
-
-            {/* タイムスキップ */}
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">タイムスキップ</p>
-              <div className="flex gap-2">
-                <div className="flex bg-white/10 rounded overflow-hidden flex-1 border border-white/20">
-                  <input
-                    type="text"
-                    value={skipDaysInput}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "" || /^[1-9]\d*$/.test(val)) {
-                        setSkipDaysInput(val);
-                      }
-                    }}
-                    onBlur={() => {
-                      if (!skipDaysInput) setSkipDaysInput("1");
-                    }}
-                    className="w-12 bg-transparent text-white text-center text-sm outline-none border-r border-white/20"
-                  />
-                  <button
-                    onClick={() => {
-                      const days = parseInt(skipDaysInput, 10);
-                      if (!isNaN(days) && days > 0) {
-                        const newOffset = debugOffset + days;
-                        setDebugDayOffset(newOffset);
-                        setDebugOffset(newOffset);
-                      }
-                    }}
-                    className="flex-1 py-1 bg-yellow-500/20 text-yellow-200 hover:bg-yellow-500/40 text-[11px] whitespace-nowrap"
-                  >
-                    日スキップ
-                  </button>
-                </div>
-                <button
-                  onClick={() => {
-                    setDebugDayOffset(0);
-                    setDebugOffset(0);
-                  }}
-                  className="w-[72px] flex-none py-1 bg-white/10 text-white/70 rounded hover:bg-white/20 text-[11px] whitespace-nowrap"
-                  disabled={debugOffset === 0}
-                  style={{ opacity: debugOffset === 0 ? 0.3 : 1 }}
-                >
-                  リセット
-                </button>
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <input
-                  type="checkbox"
-                  id="showRocketSkip"
-                  checked={showRocketSkipButton}
-                  onChange={(e) => setShowRocketSkipButton(e.target.checked)}
-                  className="w-4 h-4 rounded bg-white/10 border-white/20 text-yellow-500 cursor-pointer"
-                  style={{ accentColor: "#eab308" }}
-                />
-                <label
-                  htmlFor="showRocketSkip"
-                  className="text-[11px] text-white/70 cursor-pointer select-none"
-                >
-                  クイックスキップボタンを表示 (右下)
-                </label>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">未来への手紙（入力）</p>
-              <button
-                onClick={() => {
-                  if (!isFutureStarVisible) {
-                    debug_setFutureStarVisible(true);
-                  }
-                  setTimeout(() => {
-                    const pos =
-                      useFutureMessageStore.getState().futureStarPosition;
-                    if (pos) setFocusTarget(pos);
-                  }, 100);
-                  setDebugOpen(false);
-                }}
-                className="w-full py-2 bg-blue-500/20 text-blue-200 rounded hover:bg-blue-500/40 text-sm"
-              >
-                {isFutureStarVisible
-                  ? "未来星にフォーカス"
-                  : "未来星を強制表示＆フォーカス"}
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">
-                流れ星（過去のメッセージ取得）
-              </p>
-              <button
-                onClick={() => {
-                  debug_loadMockMessage();
-                  debug_setShootingStarVisible(true);
-                  setDebugOpen(false);
-                }}
-                className="w-full py-2 bg-pink-500/20 text-pink-200 rounded hover:bg-pink-500/40 text-sm"
-              >
-                流れ星を強制表示（モック）
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-xs text-white/50">星座テスト (1分間表示)</p>
-              <div className="flex gap-2">
-                <select
-                  className="flex-1 bg-white/10 text-white rounded text-[11px] px-2 py-2 border border-white/20 outline-none [&>option]:text-black"
-                  value={debugConstellationId}
-                  onChange={(e) => setDebugConstellationId(e.target.value)}
-                >
-                  <option value="monoceros">一角獣座</option>
-                  <option value="sagittarius">射手座</option>
-                  <option value="delphinus">イルカ座</option>
-                  <option value="indus">インディアン座</option>
-                  <option value="pisces">うお座</option>
-                  <option value="lepus">兎座</option>
-                  <option value="bootes">うしかい座</option>
-                  <option value="hydra">ウミヘビ座</option>
-                  <option value="andromeda">アンドロメダ座</option>
-                </select>
-                <button
-                  onClick={() => {
-                    debug_showConstellation(debugConstellationId);
-                    setDebugOpen(false);
-                  }}
-                  className="py-2 px-3 bg-purple-500/20 text-purple-200 rounded hover:bg-purple-500/40 text-[11px] whitespace-nowrap"
-                >
-                  表示
-                </button>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setDebugOpen(false)}
-              className="w-full py-2 mt-4 bg-white/10 text-white rounded hover:bg-white/20 text-sm"
+            <div
+              className="bg-[#1a1a3a] border border-white/20 p-6 rounded-2xl w-80 space-y-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              閉じる
-            </button>
-          </div>
-        </div>
-      )}
+              <h3 className="text-white font-bold text-center border-b border-white/10 pb-2">
+                開発者モード
+              </h3>
 
-      {/* --- 日記モーダル (Mood Diary Modal) --- */}
-      {diaryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center md:items-center">
-          {/* 背景のバックドロップ (クリックで閉じる) */}
-          <div
-            className="absolute inset-0 bg-black/20 transition-opacity duration-300"
-            onClick={closeDiaryModal}
-          ></div>
-
-          {/* モーダルコンテンツ */}
-          <div
-            className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-black/40 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0"
-            style={{ padding: "24px 36px" }}
-          >
-            {/* ヘッダー: スマホは戻る矢印+日付+X、PCは日付+X */}
-            <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
-              {/* 左: スマホstep1は戻る矢印 / それ以外はスペース */}
-              <div className="w-12 flex-shrink-0">
-                {mobileDiaryStep === 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setMobileDiaryStep(0)}
-                    className="flex md:hidden items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
-                    aria-label="戻る"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </button>
+              {/* 現在のアプリ時間 */}
+              <div className="text-center py-2 bg-white/5 rounded-lg">
+                <p className="text-[10px] text-white/40 mb-1">アプリ時間</p>
+                <p className="text-white/90 font-mono text-sm">
+                  {getAppNow().toLocaleString("ja-JP")}
+                </p>
+                {debugOffset > 0 && (
+                  <p className="text-yellow-300/70 text-[10px] mt-1">
+                    +{debugOffset}日 スキップ中
+                  </p>
                 )}
               </div>
 
-              {/* 中央: 日付 */}
-              <h2
-                className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
-                style={{
-                  fontSize: "28px",
-                  marginBottom: "10px",
-                  fontFamily: "Kiwi Maru",
-                  letterSpacing: "0rem",
-                }}
-              >
-                {getFormattedDate()}
-              </h2>
-
-              {/* 右: 閉じるX（PC常時 + スマホstep0） */}
-              <div className="w-12 flex-shrink-0 flex justify-end">
-                <button
-                  type="button"
-                  onClick={closeDiaryModal}
-                  className={`items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors ${mobileDiaryStep === 0 ? "flex" : "hidden md:flex"}`}
-                  aria-label="閉じる"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
+              {/* タイムスキップ */}
+              <div className="space-y-2">
+                <p className="text-xs text-white/50">タイムスキップ</p>
+                <div className="flex gap-2">
+                  <div className="flex bg-white/10 rounded overflow-hidden flex-1 border border-white/20">
+                    <input
+                      type="text"
+                      value={skipDaysInput}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "" || /^[1-9]\d*$/.test(val)) {
+                          setSkipDaysInput(val);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (!skipDaysInput) setSkipDaysInput("1");
+                      }}
+                      className="w-12 bg-transparent text-white text-center text-sm outline-none border-r border-white/20"
                     />
-                  </svg>
+                    <button
+                      onClick={() => {
+                        const days = parseInt(skipDaysInput, 10);
+                        if (!isNaN(days) && days > 0) {
+                          const newOffset = debugOffset + days;
+                          setDebugDayOffset(newOffset);
+                          setDebugOffset(newOffset);
+                        }
+                      }}
+                      className="flex-1 py-1 bg-yellow-500/20 text-yellow-200 hover:bg-yellow-500/40 text-[11px] whitespace-nowrap"
+                    >
+                      日スキップ
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setDebugDayOffset(0);
+                      setDebugOffset(0);
+                    }}
+                    className="w-[72px] flex-none py-1 bg-white/10 text-white/70 rounded hover:bg-white/20 text-[11px] whitespace-nowrap"
+                    disabled={debugOffset === 0}
+                    style={{ opacity: debugOffset === 0 ? 0.3 : 1 }}
+                  >
+                    リセット
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="checkbox"
+                    id="showRocketSkip"
+                    checked={showRocketSkipButton}
+                    onChange={(e) => setShowRocketSkipButton(e.target.checked)}
+                    className="w-4 h-4 rounded bg-white/10 border-white/20 text-yellow-500 cursor-pointer"
+                    style={{ accentColor: "#eab308" }}
+                  />
+                  <label
+                    htmlFor="showRocketSkip"
+                    className="text-[11px] text-white/70 cursor-pointer select-none"
+                  >
+                    クイックスキップボタンを表示 (右下)
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs text-white/50">未来への手紙（入力）</p>
+                <button
+                  onClick={() => {
+                    if (!isFutureStarVisible) {
+                      debug_setFutureStarVisible(true);
+                    }
+                    setTimeout(() => {
+                      const pos =
+                        useFutureMessageStore.getState().futureStarPosition;
+                      if (pos) setFocusTarget(pos);
+                    }, 100);
+                    setDebugOpen(false);
+                  }}
+                  className="w-full py-2 bg-blue-500/20 text-blue-200 rounded hover:bg-blue-500/40 text-sm"
+                >
+                  {isFutureStarVisible
+                    ? "未来星にフォーカス"
+                    : "未来星を強制表示＆フォーカス"}
                 </button>
               </div>
-            </div>
 
-            <div>
-              {/* コンテンツ: スマホはステップ切替、PCは左右2カラムで全表示 */}
-              <div className="flex flex-col md:flex-row md:gap-8">
-                {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
-                <div
-                  id="diary-sliders"
-                  className={`flex-1 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
-                    }`}
+              <div className="space-y-2">
+                <p className="text-xs text-white/50">
+                  流れ星（過去のメッセージ取得）
+                </p>
+                <button
+                  onClick={() => {
+                    debug_loadMockMessage();
+                    debug_setShootingStarVisible(true);
+                    setDebugOpen(false);
+                  }}
+                  className="w-full py-2 bg-pink-500/20 text-pink-200 rounded hover:bg-pink-500/40 text-sm"
                 >
-                  <div id="diary-sliders-only" className="space-y-6">
-                    {MOOD_QUESTIONS.map((q) => (
-                      <div
-                        key={q.id}
-                        className="space-y-2"
-                        style={{ margin: "12px 0" }}
-                      >
-                        <p
-                          className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left"
-                          style={{
-                            fontFamily: "Kiwi Maru",
-                            letterSpacing: "0rem",
-                          }}
-                        >
-                          {q.question}
-                        </p>
-                        <div className="relative px-3">
-                          {/* 左端ドット */}
-                          <div className="absolute left-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
-                          {/* 右端ドット */}
-                          <div className="absolute right-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
-                          {/* 中央インジケーター（50%） */}
-                          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/3 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={moodValues[q.id]}
-                            onChange={(e) =>
-                              handleSliderChange(q.id, parseInt(e.target.value))
-                            }
-                            className="mood-slider w-full appearance-none cursor-pointer"
-                            style={{
-                              background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`,
-                            }}
-                          />
-                        </div>
-                        <div
-                          className="flex justify-between text-white/50 text-xs font-sans"
-                          style={{
-                            fontFamily: "Kiwi Maru",
-                            letterSpacing: "0rem",
-                          }}
-                        >
-                          <span>{q.leftLabel}</span>
-                          <span>{q.rightLabel}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  流れ星を強制表示（モック）
+                </button>
+              </div>
 
-                  {/* タグ選択 */}
-                  {availableTags.length > 0 && (
-                    <div id="diary-tags" className="space-y-2 mt-2">
-                      <label
-                        className="text-white/90 text-sm font-sans tracking-wide block"
-                        style={{
-                          fontFamily: "Kiwi Maru",
-                          letterSpacing: "-2px",
-                          margin: "20px 0 10px 0",
-                        }}
-                      >
-                        <div class="icon-text" style={{ display: "flex" }}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-tag-icon lucide-tag"
-                            style={{
-                              height: "18px",
-                              width: "18px",
-                              padding: "3px 3px 0 0",
-                            }}
-                          >
-                            <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
-                            <circle
-                              cx="7.5"
-                              cy="7.5"
-                              r=".5"
-                              fill="currentColor"
-                            />
-                          </svg>
-                          <p>タグ</p>
-                        </div>
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {availableTags.map((tag) => {
-                          const isSelected = selectedTag?.id === tag.id;
-                          return (
-                            <button
-                              key={tag.id}
-                              onClick={() => {
-                                if (isSelected) setSelectedTag(null);
-                                else {
-                                  setSelectedTag(tag);
-                                  if (tutorial.isActive) {
-                                    tutorial.triggerEvent('TAG_SELECTED');
-                                    // チュートリアル中かつスマホサイズの場合、タグ選択で自動的に次のステップへ進む
-                                    if (window.innerWidth < 768) {
-                                      setTimeout(() => setMobileDiaryStep(1), 300);
-                                    }
-                                  }
-                                }
-                              }}
-                              className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
-                                ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                                : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
-                                }`}
-                              style={{
-                                padding: "8px 15px",
-                                fontFamily: "Kiwi Maru",
-                                letterSpacing: "0rem",
-                              }}
-                            >
-                              #{tag.tag_name}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+              <div className="space-y-2">
+                <p className="text-xs text-white/50">星座テスト (1分間表示)</p>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 bg-white/10 text-white rounded text-[11px] px-2 py-2 border border-white/20 outline-none [&>option]:text-black"
+                    value={debugConstellationId}
+                    onChange={(e) => setDebugConstellationId(e.target.value)}
+                  >
+                    <option value="monoceros">一角獣座</option>
+                    <option value="sagittarius">射手座</option>
+                    <option value="delphinus">イルカ座</option>
+                    <option value="indus">インディアン座</option>
+                    <option value="pisces">うお座</option>
+                    <option value="lepus">兎座</option>
+                    <option value="bootes">うしかい座</option>
+                    <option value="hydra">ウミヘビ座</option>
+                    <option value="andromeda">アンドロメダ座</option>
+                  </select>
+                  <button
+                    onClick={() => {
+                      debug_showConstellation(debugConstellationId);
+                      setDebugOpen(false);
+                    }}
+                    className="py-2 px-3 bg-purple-500/20 text-purple-200 rounded hover:bg-purple-500/40 text-[11px] whitespace-nowrap"
+                  >
+                    表示
+                  </button>
+                </div>
+              </div>
 
-                  {/* スマホステップ0: →ボタンで次へ */}
-                  <div className="flex md:hidden justify-end items-center mt-8">
+              <button
+                onClick={() => setDebugOpen(false)}
+                className="w-full py-2 mt-4 bg-white/10 text-white rounded hover:bg-white/20 text-sm"
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        )
+      }
+
+      {/* --- 日記モーダル (Mood Diary Modal) --- */}
+      {
+        diaryOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center md:items-center">
+            {/* 背景のバックドロップ (クリックで閉じる) */}
+            <div
+              className="absolute inset-0 bg-black/20 transition-opacity duration-300"
+              onClick={closeDiaryModal}
+            ></div>
+
+            {/* モーダルコンテンツ */}
+            <div
+              className="relative w-full max-w-sm md:max-w-3xl mx-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-t-3xl md:rounded-[32px] shadow-2xl shadow-black/40 transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] md:max-h-[85vh] overflow-y-auto mt-auto md:mt-0"
+              style={{ padding: "24px 36px" }}
+            >
+              {/* ヘッダー: スマホは戻る矢印+日付+X、PCは日付+X */}
+              <div className="relative z-10 flex items-center justify-between mb-6 min-h-[44px]">
+                {/* 左: スマホstep1は戻る矢印 / それ以外はスペース */}
+                <div className="w-12 flex-shrink-0">
+                  {mobileDiaryStep === 1 && (
                     <button
-                      onClick={() => setMobileDiaryStep(1)}
-                      className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300"
-                      aria-label="次へ"
+                      type="button"
+                      onClick={() => setMobileDiaryStep(0)}
+                      className="flex md:hidden items-center justify-center w-12 h-12 min-w-[48px] min-h-[48px] text-white/90 hover:text-white active:opacity-70 transition-opacity touch-manipulation"
+                      aria-label="戻る"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1207,157 +1032,361 @@ export const UI = ({ onSend, onStarClick }) => {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                          d="M15 19l-7-7 7-7"
                         />
                       </svg>
                     </button>
-                  </div>
+                  )}
                 </div>
 
-                {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
-                <div
-                  id="diary-good-things"
-                  className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
-                    }`}
+                {/* 中央: 日付 */}
+                <h2
+                  className="flex-1 text-center text-white/95 font-sans text-xl md:text-lg tracking-[0.15em] font-light drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                  style={{
+                    fontSize: "28px",
+                    marginBottom: "10px",
+                    fontFamily: "Kiwi Maru",
+                    letterSpacing: "0rem",
+                  }}
                 >
-                  <div className="space-y-2">
-                    <label
-                      className="text-white/90 text-sm font-sans tracking-wide block"
-                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                  {getFormattedDate()}
+                </h2>
+
+                {/* 右: 閉じるX（PC常時 + スマホstep0） */}
+                <div className="w-12 flex-shrink-0 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={closeDiaryModal}
+                    className={`items-center justify-center w-10 h-10 text-white/50 hover:text-white transition-colors ${mobileDiaryStep === 0 ? "flex" : "hidden md:flex"}`}
+                    aria-label="閉じる"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-5 h-5"
                     >
-                      今日のいいこと1{" "}
-                      <span className="text-white/50">(必須)</span>
-                    </label>
-                    <textarea
-                      spellcheck="false"
-                      value={goodThing1}
-                      onChange={(e) => setGoodThing1(e.target.value)}
-                      maxLength={300}
-                      placeholder=""
-                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{
-                        height: "80px",
-                        margin: "10px 0",
-                        padding: "10px",
-                        fontFamily: "Kiwi Maru",
-                        letterSpacing: "0rem",
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      className="text-white/90 text-sm font-sans tracking-wide block"
-                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
-                    >
-                      今日のいいこと2{" "}
-                      <span className="text-white/50">(任意)</span>
-                    </label>
-                    <textarea
-                      spellcheck="false"
-                      value={goodThing2}
-                      onChange={(e) => setGoodThing2(e.target.value)}
-                      maxLength={300}
-                      placeholder=""
-                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{
-                        height: "80px",
-                        margin: "10px 0",
-                        padding: "10px",
-                        fontFamily: "Kiwi Maru",
-                        letterSpacing: "0rem",
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      className="text-white/90 text-sm font-sans tracking-wide block"
-                      style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
-                    >
-                      今日のいいこと3{" "}
-                      <span className="text-white/50">(任意)</span>
-                    </label>
-                    <textarea
-                      spellcheck="false"
-                      value={goodThing3}
-                      onChange={(e) => setGoodThing3(e.target.value)}
-                      maxLength={300}
-                      placeholder=""
-                      className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
-                      style={{
-                        height: "80px",
-                        margin: "10px 0",
-                        padding: "10px",
-                        fontFamily: "Kiwi Maru",
-                        letterSpacing: "0rem",
-                      }}
-                    />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                {/* コンテンツ: スマホはステップ切替、PCは左右2カラムで全表示 */}
+                <div className="flex flex-col md:flex-row md:gap-8">
+                  {/* 左: スライダー質問リスト（スマホステップ0 / PC常時） */}
+                  <div
+                    id="diary-sliders"
+                    className={`flex-1 min-w-0 ${mobileDiaryStep === 1 ? "hidden md:block" : "block"
+                      }`}
+                  >
+                    <div id="diary-sliders-only" className="space-y-6">
+                      {MOOD_QUESTIONS.map((q) => (
+                        <div
+                          key={q.id}
+                          className="space-y-2"
+                          style={{ margin: "12px 0" }}
+                        >
+                          <p
+                            className="text-white/90 text-sm font-sans tracking-wide text-center md:text-left"
+                            style={{
+                              fontFamily: "Kiwi Maru",
+                              letterSpacing: "0rem",
+                            }}
+                          >
+                            {q.question}
+                          </p>
+                          <div className="relative px-3">
+                            {/* 左端ドット */}
+                            <div className="absolute left-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
+                            {/* 右端ドット */}
+                            <div className="absolute right-0 top-1/2 -translate-y-1/3 w-3 h-3 rounded-full bg-white/100 z-[1]" />
+                            {/* 中央インジケーター（50%） */}
+                            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/3 w-[2px] h-5 bg-blue-400/90 rounded-full z-[1] pointer-events-none" />
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={moodValues[q.id]}
+                              onChange={(e) =>
+                                handleSliderChange(q.id, parseInt(e.target.value))
+                              }
+                              className="mood-slider w-full appearance-none cursor-pointer"
+                              style={{
+                                background: `linear-gradient(to right, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.7) ${moodValues[q.id]}%, rgba(255,255,255,0.2) ${moodValues[q.id]}%, rgba(255,255,255,0.2) 100%)`,
+                              }}
+                            />
+                          </div>
+                          <div
+                            className="flex justify-between text-white/50 text-xs font-sans"
+                            style={{
+                              fontFamily: "Kiwi Maru",
+                              letterSpacing: "0rem",
+                            }}
+                          >
+                            <span>{q.leftLabel}</span>
+                            <span>{q.rightLabel}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* タグ選択 */}
+                    {availableTags.length > 0 && (
+                      <div id="diary-tags" className="space-y-2 mt-2">
+                        <label
+                          className="text-white/90 text-sm font-sans tracking-wide block"
+                          style={{
+                            fontFamily: "Kiwi Maru",
+                            letterSpacing: "-2px",
+                            margin: "20px 0 10px 0",
+                          }}
+                        >
+                          <div class="icon-text" style={{ display: "flex" }}>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-tag-icon lucide-tag"
+                              style={{
+                                height: "18px",
+                                width: "18px",
+                                padding: "3px 3px 0 0",
+                              }}
+                            >
+                              <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
+                              <circle
+                                cx="7.5"
+                                cy="7.5"
+                                r=".5"
+                                fill="currentColor"
+                              />
+                            </svg>
+                            <p>タグ</p>
+                          </div>
+                        </label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {availableTags.map((tag) => {
+                            const isSelected = selectedTag?.id === tag.id;
+                            return (
+                              <button
+                                key={tag.id}
+                                onClick={() => {
+                                  if (isSelected) setSelectedTag(null);
+                                  else {
+                                    setSelectedTag(tag);
+                                    if (tutorial.isActive) {
+                                      tutorial.triggerEvent('TAG_SELECTED');
+                                      // チュートリアル中かつスマホサイズの場合、タグ選択で自動的に次のステップへ進む
+                                      if (window.innerWidth < 768) {
+                                        setTimeout(() => setMobileDiaryStep(1), 300);
+                                      }
+                                    }
+                                  }
+                                }}
+                                className={`px-4 py-1.5 border rounded-full text-xs transition-colors duration-200 cursor-pointer ${isSelected
+                                  ? "bg-white/30 border-white/60 text-white shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                                  : "bg-white/8 hover:bg-white/15 border-white/10 text-white/80"
+                                  }`}
+                                style={{
+                                  padding: "8px 15px",
+                                  fontFamily: "Kiwi Maru",
+                                  letterSpacing: "0rem",
+                                }}
+                              >
+                                #{tag.tag_name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* スマホステップ0: →ボタンで次へ */}
+                    <div className="flex md:hidden justify-end items-center mt-8">
+                      <button
+                        onClick={() => setMobileDiaryStep(1)}
+                        className="w-10 h-10 flex items-center justify-center text-white/80 hover:text-white transition-all duration-300"
+                        aria-label="次へ"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* 打ち上げボタン */}
-                  <div id="diary-launch-btn" className="mt-6 md:mt-auto flex justify-center">
-                    <button
-                      onClick={handleSend}
-                      disabled={isSending || !goodThing1.trim()}
-                      className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white/70 text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                      style={{
-                        padding: "8px",
-                        fontWeight: "bold",
-                        fontFamily: "Kiwi Maru",
-                        letterSpacing: "0rem",
-                      }}
-                    >
-                      {isSending ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin w-4 h-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          打ち上げる準備中...
-                        </span>
-                      ) : (
-                        "打ち上げ"
-                      )}
-                    </button>
+                  {/* 右: 今日のいいこと入力 + 打ち上げボタン（スマホステップ1 / PC常時） */}
+                  <div
+                    id="diary-good-things"
+                    className={`flex flex-1 flex-col gap-5 md:gap-4 ${mobileDiaryStep === 0 ? "hidden md:flex" : "flex"
+                      }`}
+                  >
+                    <div className="space-y-2">
+                      <label
+                        className="text-white/90 text-sm font-sans tracking-wide block"
+                        style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                      >
+                        今日のいいこと1{" "}
+                        <span className="text-white/50">(必須)</span>
+                      </label>
+                      <textarea
+                        spellcheck="false"
+                        value={goodThing1}
+                        onChange={(e) => setGoodThing1(e.target.value)}
+                        maxLength={300}
+                        placeholder=""
+                        className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                        style={{
+                          height: "80px",
+                          margin: "10px 0",
+                          padding: "10px",
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        className="text-white/90 text-sm font-sans tracking-wide block"
+                        style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                      >
+                        今日のいいこと2{" "}
+                        <span className="text-white/50">(任意)</span>
+                      </label>
+                      <textarea
+                        spellcheck="false"
+                        value={goodThing2}
+                        onChange={(e) => setGoodThing2(e.target.value)}
+                        maxLength={300}
+                        placeholder=""
+                        className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                        style={{
+                          height: "80px",
+                          margin: "10px 0",
+                          padding: "10px",
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        className="text-white/90 text-sm font-sans tracking-wide block"
+                        style={{ fontFamily: "Kiwi Maru", letterSpacing: "0rem" }}
+                      >
+                        今日のいいこと3{" "}
+                        <span className="text-white/50">(任意)</span>
+                      </label>
+                      <textarea
+                        spellcheck="false"
+                        value={goodThing3}
+                        onChange={(e) => setGoodThing3(e.target.value)}
+                        maxLength={300}
+                        placeholder=""
+                        className="w-full px-4 py-3 bg-white/15 border-0 rounded-xl text-white/90 placeholder-white/30 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors resize-none overflow-y-auto"
+                        style={{
+                          height: "80px",
+                          margin: "10px 0",
+                          padding: "10px",
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      />
+                    </div>
+
+                    {/* 打ち上げボタン */}
+                    <div id="diary-launch-btn" className="mt-6 md:mt-auto flex justify-center">
+                      <button
+                        onClick={handleSend}
+                        disabled={isSending || !goodThing1.trim()}
+                        className="w-full md:w-auto min-w-[200px] px-8 py-4 md:py-3 bg-transparent border-2 border-white/70 text-white rounded-2xl font-sans tracking-widest text-sm font-medium hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                        style={{
+                          padding: "8px",
+                          fontWeight: "bold",
+                          fontFamily: "Kiwi Maru",
+                          letterSpacing: "0rem",
+                        }}
+                      >
+                        {isSending ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <svg
+                              className="animate-spin w-4 h-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            打ち上げる準備中...
+                          </span>
+                        ) : (
+                          "打ち上げ"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* --- ログ一覧モーダル --- */}
-      {logModalOpen && (
-        <LogViewsModal
-          onClose={() => setLogModalOpen(false)}
-          onLogClick={(star) => {
-            if (star?.position) {
-              setFocusTarget(star.position);
-            }
-            setLogModalOpen(false);
-            // チュートリアル: ログの星にフォーカスした
-            if (tutorial.isActive) {
-              tutorial.triggerEvent('LOG_STAR_FOCUSED');
-            }
-          }}
-        />
-      )}
+      {
+        logModalOpen && (
+          <LogViewsModal
+            onClose={() => setLogModalOpen(false)}
+            onLogClick={(star) => {
+              if (star?.position) {
+                setFocusTarget(star.position);
+              }
+              setLogModalOpen(false);
+              // チュートリアル: ログの星にフォーカスした
+              if (tutorial.isActive) {
+                tutorial.triggerEvent('LOG_STAR_FOCUSED');
+              }
+            }}
+          />
+        )
+      }
 
       {/* --- プロフィールモーダル (Profile Modal) --- */}
       <ProfileModal

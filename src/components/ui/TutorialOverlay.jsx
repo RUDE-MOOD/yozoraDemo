@@ -273,8 +273,8 @@ export function TutorialOverlay() {
                         margin: '0 auto',
                         maxWidth: '90vw',
                         width: '420px',
-                    } : [8, 16].includes(currentStep) ? {
-                        // Step 8, 16: ユーザーメニューを開くため、メニューを遮らないように画面中央やや下に配置
+                    } : [8, 16, 20].includes(currentStep) ? {
+                        // Step 8, 16, 20: ユーザーメニューを開くため、メニューを遮らないように画面中央やや下に配置
                         position: 'fixed',
                         top: '50%',
                         left: '0',
@@ -282,8 +282,8 @@ export function TutorialOverlay() {
                         margin: '0 auto',
                         maxWidth: '90vw',
                         width: '420px',
-                    } : currentStep === 18 ? {
-                        // Step 18: テーマ選択モーダルの選択肢を遮らないように画面最下部に配置
+                    } : [18, 23].includes(currentStep) ? {
+                        // Step 18, 23: モーダルの選択肢や入力欄を遮らないように画面最下部に配置
                         position: 'fixed',
                         bottom: '2px',
                         left: '0',

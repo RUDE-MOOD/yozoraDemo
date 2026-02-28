@@ -152,13 +152,27 @@ const TUTORIAL_STEPS = [
     {
         id: 20,
         title: 'チュートリアル',
-        message: '画面に浮かぶ「未来への手紙」を\n見つけてタップしてみましょう。\n未来の自分にメッセージを送れます。',
+        message: '右上のメニューを開いてください。',
+        highlightTarget: '#user-menu-btn',
+        completionEvent: 'FUTURE_MENU_OPENED',
+    },
+    {
+        id: 21,
+        title: 'チュートリアル',
+        message: '「未来への手紙」をタップしてください。',
+        highlightTarget: '#menu-future-letter',
+        completionEvent: 'FUTURE_MENU_CLICKED',
+    },
+    {
+        id: 22,
+        title: 'チュートリアル',
+        message: '画面に浮かぶ星をタップしてみましょう。\n未来の自分にメッセージを送れます。',
         highlightTarget: null, // 3D空間のFutureStar
         completionEvent: 'FUTURE_INPUT_OPENED',
         noOverlay: true,
     },
     {
-        id: 21,
+        id: 23,
         title: 'チュートリアル',
         message: '未来の自分へメッセージを書いて、\n星を発射しましょう。',
         highlightTarget: null, // FutureMessageInputModal内
@@ -166,21 +180,21 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 22,
+        id: 24,
         title: 'チュートリアル',
         message: 'もう一度日記を書いてみましょう。\nロケットボタンを押してください。',
         highlightTarget: '#rocket-button',
         completionEvent: 'DIARY_OPENED_2',
     },
     {
-        id: 23,
+        id: 25,
         title: 'チュートリアル',
         message: '今度はスライダーを全て左側（25以下）に\n動かしてみてください。\n特別なことが起こるかもしれません。',
         highlightTarget: '#diary-sliders-only',
         completionEvent: 'SLIDERS_LOW_AND_LAUNCHED',
     },
     {
-        id: 24,
+        id: 26,
         title: 'チュートリアル',
         message: '流れ星が現れました！\n流れ星をタップして、\n過去の自分からのメッセージを受け取りましょう。',
         highlightTarget: null, // 3D空間のShootingStar
@@ -188,7 +202,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 25,
+        id: 27,
         title: 'チュートリアル',
         message: '過去の自分からのメッセージです。\n読み終わったら閉じましょう。',
         highlightTarget: null,
@@ -196,7 +210,7 @@ const TUTORIAL_STEPS = [
         noOverlay: true,
     },
     {
-        id: 26,
+        id: 28,
         title: 'チュートリアル完了！',
         message: 'すべてのチュートリアルが完了しました。\n夜空の世界を自由にお楽しみください。',
         highlightTarget: null,
