@@ -21,7 +21,16 @@ export function TutorialOverlay() {
     // 引き上げた要素のリスト（ターゲット + 親スタッキングコンテキスト）
     const elevatedEls = useRef([]);
 
-    const step = currentStep > 0 && currentStep <= steps.length ? steps[currentStep - 1] : null;
+    const rawStep = currentStep > 0 && currentStep <= steps.length ? steps[currentStep - 1] : null;
+
+    // スマホ版のStep 4, 27ではキーボードによるレイアウト崩れを防ぐため
+    // ハイライト枠と背景暗幕を無効化する（PC版は従来通り）
+    const isMobile = window.innerWidth < 768;
+    const step = rawStep ? { ...rawStep } : null;
+    if (step && isMobile && [4, 27].includes(currentStep)) {
+        step.highlightTarget = null;
+        step.noOverlay = true;
+    }
 
     // ハイライト対象の要素 + 親のスタッキングコンテキストを引き上げる
     useEffect(() => {
@@ -148,6 +157,17 @@ export function TutorialOverlay() {
     const getTooltipStyle = () => {
         if (!highlightRect) {
             // ハイライトなし → 画面の中央下に配置
+            if (currentStep === 30) {
+                return {
+                    position: 'fixed',
+                    bottom: '5%',
+                    left: '0',
+                    right: '0',
+                    margin: '0 auto',
+                    maxWidth: '90vw',
+                    width: '420px',
+                };
+            }
             return {
                 position: 'fixed',
                 bottom: '15%',

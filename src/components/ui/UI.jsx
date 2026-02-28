@@ -155,6 +155,13 @@ export const UI = ({ onSend, onStarClick }) => {
         useTutorialStore.getState().triggerEvent('LOG_OPENED');
       }, 50);
     }
+
+    // Step 5, 28: 入力ステップ完了後にキーボードを強制的に閉じる
+    if (tutorial.currentStep === 5 || tutorial.currentStep === 28) {
+      if (document.activeElement && document.activeElement.tagName !== 'BODY') {
+        document.activeElement.blur();
+      }
+    }
   }, [tutorial.isActive, tutorial.currentStep, starOpen, logModalOpen, isFutureStarVisible]);
 
   // チュートリアル: 3 Good Things チェック (Step 4, Step 27)
