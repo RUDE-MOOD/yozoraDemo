@@ -116,7 +116,7 @@ export const UI = ({ onSend, onStarClick }) => {
     debug_loadMockMessage,
   } = useFutureMessageStore();
 
-  const { user, showStarDate, toggleShowStarDate } = useUserStore();
+  const { user, showStarDate, toggleShowStarDate, showWelcomeText, toggleShowWelcomeText } = useUserStore();
 
   const { setFocusTarget, stars, debug_showConstellation } = useStarStore();
 
@@ -212,7 +212,8 @@ export const UI = ({ onSend, onStarClick }) => {
 
   // 1日スキップ関連
   const [skipDaysInput, setSkipDaysInput] = useState("1");
-  const [showRocketSkipButton, setShowRocketSkipButton] = useState(false);
+  const showRocketSkipButton = useUserStore((s) => s.showRocketSkipButton);
+  const setShowRocketSkipButton = useUserStore((s) => s.setShowRocketSkipButton);
 
   // 冷却状態を1秒ごとに更新
   useEffect(() => {
@@ -816,6 +817,31 @@ export const UI = ({ onSend, onStarClick }) => {
                       className="sr-only peer"
                       checked={showStarDate}
                       onChange={toggleShowStarDate}
+                    />
+                    <div className="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-blue after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                  </label>
+                </div>
+
+                {/* Welcome Text Toggle */}
+                <div className="px-6 py-3 flex items-center justify-between border-b border-white/5">
+                  <span
+                    className="text-white/90 font-sans tracking-widest text-xs"
+                    style={{
+                      fontFamily: "Kiwi Maru",
+                      letterSpacing: "0rem",
+                      borderRadius: "5px",
+                      padding: "0.2rem 1.25rem 0.2rem 1rem",
+                      fontSize: "12px",
+                    }}
+                  >
+                    ウェルカムテキスト
+                  </span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={showWelcomeText}
+                      onChange={toggleShowWelcomeText}
                     />
                     <div className="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-blue after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
                   </label>

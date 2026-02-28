@@ -261,7 +261,7 @@ function App() {
             </PerformanceMonitor>
           </Canvas>
           <UI onSend={addStar} onStarClick={handleSetStarClickHandler} />
-          {phase === 'app' && <NostargiaIntro />}
+          {phase === 'app' && useUserStore.getState().showWelcomeText && <NostargiaIntro />}
         </>
       )}
 
