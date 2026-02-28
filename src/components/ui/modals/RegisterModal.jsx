@@ -408,7 +408,7 @@ export function RegisterModal({ onRegister, onBackToLogin }) {
             />
 
             {/* 誕生日 */}
-            <label style={labelStyle}>誕生日</label>
+            <label style={labelStyle}>生年月日</label>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               {/* 年 */}
               <select

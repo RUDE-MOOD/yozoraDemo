@@ -1,8 +1,8 @@
-import * as THREE from 'three'
-import { shaderMaterial, Text } from '@react-three/drei'
-import { extend, useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
-import { useUserStore } from '../../../store/useUserStore'
+import * as THREE from "three";
+import { shaderMaterial, Text } from "@react-three/drei";
+import { extend, useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import { useUserStore } from "../../../store/useUserStore";
 
 // --- SingleStarMaterial ---
 // MyStarMaterialを単一の星用に調整したシェーダー
@@ -89,13 +89,21 @@ const SingleStarMaterial = shaderMaterial(
 
       gl_FragColor = vec4(finalColor, alpha);
     }
-  `
-)
+  `,
+);
 
-extend({ SingleStarMaterial })
+extend({ SingleStarMaterial });
 
-export function UserStar({ position, color, scale, random, date, starData, onStarClick }) {
-  const materialRef = useRef()
+export function UserStar({
+  position,
+  color,
+  scale,
+  random,
+  date,
+  starData,
+  onStarClick,
+}) {
+  const materialRef = useRef();
   const { showStarDate } = useUserStore();
 
   // マウント時に、この星が新しく作られたものか判定（isJustCreatedフラグ）
@@ -104,34 +112,37 @@ export function UserStar({ position, color, scale, random, date, starData, onSta
 
   useFrame((state, delta) => {
     if (materialRef.current) {
-      materialRef.current.time += delta
+      materialRef.current.time += delta;
 
       if (isNewRef.current) {
         elapsedRef.current += delta;
         // 1.5秒待機（カメラが移動する時間）後、1.5秒かけてフェードイン
-        const progress = Math.min(Math.max((elapsedRef.current - 1.5) / 1.5, 0.0), 1.0);
+        const progress = Math.min(
+          Math.max((elapsedRef.current - 1.5) / 1.5, 0.0),
+          1.0,
+        );
         materialRef.current.baseBrightness = progress;
       } else {
         materialRef.current.baseBrightness = 1.0;
       }
     }
-  })
+  });
 
   const handleClick = (e) => {
     // クリックされた星の情報しか表示されない
     e.stopPropagation();
     // ＝＝＝＝＝＝＝＝＝＝＝
-    console.log('=== Star clicked! ===');
+    console.log("=== Star clicked! ===");
     console.log(`日付：${date}、座標:${position}`);
-    console.log('onStarClick:', onStarClick);
-    console.log('starData:', starData);
+    console.log("onStarClick:", onStarClick);
+    console.log("starData:", starData);
 
     // モーダルを開く
     if (onStarClick && starData) {
-      console.log('Calling onStarClick with starData');
+      console.log("Calling onStarClick with starData");
       onStarClick(starData);
     } else {
-      console.warn('onStarClick or starData is missing!');
+      console.warn("onStarClick or starData is missing!");
     }
   };
 
@@ -163,6 +174,5 @@ export function UserStar({ position, color, scale, random, date, starData, onSta
         </Text>
       )}
     </group>
-  )
+  );
 }
-

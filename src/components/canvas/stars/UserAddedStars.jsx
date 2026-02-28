@@ -190,12 +190,12 @@
   ユーザー入力 → App.jsx (ステート更新) → Experience.jsx (プロップ) 
     → UserAddedStars.jsx (プロップ) → UserStar.jsx (個別レンダリング)
 */
-import * as THREE from 'three'
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { Instances, Instance, Text } from '@react-three/drei'
-import { useUserStore } from '../../../store/useUserStore'
-import { UserStar } from './UserStar'
+import * as THREE from "three";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Instances, Instance, Text } from "@react-three/drei";
+import { useUserStore } from "../../../store/useUserStore";
+import { UserStar } from "./UserStar";
 
 export function UserAddedStars({ stars, onStarClick }) {
   const { showStarDate } = useUserStore();
@@ -234,7 +234,7 @@ export function UserAddedStars({ stars, onStarClick }) {
                 color={star.color}
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('=== Instanced Star clicked! ===');
+                  console.log("=== Instanced Star clicked! ===");
                   console.log(`日付：${star.date}、座標:${star.position}`);
                   if (onStarClick) onStarClick(star);
                 }}
@@ -243,24 +243,32 @@ export function UserAddedStars({ stars, onStarClick }) {
           </Instances>
 
           {/* 日付ラベル (TextはInstancedMeshに含められないため独立レンダリング, ただしBillboardを外して超軽量化) */}
-          {showStarDate && staticStars.map((star) => {
-            const dateStr = typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date;
-            if (!dateStr) return null;
-            return (
-              <Text
-                key={`date-${star.id}`}
-                position={[star.position[0], star.position[1] - (star.scale * 0.6), star.position[2]]}
-                fontSize={0.5}
-                color="white"
-                anchorX="center"
-                anchorY="top"
-                outlineWidth={0.02}
-                outlineColor="#000000"
-              >
-                {dateStr}
-              </Text>
-            );
-          })}
+          {showStarDate &&
+            staticStars.map((star) => {
+              const dateStr =
+                typeof star.id === "string" && star.id.startsWith("debug-")
+                  ? null
+                  : star.display_date;
+              if (!dateStr) return null;
+              return (
+                <Text
+                  key={`date-${star.id}`}
+                  position={[
+                    star.position[0],
+                    star.position[1] - star.scale * 0.6,
+                    star.position[2],
+                  ]}
+                  fontSize={0.5}
+                  color="white"
+                  anchorX="center"
+                  anchorY="top"
+                  outlineWidth={0.02}
+                  outlineColor="#000000"
+                >
+                  {dateStr}
+                </Text>
+              );
+            })}
         </>
       )}
 
@@ -272,11 +280,15 @@ export function UserAddedStars({ stars, onStarClick }) {
           color={star.color}
           scale={star.scale}
           random={star.random}
-          date={typeof star.id === 'string' && star.id.startsWith('debug-') ? null : star.display_date}
+          date={
+            typeof star.id === "string" && star.id.startsWith("debug-")
+              ? null
+              : star.display_date
+          }
           starData={star}
           onStarClick={onStarClick}
         />
       ))}
     </group>
-  )
+  );
 }

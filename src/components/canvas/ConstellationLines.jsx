@@ -1,9 +1,9 @@
-import { useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Billboard, useTexture } from '@react-three/drei';
-import { useStarStore } from '../../store/useStarStore';
-import { CONSTELLATIONS } from '../../data/constellationData';
-import * as THREE from 'three';
+import { useRef, useMemo } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Billboard, useTexture } from "@react-three/drei";
+import { useStarStore } from "../../store/useStarStore";
+import { CONSTELLATIONS } from "../../data/constellationData";
+import * as THREE from "three";
 
 // --- カスタムシェーダーマテリアル ---
 // 距離カリングと流れる光の効果を組み合わせた軽量なラインマテリアル
@@ -50,38 +50,47 @@ function ShaderGlowingLine({ start, end, color = "#e0e0ff" }) {
     const geometry = useMemo(() => {
         const geo = new THREE.BufferGeometry();
         const vertices = new Float32Array([
-            start[0], start[1], start[2],
-            end[0], end[1], end[2]
+            start[0],
+            start[1],
+            start[2],
+            end[0],
+            end[1],
+            end[2],
         ]);
-        const uvs = new Float32Array([
-            0, 0,
-            1, 0
-        ]);
-        geo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-        geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+        const uvs = new Float32Array([0, 0, 1, 0]);
+        geo.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+        geo.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
         return geo;
     }, [start, end]);
 
     // 線分の中点を計算（カメラとの距離判定用）
-    const center = useMemo(() => new THREE.Vector3(
-        (start[0] + end[0]) / 2,
-        (start[1] + end[1]) / 2,
-        (start[2] + end[2]) / 2
-    ), [start, end]);
+    const center = useMemo(
+        () =>
+            new THREE.Vector3(
+                (start[0] + end[0]) / 2,
+                (start[1] + end[1]) / 2,
+                (start[2] + end[2]) / 2,
+            ),
+        [start, end],
+    );
 
     // カスタムマテリアル
-    const material = useMemo(() => new THREE.ShaderMaterial({
-        vertexShader: glowLineVertexShader,
-        fragmentShader: glowLineFragmentShader,
-        uniforms: {
-            uTime: { value: 0 },
-            uColor: { value: new THREE.Color(color) },
-            uOpacity: { value: 0.0 }
-        },
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false, // 線同士の重なりでおかしくならないように
-    }), [color]);
+    const material = useMemo(
+        () =>
+            new THREE.ShaderMaterial({
+                vertexShader: glowLineVertexShader,
+                fragmentShader: glowLineFragmentShader,
+                uniforms: {
+                    uTime: { value: 0 },
+                    uColor: { value: new THREE.Color(color) },
+                    uOpacity: { value: 0.0 },
+                },
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false, // 線同士の重なりでおかしくならないように
+            }),
+        [color],
+    );
 
     useFrame((state, delta) => {
         if (!materialRef.current) return;
@@ -104,24 +113,30 @@ function ShaderGlowingLine({ start, end, color = "#e0e0ff" }) {
             targetOpacity = 1.0;
         } else if (distance < maxVisibleDistance) {
             // fadeStartDistance から maxVisibleDistance に向かって 1.0 -> 0.0 に減少
-            targetOpacity = 1.0 - ((distance - fadeStartDistance) / (maxVisibleDistance - fadeStartDistance));
+            targetOpacity =
+                1.0 -
+                (distance - fadeStartDistance) /
+                (maxVisibleDistance - fadeStartDistance);
         }
 
         // カメラが極端に引いている時（Zが大きいなど）も念のため隠す
         if (camera.position.z > 80) {
-            targetOpacity *= Math.max(0, 1.0 - ((camera.position.z - 80) / 20));
+            targetOpacity *= Math.max(0, 1.0 - (camera.position.z - 80) / 20);
         }
 
         materialRef.current.material.uniforms.uOpacity.value = targetOpacity;
     });
 
-    return (
-        <line geometry={geometry} material={material} ref={materialRef} />
-    );
+    return <line geometry={geometry} material={material} ref={materialRef} />;
 }
 
 // --- 背景テクスチャ用コンポーネント ---
-function ConstellationBackground({ url, position, size, visibleDistance = 150 }) {
+function ConstellationBackground({
+    url,
+    position,
+    size,
+    visibleDistance = 150,
+}) {
     const texture = useTexture(url);
     const materialRef = useRef();
 
@@ -133,11 +148,11 @@ function ConstellationBackground({ url, position, size, visibleDistance = 150 })
         if (dist < 80.0) {
             opacity = 0.3; // 最大透明度
         } else if (dist < visibleDistance) {
-            opacity = 0.3 * (1.0 - ((dist - 80.0) / (visibleDistance - 80.0)));
+            opacity = 0.3 * (1.0 - (dist - 80.0) / (visibleDistance - 80.0));
         }
 
         // Z退避時
-        if (camera.position.z > 80) opacity = 0;
+        if (camera.position.z > 80) opacity = 0.2;
 
         materialRef.current.opacity = opacity;
     });
@@ -168,7 +183,7 @@ export function ConstellationLines() {
     const activeNodes = {};
 
     // Reactの再レンダリングループ内で重い処理を避けるため、一回のループでマップを構築
-    stars.forEach(s => {
+    stars.forEach((s) => {
         const cConfig = s.analysis_data?.constellation;
         if (cConfig) {
             if (!activeNodes[cConfig.id]) {
@@ -180,32 +195,41 @@ export function ConstellationLines() {
 
     return (
         <group>
-            {CONSTELLATIONS.map(c => {
+            {CONSTELLATIONS.map((c) => {
                 const cNodes = activeNodes[c.id];
                 if (!cNodes) return null;
 
                 // テスト用テクスチャ表示ロジック
                 // 星座のバウンディングボックスの中心を計算します
-                let centerX = 0, centerY = 0, centerZ = 0;
+                let centerX = 0,
+                    centerY = 0,
+                    centerZ = 0;
                 let activeCount = Object.keys(cNodes).length;
                 let bgRender = null;
 
                 const supportedBackgrounds = [
-                    "monoceros", "andromeda", "sagittarius", "delphinus",
-                    "indus", "pisces", "lepus", "bootes", "hydra"
+                    "monoceros",
+                    "andromeda",
+                    "sagittarius",
+                    "delphinus",
+                    "indus",
+                    "pisces",
+                    "lepus",
+                    "bootes",
+                    "hydra",
                 ];
 
                 // 画像ごとの位置合わせ用オフセットとサイズ
                 const backgroundConfig = {
-                    "monoceros": { offsetX: 2, offsetY: 5, scale: 1 },
-                    "andromeda": { offsetX: -7, offsetY: -4, scale: 1.4 },
-                    "sagittarius": { offsetX: 0, offsetY: 5, scale: 1.15 },
-                    "delphinus": { offsetX: -3, offsetY: -7, scale: 1.2 },
-                    "indus": { offsetX: 2, offsetY: 5, scale: 1.2 },
-                    "pisces": { offsetX: 0, offsetY: 7, scale: 1.2 },
-                    "lepus": { offsetX: -2, offsetY: 4, scale: 1 },
-                    "bootes": { offsetX: 0, offsetY: 0, scale: 1.2 },
-                    "hydra": { offsetX: 0, offsetY: 0, scale: 1.2 }
+                    monoceros: { offsetX: 2, offsetY: 5, scale: 1 },
+                    andromeda: { offsetX: -7, offsetY: -4, scale: 1.4 },
+                    sagittarius: { offsetX: 0, offsetY: 5, scale: 1.15 },
+                    delphinus: { offsetX: -3, offsetY: -7, scale: 1.2 },
+                    indus: { offsetX: 2, offsetY: 5, scale: 1.2 },
+                    pisces: { offsetX: 0, offsetY: 7, scale: 1.2 },
+                    lepus: { offsetX: -2, offsetY: 4, scale: 1 },
+                    bootes: { offsetX: 0, offsetY: 0, scale: 1.2 },
+                    hydra: { offsetX: 0, offsetY: 0, scale: 1.2 },
                 };
 
                 if (supportedBackgrounds.includes(c.id) && activeCount >= c.starCount) {
@@ -218,14 +242,22 @@ export function ConstellationLines() {
                     centerY /= activeCount;
                     centerZ /= activeCount;
 
-                    const config = backgroundConfig[c.id] || { offsetX: 0, offsetY: 0, scale: 1.0 };
+                    const config = backgroundConfig[c.id] || {
+                        offsetX: 0,
+                        offsetY: 0,
+                        scale: 1.0,
+                    };
                     const finalSize = 70 * config.scale;
 
                     // 星のZ軸より少し奥に配置
                     bgRender = (
                         <ConstellationBackground
                             url={`/test_${c.id}.png`}
-                            position={[centerX + config.offsetX, centerY + config.offsetY, centerZ - 2]}
+                            position={[
+                                centerX + config.offsetX,
+                                centerY + config.offsetY,
+                                centerZ - 2,
+                            ]}
                             size={finalSize} // boxWidth=60に対し少し大きめに設定
                         />
                     );
@@ -234,24 +266,25 @@ export function ConstellationLines() {
                 return (
                     <group key={`constellation-group-${c.id}`}>
                         {bgRender}
-                        {activeCount >= c.starCount * 0.8 && c.lines.map((lineDef, idx) => {
-                            const [indexA, indexB] = lineDef;
-                            const posA = cNodes[indexA];
-                            const posB = cNodes[indexB];
+                        {activeCount >= c.starCount * 0.8 &&
+                            c.lines.map((lineDef, idx) => {
+                                const [indexA, indexB] = lineDef;
+                                const posA = cNodes[indexA];
+                                const posB = cNodes[indexB];
 
-                            // 線の両端の星が存在する場合のみ描画する
-                            if (posA && posB) {
-                                return (
-                                    <ShaderGlowingLine
-                                        key={`line-${c.id}-${idx}`}
-                                        start={posA}
-                                        end={posB}
-                                        color="#e0e0ff"
-                                    />
-                                );
-                            }
-                            return null;
-                        })}
+                                // 線の両端の星が存在する場合のみ描画する
+                                if (posA && posB) {
+                                    return (
+                                        <ShaderGlowingLine
+                                            key={`line-${c.id}-${idx}`}
+                                            start={posA}
+                                            end={posB}
+                                            color="#e0e0ff"
+                                        />
+                                    );
+                                }
+                                return null;
+                            })}
                     </group>
                 );
             })}
