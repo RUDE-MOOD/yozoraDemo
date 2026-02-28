@@ -59,7 +59,9 @@ export function TutorialOverlay() {
             origPosition: el.style.position || undefined,
         });
         el.style.zIndex = '10000';
-        el.style.position = 'relative';
+        if (window.getComputedStyle(el).position === 'static') {
+            el.style.position = 'relative';
+        }
 
         // 親要素を走査して、z-index でスタッキングコンテキストを作っているものも引き上げる
         let current = el.parentElement;
@@ -275,6 +277,15 @@ export function TutorialOverlay() {
                         // Step 8, 16: ユーザーメニューを開くため、メニューを遮らないように画面中央やや下に配置
                         position: 'fixed',
                         top: '50%',
+                        left: '0',
+                        right: '0',
+                        margin: '0 auto',
+                        maxWidth: '90vw',
+                        width: '420px',
+                    } : currentStep === 18 ? {
+                        // Step 18: テーマ選択モーダルの選択肢を遮らないように画面最下部に配置
+                        position: 'fixed',
+                        bottom: '2px',
                         left: '0',
                         right: '0',
                         margin: '0 auto',

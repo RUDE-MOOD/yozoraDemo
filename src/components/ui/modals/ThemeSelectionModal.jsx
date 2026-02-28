@@ -56,8 +56,13 @@ export const ThemeSelectionModal = ({ isOpen, onClose }) => {
             テーマ変更
           </h2>
           <button
-            onClick={onClose}
-            className="absolute right-4 text-white/40 hover:text-white transition-colors"
+            onClick={() => {
+              onClose();
+              if (tutorial.isActive) {
+                tutorial.triggerEvent('THEME_CLOSED');
+              }
+            }}
+            className="theme-close-btn absolute right-4 text-white/40 hover:text-white transition-colors p-2 -mr-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
