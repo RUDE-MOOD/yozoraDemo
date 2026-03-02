@@ -358,6 +358,7 @@ export const UI = ({ onSend, onStarClick }) => {
         const finalAnalysisResult = {
           ...(analysisResult || {}),
           ...(selectedTag ? { tag: selectedTag.tag_name } : {}),
+          ...(tutorial.isActive ? { isTutorial: true } : {}),
         };
         newStarId = await onSend(moodValues, finalAnalysisResult, goodThings);
       }

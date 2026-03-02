@@ -396,6 +396,10 @@ export const useTutorialStore = create((set, get) => ({
         }
         // localStorage のクリーンアップ記録を削除
         try { localStorage.removeItem('pending_tutorial_cleanup'); } catch (e) { /* ignore */ }
+
+        // チュートリアル完了時に時間を現在時刻にリセット
+        setDebugDayOffset(0);
+
         set({
             isActive: false,
             currentStep: 0,

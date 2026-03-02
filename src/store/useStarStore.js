@@ -25,12 +25,14 @@ export const useStarStore = create((set, get) => ({
             return;
         }
 
-        // rgbをColorインスタンスに還元し、mood_valuesをanalysis_dataから復元
-        const starsWithColor = data.map(star => ({
-            ...star,
-            color: new Color(star.color.r, star.color.g, star.color.b),
-            mood_values: star.analysis_data?.moodValues ?? star.mood_values ?? null,
-        }));
+        // チュートリアルの星を除外し、rgbをColorインスタンスに還元し、mood_valuesをanalysis_dataから復元
+        const starsWithColor = data
+            .filter(star => !star.analysis_data?.isTutorial)
+            .map(star => ({
+                ...star,
+                color: new Color(star.color.r, star.color.g, star.color.b),
+                mood_values: star.analysis_data?.moodValues ?? star.mood_values ?? null,
+            }));
 
         set({ stars: starsWithColor });
     },
@@ -115,6 +117,10 @@ export const useStarStore = create((set, get) => ({
                 { event: 'INSERT', schema: 'public', table: 't_stars' },
                 (payload) => {
                     const newRow = payload.new;
+
+                    // チュートリアルの星はスキップ
+                    if (newRow.analysis_data?.isTutorial) return;
+
                     // 既にローカルに存在する場合はスキップ（自分が追加した星の重複防止）
                     const currentStars = useStarStore.getState().stars;
                     if (currentStars.some((s) => s.id === newRow.id)) return;

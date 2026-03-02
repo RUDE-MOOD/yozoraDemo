@@ -8,14 +8,18 @@
  * 日記周期: 毎日 6:00 AM 〜 翌日 6:00 AM を1周期とする。
  */
 
-const STORAGE_KEY = "yozora_debugDayOffset";
+import { useUserStore } from '../store/useUserStore';
+
+const BASE_STORAGE_KEY = "yozora_debugDayOffset";
 const RESET_HOUR = 6; // 日記リセット時刻（6:00 AM）
 
 // --- Debug Day Offset（localStorage 永続化） ---
 
 export function getDebugDayOffset() {
     try {
-        const val = localStorage.getItem(STORAGE_KEY);
+        const user = useUserStore.getState().user;
+        const key = user ? `${BASE_STORAGE_KEY}_${user.id}` : BASE_STORAGE_KEY;
+        const val = localStorage.getItem(key);
         return val ? parseInt(val, 10) || 0 : 0;
     } catch {
         return 0;
@@ -24,7 +28,9 @@ export function getDebugDayOffset() {
 
 export function setDebugDayOffset(days) {
     try {
-        localStorage.setItem(STORAGE_KEY, String(days));
+        const user = useUserStore.getState().user;
+        const key = user ? `${BASE_STORAGE_KEY}_${user.id}` : BASE_STORAGE_KEY;
+        localStorage.setItem(key, String(days));
     } catch {
         // localStorage が使えない環境では無視
     }
