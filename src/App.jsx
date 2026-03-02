@@ -17,6 +17,7 @@ import { supabase } from './supabaseClient';
 import { useUserStore } from './store/useUserStore';
 
 import { translateAuthError } from './utils/errorTranslator';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   // Zustand storeから星のデータと追加関数を取得
@@ -107,6 +108,7 @@ function App() {
 
   return (
     <>
+      <Analytics />
 
       {phase === 'loading' && null}
 
