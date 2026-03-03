@@ -196,7 +196,7 @@ export const StarDetailModal = ({ isOpen, onClose, starData }) => {
                 7
               </span>
               <span className="text-white text-[14px] font-bold tracking-[0.05em]" style={{ fontFamily: "'Kiwi Maru', sans-serif" }}>
-                チュートリアル
+                星の情報を確認しましょう
               </span>
             </div>
             <p className="text-[rgba(255,255,255,0.9)] text-[13px] leading-[1.8] whitespace-pre-line m-0" style={{ fontFamily: "'Kiwi Maru', sans-serif" }}>
