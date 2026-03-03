@@ -117,6 +117,16 @@ export const LogViewsModal = ({ onClose, onLogClick }) => {
   if (user && user.created_at) {
     minDate = new Date(user.created_at);
   }
+  // テストデータのようにアカウント作成日より古い星がある場合を考慮
+  if (stars && stars.length > 0) {
+    const oldestStarTime = Math.min(
+      ...stars.map((s) => new Date(s.created_at).getTime())
+    );
+    const oldestStarDate = new Date(oldestStarTime);
+    if (oldestStarDate < minDate) {
+      minDate = oldestStarDate;
+    }
+  }
 
   const isMinMonth =
     currentDate.getFullYear() < minDate.getFullYear() ||
