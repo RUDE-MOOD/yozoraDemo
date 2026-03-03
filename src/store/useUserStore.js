@@ -9,7 +9,7 @@ export const useUserStore = create(
             user: null, // { id, email }
             session: null,
             showStarDate: true, // 星の下の日付を表示するかどうか
-            showWelcomeText: true, // ログイン時の「Nostargia」ウェルカムテキストを表示するかどうか
+            showWelcomeText: false, // ログイン時の「Nostargia」ウェルカムテキストを表示するかどうか
             showRocketSkipButton: false, // 開発者用クイックスキップボタンを表示するかどうか
 
             setUser: (user) => set({ user }),
