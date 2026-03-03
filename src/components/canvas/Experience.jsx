@@ -90,6 +90,9 @@ const FrameLimiter = () => {
   return null;
 };
 
+// モバイル判定（片手ピンチ操作の最適化に使用）
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
   const cameraControlsRef = useRef();
   const skyboxType = useThemeStore((state) => state.skyboxType);
@@ -129,8 +132,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
         maxZoom={2} // 最大ズーム倍率 (これ以上拡大できない)
         minDistance={10} // カメラの最小距離 (被写体に近づける限界)
         maxDistance={100} // カメラの最大距離 (被写体から離れられる限界 - これで黒い背景が見えるのを防ぐ)
-        dollySpeed={2} // ズーム速度 (-2 にするとピンチ操作の方向が反転します)
-        //! できれば上のdollySpeedはPCとモバイルに分けて、PCだと2、モバイルだと-2にする。-2のままにしたらPCのスクロールが反転になっちゃう
+        dollySpeed={isMobile ? 1 : 2} // PC: ホイールズーム速度2, モバイル: ピンチズーム速度1
         azimuthRotateSpeed={0} // 水平方向の回転速度 (0 = 回転無効)
         polarRotateSpeed={0} // 垂直方向の回転速度 (0 = 回転無効)
         truckSpeed={5} // 平行移動(ドラッグ)の速度
@@ -142,7 +144,7 @@ export const Experience = ({ userStars = [], onStarClick, focusTarget }) => {
         }}
         touches={{
           one: 2, // 1本指タッチ: 2 = TRUCK (平行移動)
-          two: 16, // 2本指タッチ: 16 = ZOOM (ピンチズーム)
+          two: 4096, // 2本指タッチ: 4096 = TOUCH_DOLLY_TRUCK (ピンチズーム＋パン同時処理 — 片手ピンチ対応)
           three: 0, // 3本指タッチ: 0 = 無効
         }}
         imgui={false} // デバッグUIの表示 (false = 非表示)
