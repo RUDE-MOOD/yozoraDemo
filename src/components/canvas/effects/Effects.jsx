@@ -32,7 +32,7 @@ export const Effects = ({ isLowPerformance = false }) => {
   }, { collapsed: true });
 
   return (
-    <EffectComposer disableNormalPass multisampling={0}>
+    <EffectComposer disableNormalPass multisampling={isLowPerformance ? 0 : 4}>
       {/* 
         Bloom (輝き):
         星の輝きや発光感を強調します。
