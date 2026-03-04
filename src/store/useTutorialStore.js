@@ -283,7 +283,7 @@ export const useTutorialStore = create((set, get) => ({
     // 冷却中なら日付をスキップ
     let offset = getDebugDayOffset();
     let attempts = 0;
-    while (isCooldownFn(stars) && attempts < 30) {
+    while (isCooldownFn(stars) && attempts < 100) {
       offset += 1;
       setDebugDayOffset(offset);
       attempts++;
@@ -403,6 +403,13 @@ export const useTutorialStore = create((set, get) => ({
     } catch (e) {
       /* ignore */
     }
+    // チュートリアル中止時に時間を現在時刻にリセット
+    try {
+      setDebugDayOffset(0);
+    } catch (e) {
+      console.error("Failed to reset time offset:", e);
+    }
+
     set({
       isActive: false,
       currentStep: 0,
