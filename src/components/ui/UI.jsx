@@ -1037,6 +1037,7 @@ export const UI = ({ onSend, onStarClick }) => {
                 </div>
               </div>
 
+
               <button
                 onClick={() => setDebugOpen(false)}
                 className="w-full py-2 mt-4 bg-white/10 text-white rounded hover:bg-white/20 text-sm"

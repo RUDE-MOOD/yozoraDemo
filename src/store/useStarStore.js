@@ -34,7 +34,52 @@ export const useStarStore = create((set, get) => ({
                 mood_values: star.analysis_data?.moodValues ?? star.mood_values ?? null,
             }));
 
-        set({ stars: starsWithColor });
+        // イルカ座・兎座の古い座標を正しい位置に自動補正する（ハッシュ衝突による位置ずれを修正）
+        const { CONSTELLATIONS } = await import('../data/constellationData.js');
+        const delphinusData = CONSTELLATIONS.find(c => c.id === 'delphinus');
+        const lepusData = CONSTELLATIONS.find(c => c.id === 'lepus');
+        const boxWidth = 60;
+        const boxHeight = 60;
+
+        const starsWithFixedPositions = starsWithColor.map(star => {
+            const cid = star.analysis_data?.constellation?.id;
+            const nodeIndex = star.analysis_data?.constellation?.nodeIndex;
+
+            // イルカ座: 古い座標（x < 0）を新しい位置に補正
+            if (cid === 'delphinus' && star.position[0] < 0) {
+                const nodeNormalized = delphinusData?.starPositions?.[nodeIndex];
+                if (nodeNormalized) {
+                    const centerX = 180, centerY = 50, baseZ = 0;
+                    const localX = (nodeNormalized.x - 0.5) * boxWidth;
+                    const localY = (0.5 - nodeNormalized.y) * boxHeight;
+                    return { ...star, position: [centerX + localX, centerY + localY, baseZ] };
+                }
+            }
+
+            // 兎座: 古い座標（x < 0）を新しい位置に補正
+            if (cid === 'lepus' && star.position[0] < 0) {
+                const nodeNormalized = lepusData?.starPositions?.[nodeIndex];
+                if (nodeNormalized) {
+                    const centerX = 220, centerY = -100, baseZ = 0;
+                    const localX = (nodeNormalized.x - 0.5) * boxWidth;
+                    const localY = (0.5 - nodeNormalized.y) * boxHeight;
+                    return { ...star, position: [centerX + localX, centerY + localY, baseZ] };
+                }
+            }
+
+            return star;
+        });
+
+        const delphinusStars = starsWithFixedPositions.filter(s => s.analysis_data?.constellation?.id === 'delphinus');
+        console.log("FE fetched stars:", starsWithFixedPositions.length, delphinusStars.length, "are delphinus");
+        if (delphinusStars.length > 0) {
+            delphinusStars.forEach(s => {
+                const p = s.position;
+                console.log(`[DEBUG] Delphinus star ${s.id.slice(0, 8)} node${s.analysis_data?.constellation?.nodeIndex}: x=${p[0]?.toFixed(2)}, y=${p[1]?.toFixed(2)}, z=${p[2]?.toFixed(2)}`);
+            });
+        }
+
+        set({ stars: starsWithFixedPositions });
     },
 
     // UIから星を追加する
@@ -163,9 +208,23 @@ export const useStarStore = create((set, get) => ({
         const prngY = ((hash * 13) % 100) / 100;
         const prngZ = ((hash * 17) % 100) / 100;
 
-        const centerX = minX + prngX * (maxX - minX);
-        const centerY = minY + prngY * (maxY - minY);
-        const baseZ = -10 + prngZ * 15;
+        let centerX = minX + prngX * (maxX - minX);
+        let centerY = minY + prngY * (maxY - minY);
+        let baseZ = -10 + prngZ * 15;
+
+        // イルカ座（delphinus）がウミヘビ座（hydra）と座標被り（ハッシュ衝突）するため、固定の別座標に手動設定
+        if (target.id === "delphinus") {
+            centerX = 180;
+            centerY = 50;
+            baseZ = 0;
+        }
+
+        // 兎座（lepus）も他の星座と近い位置にあるため、右下の空きエリアに移動
+        if (target.id === "lepus") {
+            centerX = 220;
+            centerY = -100;
+            baseZ = 0;
+        }
 
         const mockStars = [];
         for (let i = 0; i < target.starCount; i++) {

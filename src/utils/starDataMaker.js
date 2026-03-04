@@ -95,9 +95,23 @@ export const starDataMaker = ({ moodValues, existingStars = [] }) => {
         const prngY = ((hash * 13) % 100) / 100;
         const prngZ = ((hash * 17) % 100) / 100;
 
-        const centerX = minX + prngX * (maxX - minX);
-        const centerY = minY + prngY * (maxY - minY);
-        const baseZ = -10 + prngZ * 15; // -10 ~ 5 の間
+        let centerX = minX + prngX * (maxX - minX);
+        let centerY = minY + prngY * (maxY - minY);
+        let baseZ = -10 + prngZ * 15; // -10 ~ 5 の間
+
+        // イルカ座（delphinus）がウミヘビ座（hydra）と座標被り（ハッシュ衝突）するため、固定の別座標に手動設定
+        if (targetConstellation.id === "delphinus") {
+            centerX = 180;
+            centerY = 50;
+            baseZ = 0;
+        }
+
+        // 兎座（lepus）も他の星座と近い位置にあるため、右下の空きエリアに移動
+        if (targetConstellation.id === "lepus") {
+            centerX = 220;
+            centerY = -100;
+            baseZ = 0;
+        }
 
         const nodeNormalized = targetConstellation.starPositions[targetNodeIndex];
 
